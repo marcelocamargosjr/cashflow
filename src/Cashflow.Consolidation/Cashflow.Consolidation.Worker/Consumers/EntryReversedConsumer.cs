@@ -65,6 +65,7 @@ public sealed class EntryReversedConsumer : IConsumer<EntryReversedV1>
         catch (MongoWriteException ex)
             when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
+            // Idempotência: outro consumer já registrou esse EventId — nada a fazer.
         }
 
         if (!applied)
