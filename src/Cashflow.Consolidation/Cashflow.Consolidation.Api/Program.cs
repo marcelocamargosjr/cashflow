@@ -58,7 +58,9 @@ builder.Services
 builder.Services.AddCashflowAuthorization();
 
 // ====== HealthChecks (Mongo + Redis + Keycloak JWKS + RabbitMQ socket) ======
-var mongoConn = builder.Configuration["Mongo:ConnectionString"]
+// Mongo connection string é consumida pelo MongoContext via DI — aqui validamos
+// a presença para falhar cedo no boot.
+_ = builder.Configuration["Mongo:ConnectionString"]
     ?? throw new InvalidOperationException("Mongo:ConnectionString missing");
 var redisConn = builder.Configuration["Redis:ConnectionString"]
     ?? throw new InvalidOperationException("Redis:ConnectionString missing");

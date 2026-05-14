@@ -12,7 +12,12 @@ namespace Cashflow.SharedKernel.Http;
 /// </summary>
 public static class ProblemDetailsTypes
 {
+    // S1075 silenciado: a URI canônica de "type" do RFC 7807 é um identificador
+    // opaco do tipo de erro, não um endpoint externo. Movê-la para configuração
+    // quebraria a interoperabilidade com clientes que indexam por este valor.
+#pragma warning disable S1075
     public const string BaseUri = "https://cashflow.local/errors/";
+#pragma warning restore S1075
 
     public const string Validation = BaseUri + "validation";
     public const string Unauthorized = BaseUri + "unauthorized";

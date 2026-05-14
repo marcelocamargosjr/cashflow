@@ -207,4 +207,10 @@ static bool HasRealmRole(ClaimsPrincipal user, string role)
         || user.HasClaim(c => string.Equals(c.Type, "roles", StringComparison.Ordinal) && string.Equals(c.Value, role, StringComparison.Ordinal));
 }
 
+// S1118 silenciado: top-level statements em C# 9+ sintetizam um `internal partial
+// class Program` no global namespace. A redeclaração public partial existe para
+// que WebApplicationFactory<Program> em integration tests consiga referenciar o
+// tipo. Não é uma utility class — não cabe `static` nem ctor protected.
+#pragma warning disable S1118
 public partial class Program;
+#pragma warning restore S1118

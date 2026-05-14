@@ -30,7 +30,7 @@ internal sealed class ListEntriesQueryHandler(IEntryRepository entryRepository)
             .ThenByDescending(e => e.CreatedAt)
             .Skip((request.Page - 1) * request.Size)
             .Take(request.Size)
-            .ToList()
+            .AsEnumerable()
             .Select(EntryDto.FromEntity)
             .ToList();
 
