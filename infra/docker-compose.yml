@@ -180,6 +180,127 @@ services:
       retries: 30
       start_period: 60s
 
+  # ==================== OBSERVABILITY ====================
+  # (Profile `core` — sobem junto com `make up`; usados por OTel export, Grafana
+  #  e Prometheus scrape. otel-collector é a porta única para os serviços .NET
+  #  (gRPC :4317). Healthchecks reais; dashboards e datasources provisionados.)
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.107.0
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-otel-collector
+    command: ["--config=/etc/otel-collector/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector/config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus pull endpoint
+      - "13133:13133" # health_check extension
+    networks: [cashflow-net, observability-net]
+    depends_on:
+      tempo: { condition: service_started }
+      loki:  { condition: service_started }
+    # Imagem distroless do otel-collector não tem sh nem wget; usamos a sonda
+    # nativa via `otelcol_process_uptime_seconds` exposto pelo próprio binário
+    # em :8888/metrics (telemetria do collector). Se o binário não estiver
+    # vivo a TCP conexão falha — wget no contrib image existe via "otelcol-contrib"
+    # mas usar binário interno é mais robusto. Simples: removemos o healthcheck e
+    # confiamos no port-binding (depends_on não usa otel como gate).
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=24h
+      - --web.enable-remote-write-receiver
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheusdata:/prometheus
+    networks: [cashflow-net, observability-net]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  loki:
+    image: grafana/loki:3.2.0
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-loki
+    command: ["-config.file=/etc/loki/loki-config.yaml"]
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - lokidata:/loki
+    networks: [observability-net]
+    user: "0:0"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3100/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  tempo:
+    image: grafana/tempo:2.6.0
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-tempo
+    command: ["-config.file=/etc/tempo/tempo-config.yaml"]
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./tempo/tempo-config.yaml:/etc/tempo/tempo-config.yaml:ro
+      - tempodata:/var/tempo
+    networks: [observability-net]
+    user: "0:0"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3200/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-grafana
+    depends_on:
+      prometheus: { condition: service_healthy }
+      loki:       { condition: service_healthy }
+      tempo:      { condition: service_healthy }
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_FEATURE_TOGGLES_ENABLE: traceqlEditor,tempoSearch,tempoServiceGraph
+      GF_LOG_LEVEL: warn
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    networks: [observability-net]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
   # ==================== APP ====================
 
   ledger-api:
@@ -354,3 +475,7 @@ volumes:
   rabbitdata: {}
   redisdata: {}
   keycloakdata: {}
+  prometheusdata: {}
+  lokidata: {}
+  tempodata: {}
+  grafanadata: {}

@@ -165,10 +165,28 @@ public sealed class ProjectionService : IProjectionService
         catch (MongoWriteException ex)
             when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
-            // Upsert raced against another consumer for the same `_id` but a different
-            // event. Treat as guard-blocked: the writer that wins persists; ours is a no-op.
+            // Upsert raced against another consumer for the same `_id`. The doc now
+            // exists; our event is NOT yet applied. Retry Pass 1 (existing bucket) and
+            // then Pass 2 without upsert. The guard ensures we never apply twice.
             _logger.LogInformation(
-                "Event {EventId} for {Id} hit DuplicateKey on upsert — treated as guard-blocked",
+                "Event {EventId} for {Id} hit DuplicateKey on upsert — retrying as non-upsert update",
+                eventId, id);
+
+            var retryPass1 = await _context.DailyBalances
+                .UpdateOneAsync(pass1Filter, pass1Update, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            if (retryPass1.ModifiedCount > 0)
+                return true;
+
+            var retryOptions = new UpdateOptions { IsUpsert = false };
+            var retryPass2 = await _context.DailyBalances
+                .UpdateOneAsync(pass2Filter, pass2Update, retryOptions, cancellationToken)
+                .ConfigureAwait(false);
+            if (retryPass2.ModifiedCount > 0)
+                return true;
+
+            _logger.LogWarning(
+                "Event {EventId} for {Id} could not be applied after DuplicateKey retry — guard most likely matched",
                 eventId, id);
             return false;
         }

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Cashflow.Consolidation.Application.Abstractions;
 using Cashflow.Consolidation.Domain.Projections;
+using Cashflow.SharedKernel.Observability;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -53,13 +54,28 @@ public sealed class RedisDailyBalanceCache : IDailyBalanceCache
             var db = _multiplexer.GetDatabase();
             var value = await db.StringGetAsync(CacheKey(merchantId, date)).ConfigureAwait(false);
             if (value.IsNullOrEmpty)
+            {
+                CashflowMeters.CacheMisses.Add(
+                    1,
+                    new KeyValuePair<string, object?>("key_pattern", "balance:daily"));
                 return null;
+            }
 
-            return JsonSerializer.Deserialize<CachedBalance>(value!, JsonOptions)?.ToReadModel(merchantId);
+            var hit = JsonSerializer.Deserialize<CachedBalance>(value!, JsonOptions)?.ToReadModel(merchantId);
+            if (hit is not null)
+            {
+                CashflowMeters.CacheHits.Add(
+                    1,
+                    new KeyValuePair<string, object?>("key_pattern", "balance:daily"));
+            }
+            return hit;
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Redis cache read failed for {MerchantId} {Date}", merchantId, date);
+            CashflowMeters.CacheMisses.Add(
+                1,
+                new KeyValuePair<string, object?>("key_pattern", "balance:daily"));
             return null;
         }
     }

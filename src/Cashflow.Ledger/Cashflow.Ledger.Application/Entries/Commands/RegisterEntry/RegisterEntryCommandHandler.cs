@@ -3,6 +3,7 @@ using Cashflow.Ledger.Application.Entries.Dtos;
 using Cashflow.Ledger.Domain.Abstractions;
 using Cashflow.Ledger.Domain.Entries;
 using Cashflow.SharedKernel.Domain.ValueObjects;
+using Cashflow.SharedKernel.Observability;
 using Cashflow.SharedKernel.Results;
 using Cashflow.SharedKernel.Time;
 using MediatR;
@@ -32,7 +33,12 @@ internal sealed class RegisterEntryCommandHandler(
         if (existing is not null)
         {
             if (string.Equals(existing.IdempotencyBodyHash, bodyHash, StringComparison.Ordinal))
+            {
+                CashflowMeters.IdempotencyHits.Add(
+                    1,
+                    new KeyValuePair<string, object?>("endpoint", "POST /api/v1/entries"));
                 return new RegisterEntryResult(EntryDto.FromEntity(existing), Replayed: true);
+            }
 
             return LedgerErrors.IdempotencyConflict;
         }
@@ -53,6 +59,11 @@ internal sealed class RegisterEntryCommandHandler(
 
         await _entryRepository.AddAsync(entry, cancellationToken).ConfigureAwait(false);
         await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        CashflowMeters.EntriesRegistered.Add(
+            1,
+            new KeyValuePair<string, object?>("type", request.Type.ToString()),
+            new KeyValuePair<string, object?>("category", request.Category ?? "uncategorized"));
 
         return new RegisterEntryResult(EntryDto.FromEntity(entry), Replayed: false);
     }

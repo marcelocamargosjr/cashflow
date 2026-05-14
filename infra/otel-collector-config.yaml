@@ -1,0 +1,75 @@
+# =============================================================================
+# OpenTelemetry Collector — Cashflow (07 §2.3)
+#
+# Pipelines:
+#   traces  → Tempo (OTLP/gRPC)
+#   metrics → Prometheus (pull /metrics em :8889)
+#   logs    → Loki (OTLP HTTP)
+#
+# Receivers: OTLP gRPC :4317 e HTTP :4318 (apps .NET via Cashflow.SharedKernel
+# .Observability fazem export por gRPC para `otel-collector:4317`).
+# =============================================================================
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+  memory_limiter:
+    check_interval: 5s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: docker
+        action: insert
+
+exporters:
+  # Prometheus pull endpoint — Prometheus scrapeia em :8889 (ver prometheus.yml).
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    send_timestamps: true
+    metric_expiration: 5m
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Loki via OTLP/HTTP — endpoint `/otlp/v1/logs` é roteado automaticamente.
+  otlphttp/loki:
+    endpoint: http://loki:3100/otlp
+
+  # Tempo via OTLP/gRPC (mais eficiente para spans).
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [otlp/tempo]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [otlphttp/loki]
+  telemetry:
+    logs:
+      level: info

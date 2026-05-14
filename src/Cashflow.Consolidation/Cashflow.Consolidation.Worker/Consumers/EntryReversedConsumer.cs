@@ -2,6 +2,7 @@ using Cashflow.Consolidation.Infrastructure.Persistence;
 using Cashflow.Consolidation.Infrastructure.Persistence.Documents;
 using Cashflow.Consolidation.Infrastructure.Projections;
 using Cashflow.Contracts.V1;
+using Cashflow.SharedKernel.Observability;
 using Cashflow.SharedKernel.Time;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -36,6 +37,12 @@ public sealed class EntryReversedConsumer : IConsumer<EntryReversedV1>
     {
         var evt = context.Message;
         var ct = context.CancellationToken;
+
+        var lag = (_clock.UtcNow - evt.OccurredOn).TotalSeconds;
+        if (lag >= 0)
+            CashflowMeters.ProjectionLagSeconds.Record(
+                lag,
+                new KeyValuePair<string, object?>("event", "EntryReversedV1"));
 
         var seen = await _mongo.ProcessedEvents
             .Find(x => x.Id == evt.EventId)
