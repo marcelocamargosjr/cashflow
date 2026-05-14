@@ -1,0 +1,88 @@
+# Compose mínimo para validar o checkpoint F3 (Postgres, RabbitMQ, Keycloak).
+# F5 expande este arquivo com Gateway YARP, observability stack e demais serviços.
+#
+# Uso:
+#   docker compose -f infra/docker-compose.yml --profile core up -d postgres rabbitmq keycloak
+#   docker compose -f infra/docker-compose.yml --profile core down            # preserva volumes
+#   docker compose -f infra/docker-compose.yml --profile core down -v         # limpa volumes
+
+name: cashflow
+
+x-restart: &restart
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-postgres
+    environment:
+      POSTGRES_USER: cashflow
+      POSTGRES_PASSWORD: cashflow
+      POSTGRES_DB: postgres
+    ports:
+      # 5433 no host evita conflito com instalações nativas de PostgreSQL
+      # (a porta padrão 5432 frequentemente já está ocupada em estações dev).
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cashflow -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: cashflow
+      RABBITMQ_DEFAULT_PASS: cashflow
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-keycloak
+    command: ["start-dev", "--import-realm"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
+      KC_DB_USERNAME: cashflow
+      KC_DB_PASSWORD: cashflow
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realm-cashflow.json:/opt/keycloak/data/import/realm-cashflow.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nhost: localhost\\r\\n\\r\\n' >&3 && head -1 <&3 | grep -q 200"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+volumes:
+  postgres-data:
+  rabbitmq-data:

@@ -1,0 +1,85 @@
+{
+  "realm": "cashflow",
+  "enabled": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 3600,
+  "roles": {
+    "realm": [
+      { "name": "merchant", "description": "Merchant role for /entries" },
+      { "name": "admin", "description": "Admin role for /admin endpoints" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "cashflow-api",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "cashflow-api-secret",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "3600"
+      },
+      "protocolMappers": [
+        {
+          "name": "merchantId",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "merchantId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "merchantId",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "role",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "merchant1@cashflow.local",
+      "email": "merchant1@cashflow.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Merchant",
+      "lastName": "One",
+      "attributes": {
+        "merchantId": ["00000000-0000-0000-0000-000000000001"]
+      },
+      "credentials": [
+        { "type": "password", "value": "merchant123", "temporary": false }
+      ],
+      "realmRoles": ["merchant"]
+    },
+    {
+      "username": "admin1@cashflow.local",
+      "email": "admin1@cashflow.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "One",
+      "credentials": [
+        { "type": "password", "value": "admin123", "temporary": false }
+      ],
+      "realmRoles": ["admin"]
+    }
+  ]
+}

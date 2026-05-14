@@ -1,0 +1,4 @@
+# Generated migration files: keep tooling defaults — suppress IDE rules that conflict
+# with what `dotnet ef migrations add` emits.
+[*.cs]
+dotnet_diagnostic.IDE0161.severity = none
