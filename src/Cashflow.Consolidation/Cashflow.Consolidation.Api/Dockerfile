@@ -22,7 +22,7 @@ WORKDIR /src/src/Cashflow.Consolidation/Cashflow.Consolidation.Api
 RUN dotnet publish "Cashflow.Consolidation.Api.csproj" -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 WORKDIR /app
 
 # tzdata gives IANA zone "America/Sao_Paulo" — IClock relies on it.
