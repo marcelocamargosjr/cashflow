@@ -248,7 +248,11 @@ if (app.Environment.IsDevelopment())
             .Options;
         // Empty IServiceProvider: migrations não disparam SaveChangesAsync, então
         // o IPublishEndpoint nunca é resolvido. Evita o ciclo com BusOutbox.
+        // ASP0000 é intencional aqui: precisamos de um SP isolado para migrar sem
+        // tocar o container principal.
+#pragma warning disable ASP0000
         await using var db = new LedgerDbContext(opts, new ServiceCollection().BuildServiceProvider(), app.Services.GetRequiredService<IClock>());
+#pragma warning restore ASP0000
         Console.WriteLine("[BOOT][mig] DbContext created manually");
         Console.Out.Flush();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));

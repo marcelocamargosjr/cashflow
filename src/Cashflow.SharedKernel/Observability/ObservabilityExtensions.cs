@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Logs;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -20,10 +19,12 @@ public static class ObservabilityExtensions
 
     /// <summary>
     /// Configures OpenTelemetry traces + metrics + logs and Serilog with OTLP sink.
-    /// Matches `07-INFRA-E-DEVOPS.md §2.1` and `§2.2`.
+    /// Works on both <see cref="Microsoft.AspNetCore.Builder.WebApplicationBuilder"/> and
+    /// <see cref="HostApplicationBuilder"/> (the worker host) — they share
+    /// <see cref="IHostApplicationBuilder"/>. Matches `07-INFRA-E-DEVOPS.md §2.1` and `§2.2`.
     /// </summary>
-    public static WebApplicationBuilder AddCashflowObservability(
-        this WebApplicationBuilder builder,
+    public static IHostApplicationBuilder AddCashflowObservability(
+        this IHostApplicationBuilder builder,
         string serviceName,
         string serviceVersion)
     {
@@ -37,14 +38,14 @@ public static class ObservabilityExtensions
     }
 
     private static void ConfigureSerilog(
-        WebApplicationBuilder builder,
+        IHostApplicationBuilder builder,
         string serviceName,
         string serviceVersion,
         string otelEndpoint,
         string environment)
     {
-        builder.Host.UseSerilog((ctx, lc) => lc
-            .ReadFrom.Configuration(ctx.Configuration)
+        var logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
             .Enrich.WithMachineName()
             .Enrich.WithSpan()
@@ -62,7 +63,15 @@ public static class ObservabilityExtensions
                     ["service.version"] = serviceVersion,
                     ["deployment.environment"] = environment
                 };
-            }));
+            })
+            .CreateLogger();
+
+        // Static Log.Logger is the fallback used by Serilog.Context (LogContext)
+        // and by code paths that bypass the DI logger factory.
+        Log.Logger = logger;
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog(logger, dispose: true);
     }
 
     private static void ConfigureOpenTelemetry(
