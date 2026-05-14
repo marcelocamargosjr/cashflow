@@ -70,7 +70,7 @@
 
   <ItemGroup Label="Resilience">
     <PackageVersion Include="Polly" Version="8.5.0" />
-    <PackageVersion Include="Polly.Core" Version="8.5.0" />
+    <PackageVersion Include="Polly.Core" Version="8.6.6" />
   </ItemGroup>
 
   <ItemGroup Label="Application / CQRS / Validation">
