@@ -1,0 +1,279 @@
+===== docs/quality/final.txt — F7.1 Code Hardening final =====
+date(UTC): 2026-05-14T19:21:21Z
+branch: chore/code-hardening
+commit: 9aef651663152cfab7cab6f7b85cba720a67973b
+
+----- [1] dotnet build -c Release -warnaserror -----
+  Determinando os projetos a serem restaurados...
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\Cashflow.Consolidation.Api.csproj restaurado (em 387 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj restaurado (em 386 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\Cashflow.Contracts.csproj restaurado (em 383 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\Cashflow.Ledger.Application.csproj restaurado (em 385 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\Cashflow.SharedKernel.UnitTests.csproj restaurado (em 385 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj restaurado (em 386 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\Cashflow.Ledger.Domain.csproj restaurado (em 385 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\Cashflow.Ledger.UnitTests.csproj restaurado (em 386 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\Cashflow.Consolidation.Domain.csproj restaurado (em 385 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\Cashflow.Consolidation.Worker.csproj restaurado (em 387 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\Cashflow.TestSupport.csproj restaurado (em 411 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\Cashflow.Ledger.IntegrationTests.csproj restaurado (em 402 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\Cashflow.Consolidation.UnitTests.csproj restaurado (em 13 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj restaurado (em 18 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj restaurado (em 19 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Gateway\Cashflow.Gateway.csproj restaurado (em 19 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\Cashflow.Ledger.Api.csproj restaurado (em 33 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\Cashflow.ArchitectureTests.csproj restaurado (em 38 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\Cashflow.Consolidation.IntegrationTests.csproj restaurado (em 43 ms).
+  Cashflow.Contracts -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\bin\Release\net9.0\Cashflow.Contracts.dll
+  Cashflow.Consolidation.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Release\net9.0\Cashflow.Consolidation.UnitTests.dll
+  Cashflow.TestSupport -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Release\net9.0\Cashflow.TestSupport.dll
+  Cashflow.SharedKernel -> C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\bin\Release\net9.0\Cashflow.SharedKernel.dll
+  Cashflow.Ledger.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\bin\Release\net9.0\Cashflow.Ledger.Domain.dll
+  Cashflow.Consolidation.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\bin\Release\net9.0\Cashflow.Consolidation.Domain.dll
+  Cashflow.SharedKernel.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\bin\Release\net9.0\Cashflow.SharedKernel.UnitTests.dll
+  Cashflow.Consolidation.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\bin\Release\net9.0\Cashflow.Consolidation.Application.dll
+  Cashflow.Ledger.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\bin\Release\net9.0\Cashflow.Ledger.Application.dll
+  Cashflow.Consolidation.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\bin\Release\net9.0\Cashflow.Consolidation.Infrastructure.dll
+  Cashflow.Ledger.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\bin\Release\net9.0\Cashflow.Ledger.Infrastructure.dll
+  Cashflow.Ledger.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\bin\Release\net9.0\Cashflow.Ledger.UnitTests.dll
+  Cashflow.Consolidation.Worker -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\bin\Release\net9.0\Cashflow.Consolidation.Worker.dll
+  Cashflow.Gateway -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Gateway\bin\Release\net9.0\Cashflow.Gateway.dll
+  Cashflow.Consolidation.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\bin\Release\net9.0\Cashflow.Consolidation.Api.dll
+  Cashflow.Ledger.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\bin\Release\net9.0\Cashflow.Ledger.Api.dll
+  Cashflow.Consolidation.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\bin\Release\net9.0\Cashflow.Consolidation.IntegrationTests.dll
+  Cashflow.ArchitectureTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\bin\Release\net9.0\Cashflow.ArchitectureTests.dll
+  Cashflow.Ledger.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\bin\Release\net9.0\Cashflow.Ledger.IntegrationTests.dll
+
+Compilação com êxito.
+    0 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:04.75
+
+----- [2] dotnet test (logger console;verbosity=minimal) -----
+  Determinando os projetos a serem restaurados...
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\Cashflow.Consolidation.UnitTests.csproj restaurado (em 735 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\Cashflow.Ledger.Domain.csproj restaurado (em 834 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj restaurado (em 908 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\Cashflow.SharedKernel.UnitTests.csproj restaurado (em 820 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj restaurado (em 846 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\Cashflow.Contracts.csproj restaurado (em 727 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\Cashflow.Consolidation.Domain.csproj restaurado (em 828 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\Cashflow.Ledger.Api.csproj restaurado (em 841 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj restaurado (em 78 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\Cashflow.Consolidation.Worker.csproj restaurado (em 66 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\Cashflow.Ledger.UnitTests.csproj restaurado (em 959 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\Cashflow.Consolidation.Api.csproj restaurado (em 962 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\Cashflow.Ledger.Application.csproj restaurado (em 100 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\Cashflow.ArchitectureTests.csproj restaurado (em 119 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj restaurado (em 29 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\Cashflow.TestSupport.csproj restaurado (em 1,06 seg).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\Cashflow.Ledger.IntegrationTests.csproj restaurado (em 150 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\Cashflow.Consolidation.IntegrationTests.csproj restaurado (em 1,04 seg).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Gateway\Cashflow.Gateway.csproj restaurado (em 112 ms).
+  Cashflow.SharedKernel -> C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\bin\Debug\net9.0\Cashflow.SharedKernel.dll
+  Cashflow.Consolidation.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Debug\net9.0\Cashflow.Consolidation.UnitTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Debug\net9.0\Cashflow.Consolidation.UnitTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+  Cashflow.SharedKernel.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\bin\Debug\net9.0\Cashflow.SharedKernel.UnitTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\bin\Debug\net9.0\Cashflow.SharedKernel.UnitTests.dll (.NETCoreApp,Version=v9.0)
+  Cashflow.TestSupport -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Debug\net9.0\Cashflow.TestSupport.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Debug\net9.0\Cashflow.TestSupport.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Processo testhost para fonte(s) 'C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Debug\net9.0\Cashflow.TestSupport.dll' encerrado com erro: Error:
+  An assembly specified in the application dependencies manifest (Cashflow.TestSupport.deps.json) was not found:
+    package: 'Azure.Core', version: '1.6.0'
+    path: 'lib/netstandard2.0/Azure.Core.dll'
+. Verifique os logs de diagnóstico para mais informações.
+
+Execução de Teste Anulada.
+Não há nenhum teste disponível em C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Debug\net9.0\Cashflow.Consolidation.UnitTests.dll. Verifique se o detector e os executores de teste estão registrados e se as configurações de versão da estrutura da plataforma & são apropriadas e tente novamente.
+
+  Cashflow.Contracts -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\bin\Debug\net9.0\Cashflow.Contracts.dll
+
+Aprovado!  – Com falha:     0, Aprovado:    23, Ignorado:     0, Total:    23, Duração: 111 ms - Cashflow.SharedKernel.UnitTests.dll (net9.0)
+  Cashflow.Ledger.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\bin\Debug\net9.0\Cashflow.Ledger.Domain.dll
+  Cashflow.Ledger.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\bin\Debug\net9.0\Cashflow.Ledger.Application.dll
+  Cashflow.Ledger.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\bin\Debug\net9.0\Cashflow.Ledger.Infrastructure.dll
+  Cashflow.Consolidation.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\bin\Debug\net9.0\Cashflow.Consolidation.Domain.dll
+  Cashflow.Ledger.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\bin\Debug\net9.0\Cashflow.Ledger.UnitTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\bin\Debug\net9.0\Cashflow.Ledger.UnitTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+  Cashflow.Consolidation.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\bin\Debug\net9.0\Cashflow.Consolidation.Application.dll
+
+Aprovado!  – Com falha:     0, Aprovado:    42, Ignorado:     0, Total:    42, Duração: 169 ms - Cashflow.Ledger.UnitTests.dll (net9.0)
+  Cashflow.Consolidation.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\bin\Debug\net9.0\Cashflow.Consolidation.Infrastructure.dll
+  Cashflow.Ledger.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\bin\Debug\net9.0\Cashflow.Ledger.Api.dll
+  Cashflow.Consolidation.Worker -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\bin\Debug\net9.0\Cashflow.Consolidation.Worker.dll
+  Cashflow.Ledger.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\bin\Debug\net9.0\Cashflow.Ledger.IntegrationTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\bin\Debug\net9.0\Cashflow.Ledger.IntegrationTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+
+Aprovado!  – Com falha:     0, Aprovado:     4, Ignorado:     0, Total:     4, Duração: 2 s - Cashflow.Ledger.IntegrationTests.dll (net9.0)
+  Cashflow.Consolidation.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\bin\Debug\net9.0\Cashflow.Consolidation.Api.dll
+  Cashflow.ArchitectureTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\bin\Debug\net9.0\Cashflow.ArchitectureTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\bin\Debug\net9.0\Cashflow.ArchitectureTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+  Cashflow.Consolidation.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\bin\Debug\net9.0\Cashflow.Consolidation.IntegrationTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\bin\Debug\net9.0\Cashflow.Consolidation.IntegrationTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+
+Aprovado!  – Com falha:     0, Aprovado:    11, Ignorado:     0, Total:    11, Duração: 1 s - Cashflow.ArchitectureTests.dll (net9.0)
+
+Aprovado!  – Com falha:     0, Aprovado:     4, Ignorado:     0, Total:     4, Duração: 5 s - Cashflow.Consolidation.IntegrationTests.dll (net9.0)
+
+----- [3] grep -rn Console. src tests --include=*.cs -----
+
+----- [4] dotnet list package --vulnerable --include-transitive -----
+
+As fontes a seguir foram usadas:
+   https://api.nuget.org/v3/index.json
+
+O projeto fornecido `Cashflow.SharedKernel` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Contracts` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Gateway` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Api` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Application` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Domain` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Infrastructure` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Consolidation.Api` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto fornecido `Cashflow.Consolidation.Application` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Domain` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Consolidation.Infrastructure` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto `Cashflow.Consolidation.Worker` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto `Cashflow.ArchitectureTests` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto fornecido `Cashflow.SharedKernel.UnitTests` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.UnitTests` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Ledger.IntegrationTests` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo            Resolvido   Severidade   URL do aviso                                     
+   > Azure.Identity             1.3.0       Moderate     https://github.com/advisories/GHSA-m5vv-6r4h-3vj9
+                                            Moderate     https://github.com/advisories/GHSA-wvxc-855f-jvrv
+                                            High         https://github.com/advisories/GHSA-5mfx-4wcx-rv27
+   > SharpCompress              0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier                   1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+   > System.Drawing.Common      5.0.0       Critical     https://github.com/advisories/GHSA-rxg9-xrhp-64gj
+   > System.Formats.Asn1        5.0.0       High         https://github.com/advisories/GHSA-447r-wph3-92pm
+
+O projeto fornecido `Cashflow.Consolidation.UnitTests` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Consolidation.IntegrationTests` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo            Resolvido   Severidade   URL do aviso                                     
+   > Azure.Identity             1.3.0       Moderate     https://github.com/advisories/GHSA-m5vv-6r4h-3vj9
+                                            Moderate     https://github.com/advisories/GHSA-wvxc-855f-jvrv
+                                            High         https://github.com/advisories/GHSA-5mfx-4wcx-rv27
+   > SharpCompress              0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier                   1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+   > System.Drawing.Common      5.0.0       Critical     https://github.com/advisories/GHSA-rxg9-xrhp-64gj
+   > System.Formats.Asn1        5.0.0       High         https://github.com/advisories/GHSA-447r-wph3-92pm
+
+O projeto `Cashflow.TestSupport` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo            Resolvido   Severidade   URL do aviso                                     
+   > Azure.Identity             1.3.0       Moderate     https://github.com/advisories/GHSA-m5vv-6r4h-3vj9
+                                            Moderate     https://github.com/advisories/GHSA-wvxc-855f-jvrv
+                                            High         https://github.com/advisories/GHSA-5mfx-4wcx-rv27
+   > SharpCompress              0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier                   1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+   > System.Drawing.Common      5.0.0       Critical     https://github.com/advisories/GHSA-rxg9-xrhp-64gj
+   > System.Formats.Asn1        5.0.0       High         https://github.com/advisories/GHSA-447r-wph3-92pm
+
+
+----- [5] dotnet list package --deprecated -----
+
+As fontes a seguir foram usadas:
+   https://api.nuget.org/v3/index.json
+
+O projeto fornecido `Cashflow.SharedKernel` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Contracts` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Gateway` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Api` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Application` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Domain` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Infrastructure` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Api` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Application` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Domain` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Infrastructure` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Worker` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto `Cashflow.ArchitectureTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.SharedKernel.UnitTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Ledger.UnitTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Ledger.IntegrationTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Consolidation.UnitTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Consolidation.IntegrationTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.TestSupport` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+
+----- [6] dotnet format --verify-no-changes --report docs/quality/format-final.json -----
+
+===== end final =====

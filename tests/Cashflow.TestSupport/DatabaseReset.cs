@@ -21,7 +21,7 @@ public static class DatabaseReset
         await using (conn.ConfigureAwait(false))
         {
             await conn.OpenAsync().ConfigureAwait(false);
-        return await Respawner.CreateAsync(conn, PostgresOptions).ConfigureAwait(false);
+            return await Respawner.CreateAsync(conn, PostgresOptions).ConfigureAwait(false);
         }
     }
 
@@ -31,7 +31,7 @@ public static class DatabaseReset
         await using (conn.ConfigureAwait(false))
         {
             await conn.OpenAsync().ConfigureAwait(false);
-        await respawner.ResetAsync(conn).ConfigureAwait(false);
+            await respawner.ResetAsync(conn).ConfigureAwait(false);
         }
     }
 
