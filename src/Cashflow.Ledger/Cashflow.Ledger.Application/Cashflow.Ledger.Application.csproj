@@ -1,8 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\Cashflow.Ledger.Domain\Cashflow.Ledger.Domain.csproj" />
     <ProjectReference Include="..\..\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\Cashflow.Contracts\Cashflow.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -10,5 +19,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cashflow.Ledger.UnitTests" />
+    <InternalsVisibleTo Include="Cashflow.Ledger.IntegrationTests" />
+  </ItemGroup>
 
 </Project>
