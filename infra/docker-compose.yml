@@ -46,7 +46,7 @@ services:
   # ==================== CORE ====================
 
   postgres:
-    image: postgres:16.3-alpine
+    image: postgres:18.3-alpine
     profiles: ["core"]
     <<: *restart
     container_name: cashflow-postgres
