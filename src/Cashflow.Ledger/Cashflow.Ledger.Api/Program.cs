@@ -1,4 +1,3 @@
-using System.Threading.RateLimiting;
 using Cashflow.Ledger.Api.Authorization;
 using Cashflow.Ledger.Api.Endpoints;
 using Cashflow.Ledger.Api.Infrastructure;
@@ -8,12 +7,8 @@ using Cashflow.Ledger.Infrastructure.Persistence;
 using Cashflow.SharedKernel.Http;
 using Cashflow.SharedKernel.Observability;
 using Cashflow.SharedKernel.Time;
-using MassTransit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,183 +16,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddCashflowObservability("cashflow.ledger.api", "1.0.0");
 
 builder.Services.AddSingleton<IClock, SystemClock>();
-
 builder.Services.AddLedgerApplication();
 builder.Services.AddLedgerInfrastructure(builder.Configuration);
-
-// ====== MassTransit + Outbox transacional (06 §2.2) ======
-builder.Services.AddMassTransit(x =>
-{
-    x.SetKebabCaseEndpointNameFormatter();
-
-    x.AddEntityFrameworkOutbox<LedgerDbContext>(o =>
-    {
-        o.QueryDelay = TimeSpan.FromSeconds(1);
-        o.UsePostgres();
-        o.UseBusOutbox();
-        o.DuplicateDetectionWindow = TimeSpan.FromHours(24);
-    });
-
-    x.UsingRabbitMq((ctx, cfg) =>
-    {
-        var host = builder.Configuration["RabbitMq:Host"] ?? "localhost";
-        var vhost = builder.Configuration["RabbitMq:VirtualHost"] ?? "/";
-        var user = builder.Configuration["RabbitMq:Username"] ?? "cashflow";
-        var pwd = builder.Configuration["RabbitMq:Password"] ?? "cashflow";
-
-        cfg.Host(host, vhost, h =>
-        {
-            h.Username(user);
-            h.Password(pwd);
-        });
-
-        cfg.UseMessageRetry(r => r.Exponential(
-            retryLimit: 5,
-            minInterval: TimeSpan.FromSeconds(1),
-            maxInterval: TimeSpan.FromSeconds(30),
-            intervalDelta: TimeSpan.FromSeconds(2)));
-
-        // Producer-only. ConfigureEndpoints intentionally NOT called — Ledger não consome.
-    });
-});
-
-// Ledger é producer-only (sem InboxState — ver ADR-0007). O InboxCleanupService que o
-// AddEntityFrameworkOutbox registra tenta abrir o DbSet<InboxState> a cada ciclo e gera
-// retries barulhentos. Como não temos consumer, desligamos a sweep aqui.
-var inboxCleanupDescriptor = builder.Services.FirstOrDefault(d =>
-    d.ImplementationType is { Name: "InboxCleanupService`1" } t
-    && string.Equals(t.Namespace, "MassTransit.EntityFrameworkCoreIntegration", StringComparison.Ordinal));
-if (inboxCleanupDescriptor is not null)
-    builder.Services.Remove(inboxCleanupDescriptor);
-
-// ====== Authentication / Authorization ======
-var keycloakAuthority = builder.Configuration["Keycloak:Authority"]
-    ?? throw new InvalidOperationException("Keycloak:Authority missing");
-var keycloakAudience = builder.Configuration["Keycloak:Audience"] ?? "cashflow-api";
-var requireHttpsMetadata = builder.Configuration.GetValue<bool?>("Keycloak:RequireHttpsMetadata") ?? !builder.Environment.IsDevelopment();
-// Quando rodando em container, o iss do JWT é http://localhost:8080/... (visto pelo
-// browser), mas a API precisa buscar JWKS pela DNS interna (`http://keycloak:8080/...`).
-// MetadataAddress sobrescreve a discovery URL sem mudar o ValidIssuer — §07 §3.1.1.
-var keycloakMetadataAddress = builder.Configuration["Keycloak:MetadataAddress"];
-
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = keycloakAuthority;
-        if (!string.IsNullOrWhiteSpace(keycloakMetadataAddress))
-            options.MetadataAddress = keycloakMetadataAddress;
-        options.Audience = keycloakAudience;
-        options.RequireHttpsMetadata = requireHttpsMetadata;
-        // Sem o mapping, o claim "role" do Keycloak vira ClaimTypes.Role
-        // e quebra IsInRole/RoleClaimType="role" — ver Authorization/AuthorizationPolicies.
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = keycloakAuthority,
-            ValidateAudience = false, // Keycloak coloca audience como cliente, validamos por role.
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30),
-            NameClaimType = "preferred_username",
-            RoleClaimType = "role"
-        };
-    });
-
-builder.Services.AddCashflowAuthorization();
-
-// ====== HealthChecks (Postgres + RabbitMQ + Keycloak JWKS) ======
-var postgresConn = builder.Configuration.GetConnectionString("Postgres")!;
-var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
-var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], System.Globalization.CultureInfo.InvariantCulture, out var rp) ? rp : 5672;
-// Health check usa a discovery URL interna (mesma que o JwtBearer) para que o probe
-// passe mesmo quando o `localhost` do iss não é roteável de dentro do container.
-var keycloakHealthUrl = !string.IsNullOrWhiteSpace(keycloakMetadataAddress)
-    ? keycloakMetadataAddress
-    : $"{keycloakAuthority.TrimEnd('/')}/.well-known/openid-configuration";
-
-builder.Services.AddHealthChecks()
-    .AddNpgSql(postgresConn, name: "postgres", tags: new[] { "ready", "db" })
-    .AddCheck("rabbitmq", new RabbitMqHealthCheck(rabbitHost, rabbitPort), tags: new[] { "ready", "broker" })
-    .AddUrlGroup(new Uri(keycloakHealthUrl), name: "keycloak-discovery", tags: new[] { "ready", "auth" });
-
-// ====== Rate limiter (defense-in-depth — Gateway é o teto principal) ======
-builder.Services.AddRateLimiter(opt =>
-{
-    opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(http =>
-    {
-        var key = http.GetMerchantId()?.ToString()
-            ?? http.Connection.RemoteIpAddress?.ToString()
-            ?? "anonymous";
-        return RateLimitPartition.GetSlidingWindowLimiter(key, _ => new SlidingWindowRateLimiterOptions
-        {
-            PermitLimit = 120,
-            Window = TimeSpan.FromSeconds(1),
-            SegmentsPerWindow = 4,
-            QueueLimit = 0,
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
-        });
-    });
-});
-
-// ====== Problem Details (RFC 7807) ======
-builder.Services.AddProblemDetails(options =>
-{
-    options.CustomizeProblemDetails = ctx =>
-    {
-        if (ctx.HttpContext.Items.TryGetValue(CorrelationIdMiddleware.HttpContextItemKey, out var corr)
-            && corr is string correlation)
-        {
-            ctx.ProblemDetails.Extensions["correlationId"] = correlation;
-        }
-    };
-});
-builder.Services.AddTransient<ExceptionToProblemDetailsMiddleware>();
-builder.Services.AddTransient<IdempotencyKeyEndpointFilter>();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "Cashflow Ledger API",
-        Version = "v1",
-        Description = "Write-side API para o módulo de Lançamentos."
-    });
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "JWT emitido pelo Keycloak (realm cashflow)."
-    });
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        [new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-        {
-            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-            {
-                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                Id = "Bearer"
-            }
-        }] = Array.Empty<string>()
-    });
-});
+builder.Services.AddLedgerMessaging(builder.Configuration);
+builder.Services.AddLedgerAuth(builder.Configuration, builder.Environment);
+builder.Services.AddLedgerHealthChecks(builder.Configuration);
+builder.Services.AddLedgerRateLimiter();
+builder.Services.AddLedgerProblemDetails();
+builder.Services.AddLedgerSwagger();
 
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionToProblemDetailsMiddleware>();
-
 app.UseCashflowCorrelationId();
 app.UseStatusCodePages();
-
 app.UseRouting();
-
 app.UseRateLimiter();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -236,16 +70,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.MapScalarApiReference(o => o.Title = "Cashflow Ledger");
-}
 
-if (app.Environment.IsDevelopment())
-{
     // Apply migrations on startup — Development only (§05 §1.6).
     // Constrói o DbContext manualmente para evitar deadlock que ocorre ao resolver
     // IPublishEndpoint pelo container DI enquanto o BusOutbox EF ainda está nas
-    // últimas etapas da inicialização do bus. Migrations vão ANTES do RunAsync
-    // para manter o padrão WebApplicationFactory-friendly: o entrypoint só
-    // bloqueia em RunAsync, sem split Start/WaitForShutdown (que confunde WAF).
+    // últimas etapas da inicialização do bus.
     bootLogger.LogInformation("Applying migrations...");
     // S2139 silenciado: catch loga LogCritical e re-emite para falhar o boot.
     // Não há "handle" possível aqui — uma migration que falha exige human review.
@@ -258,8 +87,6 @@ if (app.Environment.IsDevelopment())
             .Options;
         // Empty IServiceProvider: migrations não disparam SaveChangesAsync, então
         // o IPublishEndpoint nunca é resolvido. Evita o ciclo com BusOutbox.
-        // ASP0000 é intencional aqui: precisamos de um SP isolado para migrar sem
-        // tocar o container principal.
 #pragma warning disable ASP0000
         var db = new LedgerDbContext(opts, new ServiceCollection().BuildServiceProvider(), app.Services.GetRequiredService<IClock>());
 #pragma warning restore ASP0000

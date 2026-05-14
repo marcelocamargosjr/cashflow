@@ -10,6 +10,9 @@ namespace Cashflow.Consolidation.Infrastructure.Persistence;
 
 public sealed class MongoContext
 {
+    // Latch idempotente: BsonSerializer/ConventionRegistry são singletons globais
+    // do driver Mongo; precisamos garantir que sejam configurados EXATAMENTE uma vez
+    // por processo. Interlocked.Exchange torna esta atualização atômica.
     private static int _conventionsRegistered;
 
     public MongoContext(IMongoClient client, IOptions<MongoOptions> options)
