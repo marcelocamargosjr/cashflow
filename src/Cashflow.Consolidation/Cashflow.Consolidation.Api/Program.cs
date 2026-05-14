@@ -63,10 +63,7 @@ var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], out var rp
 var keycloakJwksUrl = $"{keycloakAuthority.TrimEnd('/')}/protocol/openid-connect/certs";
 
 builder.Services.AddHealthChecks()
-    .AddMongoDb(
-        sp => new MongoDB.Driver.MongoClient(mongoConn),
-        name: "mongo",
-        tags: new[] { "ready", "db" })
+    .AddCheck<MongoHealthCheck>("mongo", tags: new[] { "ready", "db" })
     .AddRedis(redisConn, name: "redis", tags: new[] { "ready", "cache" })
     .AddCheck("rabbitmq", new RabbitMqHealthCheck(rabbitHost, rabbitPort), tags: new[] { "ready", "broker" })
     .AddUrlGroup(new Uri(keycloakJwksUrl), name: "keycloak-jwks", tags: new[] { "ready", "auth" });
@@ -84,6 +81,7 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 builder.Services.AddTransient<ExceptionToProblemDetailsMiddleware>();
+builder.Services.AddSingleton<MongoHealthCheck>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

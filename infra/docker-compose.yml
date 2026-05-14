@@ -1,8 +1,8 @@
-# Compose mínimo para validar o checkpoint F3 (Postgres, RabbitMQ, Keycloak).
-# F5 expande este arquivo com Gateway YARP, observability stack e demais serviços.
+# Compose para validar checkpoints F3 (Postgres + RabbitMQ + Keycloak) e
+# F4 (adiciona Mongo + Redis). F5 expande com Gateway YARP, observability, etc.
 #
 # Uso:
-#   docker compose -f infra/docker-compose.yml --profile core up -d postgres rabbitmq keycloak
+#   docker compose -f infra/docker-compose.yml --profile core up -d
 #   docker compose -f infra/docker-compose.yml --profile core down            # preserva volumes
 #   docker compose -f infra/docker-compose.yml --profile core down -v         # limpa volumes
 
@@ -83,6 +83,45 @@ services:
       retries: 20
       start_period: 60s
 
+  mongo:
+    image: mongo:7
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: cashflow
+      MONGO_INITDB_ROOT_PASSWORD: cashflow
+    ports:
+      # 27018 no host evita conflito com instalações nativas de MongoDB
+      # (o serviço Windows mongod frequentemente já está ocupando 27017).
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh --quiet --username cashflow --password cashflow --authenticationDatabase admin"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   postgres-data:
   rabbitmq-data:
+  mongo-data:
+  redis-data:
