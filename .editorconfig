@@ -52,5 +52,52 @@ dotnet_diagnostic.CS8625.severity = warning
 dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.IDE0008.severity = none
 
+# F7.1: regras de analyzer silenciadas no escopo inteiro com justificativa.
+#
+# CA1848 (Use LoggerMessage delegates for performance): micro-otimização recomendada
+#   apenas em hot paths comprovados. Os logs do projeto são por requisição e não
+#   estão num hot path mensurável; o ganho de LoggerMessage delegates não compensa
+#   o ruído de boilerplate em ~50 call-sites. Avaliar caso a caso se aparecer
+#   no perf profile.
+dotnet_diagnostic.CA1848.severity = none
+
+# MA0004 (Use ConfigureAwait): em ASP.NET Core 6+ não há SynchronizationContext,
+#   portanto ConfigureAwait(false) é no-op funcional. Mantemos sintaxe limpa.
+#   Em libs reutilizáveis (SharedKernel) mantemos ConfigureAwait(false) por
+#   higiene (já aplicado pelo dotnet format no Passo 2).
+dotnet_diagnostic.MA0004.severity = none
+
+# CA1716 (Identifiers conflicting with VB keywords): projeto é C#-only.
+#   Nomes naturais do domínio (Error, To, Date) seguem.
+dotnet_diagnostic.CA1716.severity = none
+
+# CA1000 (Don't declare static members on generic types): conflita com o padrão
+#   Railway-oriented (Result<T>.Success/Failure) usado pelo SharedKernel.
+#   A inconveniência de não ter sintaxe de fábrica genérica supera o ganho.
+dotnet_diagnostic.CA1000.severity = none
+
+# MA0048 (File name must match type name): C# permite múltiplos tipos por arquivo
+#   por design. Em DTOs/Requests/responses fortemente coesos (ex.: RegisterEntryRequest
+#   + AmountRequest + ReverseEntryRequest no mesmo arquivo de feature) a coesão
+#   visual supera o purismo do "one type per file". Tipos grandes são separados
+#   por padrão de design (ver §F8 / blueprint).
+dotnet_diagnostic.MA0048.severity = none
+
+[tests/**/*.cs]
+# CA1707 (Identifiers should not contain underscores): conflita com o naming
+#   pattern Method_Scenario_ExpectedResult que é o padrão do projeto para testes
+#   (blueprint §08-TESTES.md §1.3). Silenciado apenas em tests/.
+dotnet_diagnostic.CA1707.severity = none
+
+# F7.1: CA1861 (Prefer 'static readonly' arrays) — silenciado em Program.cs
+#   (boot one-shot, sem hot path) e em test infra (TestTokens carrega 1x por
+#   suite). Endereçado caso a caso em endpoint filters / handlers onde realmente
+#   reside hot path.
+[**/Program.cs]
+dotnet_diagnostic.CA1861.severity = none
+
+[**/TestTokens.cs]
+dotnet_diagnostic.CA1861.severity = none
+
 [*.{razor,cshtml}]
 indent_size = 4

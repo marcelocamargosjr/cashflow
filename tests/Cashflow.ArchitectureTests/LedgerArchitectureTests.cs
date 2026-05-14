@@ -7,11 +7,6 @@ using NetArchTest.Rules;
 
 namespace Cashflow.ArchitectureTests;
 
-/// <summary>
-/// Structural invariants for the Ledger bounded context (`08-TESTES.md §5`).
-/// These are the contract the rest of the suite relies on — anything that breaks
-/// here means the layering or domain encapsulation slipped.
-/// </summary>
 public sealed class LedgerArchitectureTests
 {
     private const string Infrastructure = "Cashflow.Ledger.Infrastructure";
@@ -96,7 +91,7 @@ public sealed class LedgerArchitectureTests
         // application queries. The DbContext is wired up in Program for DI only.
         var endpointTypes = Types.InAssembly(typeof(Cashflow.Ledger.Api.Program).Assembly)
             .That()
-            .HaveNameEndingWith("Endpoints").Or().HaveNameEndingWith("Controller")
+            .HaveNameEndingWith("Endpoints", StringComparison.Ordinal).Or().HaveNameEndingWith("Controller", StringComparison.Ordinal)
             .GetTypes()
             .ToList();
 
@@ -105,7 +100,7 @@ public sealed class LedgerArchitectureTests
 
         var result = Types.InAssembly(typeof(Cashflow.Ledger.Api.Program).Assembly)
             .That()
-            .HaveNameEndingWith("Endpoints").Or().HaveNameEndingWith("Controller")
+            .HaveNameEndingWith("Endpoints", StringComparison.Ordinal).Or().HaveNameEndingWith("Controller", StringComparison.Ordinal)
             .Should()
             .NotHaveDependencyOn("Microsoft.EntityFrameworkCore")
             .GetResult();

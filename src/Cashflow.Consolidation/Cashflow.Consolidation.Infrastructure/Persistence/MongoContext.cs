@@ -8,12 +8,11 @@ using MongoDB.Driver;
 
 namespace Cashflow.Consolidation.Infrastructure.Persistence;
 
-/// <summary>
-/// Holds the typed Mongo collections for Consolidation. Driver client is built once
-/// (singleton) and is thread-safe.
-/// </summary>
 public sealed class MongoContext
 {
+    // Latch idempotente: BsonSerializer/ConventionRegistry são singletons globais
+    // do driver Mongo; precisamos garantir que sejam configurados EXATAMENTE uma vez
+    // por processo. Interlocked.Exchange torna esta atualização atômica.
     private static int _conventionsRegistered;
 
     public MongoContext(IMongoClient client, IOptions<MongoOptions> options)
@@ -36,12 +35,6 @@ public sealed class MongoContext
 
     public IMongoCollection<ProcessedEventDoc> ProcessedEvents { get; }
 
-    /// <summary>
-    /// Register Standard GUID representation globally. The driver's legacy default
-    /// (BinData subtype 3, .NET binary) collides with the `_id` string schema for
-    /// <c>processed_events</c> and with the `lastAppliedEventId` field for
-    /// <c>daily_balances</c>. We override once per process.
-    /// </summary>
     private static void RegisterGlobalConventionsOnce()
     {
         if (Interlocked.Exchange(ref _conventionsRegistered, 1) == 1)

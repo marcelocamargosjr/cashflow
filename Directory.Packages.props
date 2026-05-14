@@ -13,9 +13,7 @@
         (Npgsql/Rabbit/Uris), JwtBearer, Swashbuckle, Scalar (ver §F3).
   -->
   <ItemGroup Label="ASP.NET / Hosting">
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.14" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.14" />
   </ItemGroup>
 
@@ -25,6 +23,7 @@
 
   <ItemGroup Label="EF Core / Postgres">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.14" />
+    <!-- Transitive pin to align Relational versions across NetArchTest.Rules etc. (sem PackageReference em nenhum csproj). -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.14" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
@@ -40,7 +39,6 @@
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Rabbitmq" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
-    <PackageVersion Include="AspNetCore.HealthChecks.MongoDb" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
   </ItemGroup>
 
@@ -106,6 +104,18 @@
     - System.IdentityModel.Tokens.Jwt: forja tokens JWT para o stub JwtBearer
       nos integration tests (sem precisar de Keycloak real).
   -->
+  <!--
+    F7.1: analyzers de qualidade aplicados a TODOS os projetos via Directory.Build.props.
+    Razão: enforcement de regras canônicas de code smells / anti-patterns / style sem
+    depender de scanner externo. PrivateAssets=all garante que analyzers não vazem
+    como dependência de pacotes consumidores. Versões fixas para reprodutibilidade.
+  -->
+  <ItemGroup Label="Quality analyzers (F7.1)">
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.25.0.139117" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.84" />
+  </ItemGroup>
+
   <ItemGroup Label="Integration / Architecture tests (F6)">
     <PackageVersion Include="Testcontainers" Version="4.0.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.0.0" />

@@ -11,10 +11,6 @@ namespace Cashflow.Consolidation.Infrastructure;
 
 public static class DependencyInjection
 {
-    /// <summary>
-    /// Registers Mongo + projection writer. Used by the Worker (and any service that
-    /// applies projections). Cache/Redis is opt-in via <see cref="AddConsolidationCache"/>.
-    /// </summary>
     public static IServiceCollection AddConsolidationInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -38,9 +34,6 @@ public static class DependencyInjection
         return services;
     }
 
-    /// <summary>
-    /// Registers Redis + the cache implementation. The Api uses cache; the Worker does not.
-    /// </summary>
     public static IServiceCollection AddConsolidationCache(
         this IServiceCollection services,
         IConfiguration configuration)

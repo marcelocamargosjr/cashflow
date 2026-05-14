@@ -6,20 +6,6 @@ using Xunit;
 
 namespace Cashflow.TestSupport;
 
-/// <summary>
-/// Shared infra fixture for integration tests (`08-TESTES.md §4.2`).
-///
-/// Spins one ephemeral instance of Postgres / Mongo / RabbitMQ / Redis per xUnit
-/// collection. All four start in parallel during <see cref="InitializeAsync"/> and
-/// are torn down in parallel during <see cref="DisposeAsync"/>. Tests run inside
-/// the collection `cashflow` and share these endpoints — per-test isolation is
-/// handled by Respawn (Postgres) and the reset helpers (<see cref="DatabaseReset"/>)
-/// for Mongo / Redis.
-///
-/// Important: we DO NOT bind host ports — Testcontainers always picks free random
-/// ports. This lets the suite run on dev boxes where a native Postgres/Mongo is
-/// already bound on the default port.
-/// </summary>
 public sealed class CashflowFixture : IAsyncLifetime
 {
     public PostgreSqlContainer Postgres { get; } = new PostgreSqlBuilder()
@@ -56,7 +42,7 @@ public sealed class CashflowFixture : IAsyncLifetime
             Postgres.StartAsync(),
             Rabbit.StartAsync(),
             Redis.StartAsync(),
-            Mongo.StartAsync());
+            Mongo.StartAsync()).ConfigureAwait(false);
 
         // The production Program.cs reads infra connection strings from
         // configuration *during* its Main body — BEFORE WebApplicationFactory's
@@ -71,7 +57,7 @@ public sealed class CashflowFixture : IAsyncLifetime
         // (e.g. `Keycloak__Authority` maps to `Keycloak:Authority`).
         Environment.SetEnvironmentVariable("ConnectionStrings__Postgres", Postgres.GetConnectionString());
         Environment.SetEnvironmentVariable("RabbitMq__Host", Rabbit.Hostname);
-        Environment.SetEnvironmentVariable("RabbitMq__Port", Rabbit.GetMappedPublicPort(5672).ToString());
+        Environment.SetEnvironmentVariable("RabbitMq__Port", Rabbit.GetMappedPublicPort(5672).ToString(System.Globalization.CultureInfo.InvariantCulture));
         Environment.SetEnvironmentVariable("RabbitMq__VirtualHost", "/");
         Environment.SetEnvironmentVariable("RabbitMq__Username", RabbitUser);
         Environment.SetEnvironmentVariable("RabbitMq__Password", RabbitPassword);

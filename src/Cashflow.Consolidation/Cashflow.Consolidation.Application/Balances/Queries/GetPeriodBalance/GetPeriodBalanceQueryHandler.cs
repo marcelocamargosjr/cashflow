@@ -5,10 +5,6 @@ using MediatR;
 
 namespace Cashflow.Consolidation.Application.Balances.Queries.GetPeriodBalance;
 
-/// <summary>
-/// Period balance hits Mongo directly: caching a 31-day window per merchant per request
-/// blows up cardinality with little benefit. Daily lookup remains cached individually.
-/// </summary>
 internal sealed class GetPeriodBalanceQueryHandler
     : IRequestHandler<GetPeriodBalanceQuery, Result<PeriodBalanceDto>>
 {

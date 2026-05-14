@@ -4,11 +4,6 @@ using MongoDB.Driver;
 
 namespace Cashflow.Consolidation.Api.Infrastructure;
 
-/// <summary>
-/// Pings Mongo using the same <see cref="IMongoClient"/> the projection writers use.
-/// Avoids the AddMongoDb library quirk where its internal MongoClient discards URI
-/// auth options and falls back to SCRAM-SHA-1 against the wrong DB.
-/// </summary>
 internal sealed class MongoHealthCheck : IHealthCheck
 {
     private readonly IMongoClient _client;

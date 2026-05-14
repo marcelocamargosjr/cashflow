@@ -10,14 +10,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Cashflow.Consolidation.IntegrationTests.Infrastructure;
 
-/// <summary>
-/// Lightweight test harness that hosts the Consolidation consumers in-process,
-/// pointed at the test RabbitMQ + Mongo containers. Mirrors
-/// <c>Cashflow.Consolidation.Worker.Program</c> for messaging plumbing but skips
-/// Serilog/OTel bootstrap to keep test logs clean and uses
-/// <c>ConfigureEndpoints</c> (vs the prod manual ReceiveEndpoint route) because
-/// retry/prefetch tuning is a prod concern not under test in IT-04..IT-06.
-/// </summary>
 public sealed class ConsolidationWorkerHost : IAsyncDisposable
 {
     private readonly IHost _host;
@@ -43,7 +35,7 @@ public sealed class ConsolidationWorkerHost : IAsyncDisposable
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
         {
             ["Mongo:ConnectionString"] = fixture.Mongo.GetConnectionString(),
             ["Mongo:Database"] = database,
@@ -72,13 +64,13 @@ public sealed class ConsolidationWorkerHost : IAsyncDisposable
         });
 
         var host = builder.Build();
-        await host.StartAsync();
+        await host.StartAsync().ConfigureAwait(false);
         return new ConsolidationWorkerHost(host, database);
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _host.StopAsync();
+        await _host.StopAsync().ConfigureAwait(false);
         _host.Dispose();
     }
 }

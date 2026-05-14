@@ -12,7 +12,12 @@ namespace Cashflow.SharedKernel.Http;
 /// </summary>
 public static class ProblemDetailsTypes
 {
+    // S1075 silenciado: a URI canônica de "type" do RFC 7807 é um identificador
+    // opaco do tipo de erro, não um endpoint externo. Movê-la para configuração
+    // quebraria a interoperabilidade com clientes que indexam por este valor.
+#pragma warning disable S1075
     public const string BaseUri = "https://cashflow.local/errors/";
+#pragma warning restore S1075
 
     public const string Validation = BaseUri + "validation";
     public const string Unauthorized = BaseUri + "unauthorized";
@@ -31,7 +36,7 @@ public static class ProblemDetailsExtensions
         IDictionary<string, string[]>? errors = null,
         HttpContext? httpContext = null)
     {
-        var problem = new ValidationProblemDetails(errors ?? new Dictionary<string, string[]>())
+        var problem = new ValidationProblemDetails(errors ?? new Dictionary<string, string[]>(StringComparer.Ordinal))
         {
             Type = ProblemDetailsTypes.Validation,
             Title = "Validation failed",
@@ -73,7 +78,7 @@ public static class ProblemDetailsExtensions
     public static ProblemDetails FromError(Error error, HttpContext? httpContext = null) => error.Type switch
     {
         ErrorType.Validation => ValidationProblem(error.Message,
-            new Dictionary<string, string[]> { [error.Code] = new[] { error.Message } }, httpContext),
+            new Dictionary<string, string[]>(StringComparer.Ordinal) { [error.Code] = new[] { error.Message } }, httpContext),
         ErrorType.NotFound => NotFound(error.Message, httpContext),
         ErrorType.Conflict => Conflict(error.Message, httpContext),
         ErrorType.Unauthorized => Unauthorized(error.Message, httpContext),

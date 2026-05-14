@@ -5,9 +5,6 @@ using NetArchTest.Rules;
 
 namespace Cashflow.ArchitectureTests;
 
-/// <summary>
-/// Structural invariants for the Consolidation bounded context.
-/// </summary>
 public sealed class ConsolidationArchitectureTests
 {
     private const string Infrastructure = "Cashflow.Consolidation.Infrastructure";
@@ -67,7 +64,7 @@ public sealed class ConsolidationArchitectureTests
         // the Mongo driver directly — keeps the persistence boundary intact.
         var result = Types.InAssembly(typeof(Cashflow.Consolidation.Api.Program).Assembly)
             .That()
-            .HaveNameEndingWith("Endpoints").Or().HaveNameEndingWith("Controller")
+            .HaveNameEndingWith("Endpoints", StringComparison.Ordinal).Or().HaveNameEndingWith("Controller", StringComparison.Ordinal)
             .Should()
             .NotHaveDependencyOn("MongoDB.Driver")
             .GetResult();

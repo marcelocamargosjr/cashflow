@@ -2,11 +2,12 @@ using Cashflow.TestSupport;
 
 namespace Cashflow.Consolidation.IntegrationTests.Infrastructure;
 
-/// <summary>
-/// xUnit collection definition for Consolidation integration tests.
-/// </summary>
+// CA1711 silenciado: sufixo "Collection" é exigido pela convenção xUnit
+//   ([CollectionDefinition] + [Collection(...)] pareiam por typename).
+#pragma warning disable CA1711
 [CollectionDefinition(Name)]
 public sealed class ConsolidationTestCollection : ICollectionFixture<CashflowFixture>
 {
     public const string Name = "consolidation-integration";
 }
+#pragma warning restore CA1711

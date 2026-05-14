@@ -3,10 +3,6 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Cashflow.Consolidation.Infrastructure.Persistence.Documents;
 
-/// <summary>
-/// Mongo representation of a per-category bucket inside a daily balance document.
-/// Monetary fields are stored as Decimal128 to keep financial precision (never Double).
-/// </summary>
 public sealed class CategoryBucketDoc
 {
     [BsonElement("category")]

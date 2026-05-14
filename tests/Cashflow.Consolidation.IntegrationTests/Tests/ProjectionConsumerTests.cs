@@ -5,14 +5,6 @@ using MassTransit;
 
 namespace Cashflow.Consolidation.IntegrationTests.Tests;
 
-/// <summary>
-/// Worker-side projection integration tests: IT-04 (consumer projects events),
-/// IT-05 (duplicate event is a no-op), IT-06 (reversal decrements the balance).
-///
-/// Events are published via the test bus directly — we do not couple these tests
-/// to the Ledger publish pipeline because IT-04..IT-06 are about the consumer
-/// contract, not the producer's outbox dispatch (that is IT-01 / IT-09's job).
-/// </summary>
 public sealed class ProjectionConsumerTests : ConsolidationWorkerTestBase
 {
     public ProjectionConsumerTests(CashflowFixture fixture) : base(fixture) { }

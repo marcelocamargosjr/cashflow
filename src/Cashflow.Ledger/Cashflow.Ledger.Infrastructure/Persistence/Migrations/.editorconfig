@@ -1,4 +1,6 @@
-# Generated migration files: keep tooling defaults — suppress IDE rules that conflict
-# with what `dotnet ef migrations add` emits.
+# Auto-generated EF Core migrations: skip analyzers e dotnet format.
+# Blueprint F7.1 §1 explicitamente exclui código gerado por EF do escopo do hardening.
 [*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
 dotnet_diagnostic.IDE0161.severity = none

@@ -13,7 +13,17 @@ internal sealed class EntryConfiguration : IEntityTypeConfiguration<Entry>
             t.HasCheckConstraint("ck_entry_amount_positive", "amount_value > 0"));
 
         builder.HasKey(e => e.Id);
+        builder.Ignore(e => e.DomainEvents);
 
+        ConfigureIdentityAndType(builder);
+        ConfigureMoney(builder);
+        ConfigureBusinessFields(builder);
+        ConfigureIdempotencyAndAudit(builder);
+        ConfigureIndexes(builder);
+    }
+
+    private static void ConfigureIdentityAndType(EntityTypeBuilder<Entry> builder)
+    {
         builder.Property(e => e.Id)
             .HasColumnName("id")
             .ValueGeneratedNever();
@@ -26,7 +36,10 @@ internal sealed class EntryConfiguration : IEntityTypeConfiguration<Entry>
             .HasColumnName("entry_type")
             .HasConversion<short>()
             .IsRequired();
+    }
 
+    private static void ConfigureMoney(EntityTypeBuilder<Entry> builder)
+    {
         // ComplexProperty (EF Core 8+) maps the Money record-struct in-place — no separate table.
         builder.ComplexProperty(e => e.Amount, money =>
         {
@@ -41,7 +54,10 @@ internal sealed class EntryConfiguration : IEntityTypeConfiguration<Entry>
                 .HasDefaultValue(Currency.BRL)
                 .IsRequired();
         });
+    }
 
+    private static void ConfigureBusinessFields(EntityTypeBuilder<Entry> builder)
+    {
         builder.Property(e => e.Description)
             .HasColumnName("description")
             .HasMaxLength(200)
@@ -65,7 +81,10 @@ internal sealed class EntryConfiguration : IEntityTypeConfiguration<Entry>
         builder.Property(e => e.ReversalReason)
             .HasColumnName("reversal_reason")
             .HasMaxLength(500);
+    }
 
+    private static void ConfigureIdempotencyAndAudit(EntityTypeBuilder<Entry> builder)
+    {
         builder.Property(e => e.IdempotencyKey)
             .HasColumnName("idempotency_key")
             .IsRequired();
@@ -84,9 +103,10 @@ internal sealed class EntryConfiguration : IEntityTypeConfiguration<Entry>
         builder.Property(e => e.UpdatedAt)
             .HasColumnName("updated_at")
             .IsRequired();
+    }
 
-        builder.Ignore(e => e.DomainEvents);
-
+    private static void ConfigureIndexes(EntityTypeBuilder<Entry> builder)
+    {
         builder.HasIndex(e => new { e.MerchantId, e.IdempotencyKey })
             .IsUnique()
             .HasDatabaseName("uq_entry_idempotency");

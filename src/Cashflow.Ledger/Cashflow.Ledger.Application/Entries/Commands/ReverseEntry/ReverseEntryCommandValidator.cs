@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Cashflow.Ledger.Application.Entries.Commands.ReverseEntry;
 
-public sealed class ReverseEntryCommandValidator : AbstractValidator<ReverseEntryCommand>
+internal sealed class ReverseEntryCommandValidator : AbstractValidator<ReverseEntryCommand>
 {
     public ReverseEntryCommandValidator()
     {

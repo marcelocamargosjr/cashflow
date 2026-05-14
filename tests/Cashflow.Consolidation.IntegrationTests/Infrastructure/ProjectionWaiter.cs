@@ -4,12 +4,6 @@ using MongoDB.Driver;
 
 namespace Cashflow.Consolidation.IntegrationTests.Infrastructure;
 
-/// <summary>
-/// Polls Mongo until a daily-balance document matches a predicate or the timeout
-/// elapses. Integration tests for the projection use this instead of <c>Task.Delay</c>:
-/// the broker round-trip + Mongo apply is fast under the test container but jittery,
-/// and a fixed sleep would either be flaky-too-short or wastefully-too-long.
-/// </summary>
 public static class ProjectionWaiter
 {
     public static async Task<DailyBalanceDoc> WaitForAsync(
@@ -29,12 +23,12 @@ public static class ProjectionWaiter
         {
             var doc = await mongo.DailyBalances
                 .Find(d => d.Id == id)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
             if (doc is not null && predicate(doc))
                 return doc;
 
-            await Task.Delay(step, cancellationToken);
+            await Task.Delay(step, cancellationToken).ConfigureAwait(false);
         }
 
         throw new TimeoutException(
@@ -49,6 +43,6 @@ public static class ProjectionWaiter
         return await mongo.ProcessedEvents
             .CountDocumentsAsync(
                 Builders<ProcessedEventDoc>.Filter.Eq(d => d.Id, eventId),
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 }

@@ -8,10 +8,6 @@ using StackExchange.Redis;
 
 namespace Cashflow.Consolidation.Infrastructure.Caching;
 
-/// <summary>
-/// Redis-backed cache implementing the cache-aside contract from
-/// <c>05-DADOS.md §3.3</c>. Logs errors and degrades gracefully — never throws to the caller.
-/// </summary>
 public sealed class RedisDailyBalanceCache : IDailyBalanceCache
 {
     // Atomic "release lock if we still own the token". Avoids the foot-gun where a

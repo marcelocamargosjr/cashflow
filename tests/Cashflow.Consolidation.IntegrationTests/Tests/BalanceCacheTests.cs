@@ -9,19 +9,9 @@ using StackExchange.Redis;
 
 namespace Cashflow.Consolidation.IntegrationTests.Tests;
 
-/// <summary>
-/// IT-07 — <c>GET /balances/{merchantId}/daily</c> cache-miss → cache-hit cycle.
-///
-/// Steps:
-///   1. Seed a daily-balance document directly in Mongo.
-///   2. First GET: cache empty, Redis key absent before the call; the handler hits
-///      Mongo and writes the cache. After the call, the key MUST exist.
-///   3. Second GET: handler reads the key from Redis (cache-hit path).
-///
-/// We don't have a high-fidelity hook to assert "this response came from cache",
-/// so we observe the side-effect (the Redis key materialized) plus the response
-/// equality between the two calls.
-/// </summary>
+// CA1001 silenciado: a limpeza assíncrona de _factory é feita por
+//   IAsyncLifetime.DisposeAsync — xUnit invoca esse ciclo, não Dispose síncrono.
+#pragma warning disable CA1001
 [Collection(ConsolidationTestCollection.Name)]
 public sealed class BalanceCacheTests : IAsyncLifetime
 {
@@ -39,9 +29,9 @@ public sealed class BalanceCacheTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _factory.DisposeAsync();
-        await DatabaseReset.ResetMongoAsync(_fixture.Mongo.GetConnectionString(), _mongoDatabase);
-        await DatabaseReset.ResetRedisAsync(_fixture.Redis.GetConnectionString());
+        await _factory.DisposeAsync().ConfigureAwait(false);
+        await DatabaseReset.ResetMongoAsync(_fixture.Mongo.GetConnectionString(), _mongoDatabase).ConfigureAwait(false);
+        await DatabaseReset.ResetRedisAsync(_fixture.Redis.GetConnectionString()).ConfigureAwait(false);
     }
 
     [Fact]
@@ -114,6 +104,7 @@ public sealed class BalanceCacheTests : IAsyncLifetime
             LastUpdatedAt = DateTime.UtcNow,
             Revision = 1,
             LastAppliedEventId = null
-        });
+        }).ConfigureAwait(false);
     }
 }
+#pragma warning restore CA1001

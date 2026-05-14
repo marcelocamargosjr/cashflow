@@ -7,11 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Cashflow.Consolidation.Application.Balances.Queries.GetDailyBalance;
 
-/// <summary>
-/// Cache-aside read of the daily projection (Redis → Mongo → populate Redis).
-/// Stampede-protected via a short-lived lock; on lock contention we wait briefly and
-/// retry the cache before falling through to Mongo unguarded (graceful degradation).
-/// </summary>
 internal sealed class GetDailyBalanceQueryHandler
     : IRequestHandler<GetDailyBalanceQuery, Result<DailyBalanceDto>>
 {

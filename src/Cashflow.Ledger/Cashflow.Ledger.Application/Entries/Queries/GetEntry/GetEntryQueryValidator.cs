@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Cashflow.Ledger.Application.Entries.Queries.GetEntry;
 
-public sealed class GetEntryQueryValidator : AbstractValidator<GetEntryQuery>
+internal sealed class GetEntryQueryValidator : AbstractValidator<GetEntryQuery>
 {
     public GetEntryQueryValidator()
     {

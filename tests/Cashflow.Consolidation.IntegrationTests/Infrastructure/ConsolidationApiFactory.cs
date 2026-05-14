@@ -6,11 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cashflow.Consolidation.IntegrationTests.Infrastructure;
 
-/// <summary>
-/// WebApplicationFactory for the Consolidation API. Wires Mongo + Redis to the
-/// ephemeral containers and replaces JwtBearer with the local symmetric key so
-/// tests can mint <see cref="TestTokens"/> directly without a Keycloak round-trip.
-/// </summary>
 public sealed class ConsolidationApiFactory : WebApplicationFactory<Cashflow.Consolidation.Api.Program>
 {
     private readonly CashflowFixture _fixture;
@@ -31,13 +26,13 @@ public sealed class ConsolidationApiFactory : WebApplicationFactory<Cashflow.Con
         builder.ConfigureAppConfiguration((_, cfg) =>
         {
             cfg.Sources.Clear();
-            cfg.AddInMemoryCollection(new Dictionary<string, string?>
+            cfg.AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
             {
                 ["Mongo:ConnectionString"] = _fixture.Mongo.GetConnectionString(),
                 ["Mongo:Database"] = _mongoDatabase,
                 ["Redis:ConnectionString"] = _fixture.Redis.GetConnectionString(),
                 ["RabbitMq:Host"] = _fixture.Rabbit.Hostname,
-                ["RabbitMq:Port"] = _fixture.Rabbit.GetMappedPublicPort(5672).ToString(),
+                ["RabbitMq:Port"] = _fixture.Rabbit.GetMappedPublicPort(5672).ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["Keycloak:Authority"] = TestTokens.Issuer,
                 ["Keycloak:Audience"] = TestTokens.Audience,
                 ["Keycloak:MetadataAddress"] = TestTokens.Issuer + "/.well-known/openid-configuration",
