@@ -96,7 +96,7 @@ public sealed class LedgerArchitectureTests
         // application queries. The DbContext is wired up in Program for DI only.
         var endpointTypes = Types.InAssembly(typeof(Cashflow.Ledger.Api.Program).Assembly)
             .That()
-            .HaveNameEndingWith("Endpoints").Or().HaveNameEndingWith("Controller")
+            .HaveNameEndingWith("Endpoints", StringComparison.Ordinal).Or().HaveNameEndingWith("Controller", StringComparison.Ordinal)
             .GetTypes()
             .ToList();
 
@@ -105,7 +105,7 @@ public sealed class LedgerArchitectureTests
 
         var result = Types.InAssembly(typeof(Cashflow.Ledger.Api.Program).Assembly)
             .That()
-            .HaveNameEndingWith("Endpoints").Or().HaveNameEndingWith("Controller")
+            .HaveNameEndingWith("Endpoints", StringComparison.Ordinal).Or().HaveNameEndingWith("Controller", StringComparison.Ordinal)
             .Should()
             .NotHaveDependencyOn("Microsoft.EntityFrameworkCore")
             .GetResult();

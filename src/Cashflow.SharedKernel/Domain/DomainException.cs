@@ -25,4 +25,12 @@ public class DomainException : Exception
     {
         Code = code;
     }
+
+    public DomainException() : base()
+    {
+    }
+
+    public DomainException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
 }

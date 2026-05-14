@@ -28,18 +28,18 @@ public abstract class LedgerIntegrationTestBase : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await Factory.EnsureSchemaAsync();
+        await Factory.EnsureSchemaAsync().ConfigureAwait(false);
         _respawner = await DatabaseReset
             .CreatePostgresRespawnerAsync(Factory.PostgresConnectionString)
-            ;
+.ConfigureAwait(false);
         await DatabaseReset
             .ResetPostgresAsync(_respawner, Factory.PostgresConnectionString)
-            ;
+.ConfigureAwait(false);
     }
 
     public async Task DisposeAsync()
     {
-        await Factory.DisposeAsync();
+        await Factory.DisposeAsync().ConfigureAwait(false);
     }
 
     /// <summary>

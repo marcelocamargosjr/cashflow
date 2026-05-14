@@ -29,7 +29,7 @@ internal static class HealthChecksResponseWriter
                     duration = kv.Value.Duration,
                     tags = kv.Value.Tags,
                     error = kv.Value.Exception?.Message
-                })
+                }, StringComparer.Ordinal)
         };
 
         return httpContext.Response.WriteAsJsonAsync(payload, Options);

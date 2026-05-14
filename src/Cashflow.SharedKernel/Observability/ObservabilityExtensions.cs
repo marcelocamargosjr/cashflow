@@ -66,6 +66,7 @@ public static class ObservabilityExtensions
                 o.Endpoint = otelEndpoint;
                 o.Protocol = OtlpProtocol.Grpc;
                 o.ResourceAttributes = new Dictionary<string, object>
+(StringComparer.Ordinal)
                 {
                     ["service.name"] = serviceName,
                     ["service.version"] = serviceVersion,

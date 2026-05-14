@@ -67,7 +67,7 @@ public sealed class ConsolidationArchitectureTests
         // the Mongo driver directly — keeps the persistence boundary intact.
         var result = Types.InAssembly(typeof(Cashflow.Consolidation.Api.Program).Assembly)
             .That()
-            .HaveNameEndingWith("Endpoints").Or().HaveNameEndingWith("Controller")
+            .HaveNameEndingWith("Endpoints", StringComparison.Ordinal).Or().HaveNameEndingWith("Controller", StringComparison.Ordinal)
             .Should()
             .NotHaveDependencyOn("MongoDB.Driver")
             .GetResult();

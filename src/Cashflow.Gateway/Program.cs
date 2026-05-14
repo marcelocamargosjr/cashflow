@@ -203,8 +203,8 @@ static string ResolvePartitionKey(HttpContext ctx)
 static bool HasRealmRole(ClaimsPrincipal user, string role)
 {
     return user.IsInRole(role)
-        || user.HasClaim(c => c.Type == "role" && string.Equals(c.Value, role, StringComparison.Ordinal))
-        || user.HasClaim(c => c.Type == "roles" && string.Equals(c.Value, role, StringComparison.Ordinal));
+        || user.HasClaim(c => string.Equals(c.Type, "role", StringComparison.Ordinal) && string.Equals(c.Value, role, StringComparison.Ordinal))
+        || user.HasClaim(c => string.Equals(c.Type, "roles", StringComparison.Ordinal) && string.Equals(c.Value, role, StringComparison.Ordinal));
 }
 
 public partial class Program;

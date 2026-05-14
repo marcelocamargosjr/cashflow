@@ -31,7 +31,7 @@ public static class ProblemDetailsExtensions
         IDictionary<string, string[]>? errors = null,
         HttpContext? httpContext = null)
     {
-        var problem = new ValidationProblemDetails(errors ?? new Dictionary<string, string[]>())
+        var problem = new ValidationProblemDetails(errors ?? new Dictionary<string, string[]>(StringComparer.Ordinal))
         {
             Type = ProblemDetailsTypes.Validation,
             Title = "Validation failed",
@@ -73,7 +73,7 @@ public static class ProblemDetailsExtensions
     public static ProblemDetails FromError(Error error, HttpContext? httpContext = null) => error.Type switch
     {
         ErrorType.Validation => ValidationProblem(error.Message,
-            new Dictionary<string, string[]> { [error.Code] = new[] { error.Message } }, httpContext),
+            new Dictionary<string, string[]>(StringComparer.Ordinal) { [error.Code] = new[] { error.Message } }, httpContext),
         ErrorType.NotFound => NotFound(error.Message, httpContext),
         ErrorType.Conflict => Conflict(error.Message, httpContext),
         ErrorType.Unauthorized => Unauthorized(error.Message, httpContext),

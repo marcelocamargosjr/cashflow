@@ -73,7 +73,7 @@ builder.Services.AddMassTransit(x =>
 // retries barulhentos. Como não temos consumer, desligamos a sweep aqui.
 var inboxCleanupDescriptor = builder.Services.FirstOrDefault(d =>
     d.ImplementationType is { Name: "InboxCleanupService`1" } t
-    && t.Namespace == "MassTransit.EntityFrameworkCoreIntegration");
+    && string.Equals(t.Namespace, "MassTransit.EntityFrameworkCoreIntegration", StringComparison.Ordinal));
 if (inboxCleanupDescriptor is not null)
     builder.Services.Remove(inboxCleanupDescriptor);
 
@@ -116,7 +116,7 @@ builder.Services.AddCashflowAuthorization();
 // ====== HealthChecks (Postgres + RabbitMQ + Keycloak JWKS) ======
 var postgresConn = builder.Configuration.GetConnectionString("Postgres")!;
 var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
-var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], out var rp) ? rp : 5672;
+var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], System.Globalization.CultureInfo.InvariantCulture, out var rp) ? rp : 5672;
 // Health check usa a discovery URL interna (mesma que o JwtBearer) para que o probe
 // passe mesmo quando o `localhost` do iss não é roteável de dentro do container.
 var keycloakHealthUrl = !string.IsNullOrWhiteSpace(keycloakMetadataAddress)
@@ -256,13 +256,16 @@ if (app.Environment.IsDevelopment())
         // ASP0000 é intencional aqui: precisamos de um SP isolado para migrar sem
         // tocar o container principal.
 #pragma warning disable ASP0000
-        await using var db = new LedgerDbContext(opts, new ServiceCollection().BuildServiceProvider(), app.Services.GetRequiredService<IClock>());
+        var db = new LedgerDbContext(opts, new ServiceCollection().BuildServiceProvider(), app.Services.GetRequiredService<IClock>());
 #pragma warning restore ASP0000
-        Console.WriteLine("[BOOT][mig] DbContext created manually");
-        Console.Out.Flush();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        await db.Database.MigrateAsync(cts.Token).ConfigureAwait(false);
-        Console.WriteLine("[BOOT] migrations applied");
+        await using (db.ConfigureAwait(false))
+        {
+            Console.WriteLine("[BOOT][mig] DbContext created manually");
+            Console.Out.Flush();
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            await db.Database.MigrateAsync(cts.Token).ConfigureAwait(false);
+            Console.WriteLine("[BOOT] migrations applied");
+        }
     }
     catch (Exception ex)
     {

@@ -44,6 +44,7 @@ public sealed class ConsolidationWorkerHost : IAsyncDisposable
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+(StringComparer.Ordinal)
         {
             ["Mongo:ConnectionString"] = fixture.Mongo.GetConnectionString(),
             ["Mongo:Database"] = database,
@@ -72,13 +73,13 @@ public sealed class ConsolidationWorkerHost : IAsyncDisposable
         });
 
         var host = builder.Build();
-        await host.StartAsync();
+        await host.StartAsync().ConfigureAwait(false);
         return new ConsolidationWorkerHost(host, database);
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _host.StopAsync();
+        await _host.StopAsync().ConfigureAwait(false);
         _host.Dispose();
     }
 }

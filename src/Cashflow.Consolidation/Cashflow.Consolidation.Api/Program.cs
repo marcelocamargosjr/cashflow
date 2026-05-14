@@ -63,7 +63,7 @@ var mongoConn = builder.Configuration["Mongo:ConnectionString"]
 var redisConn = builder.Configuration["Redis:ConnectionString"]
     ?? throw new InvalidOperationException("Redis:ConnectionString missing");
 var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
-var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], out var rp) ? rp : 5672;
+var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], System.Globalization.CultureInfo.InvariantCulture, out var rp) ? rp : 5672;
 var keycloakHealthUrl = !string.IsNullOrWhiteSpace(keycloakMetadataAddress)
     ? keycloakMetadataAddress
     : $"{keycloakAuthority.TrimEnd('/')}/.well-known/openid-configuration";

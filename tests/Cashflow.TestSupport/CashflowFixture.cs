@@ -56,7 +56,7 @@ public sealed class CashflowFixture : IAsyncLifetime
             Postgres.StartAsync(),
             Rabbit.StartAsync(),
             Redis.StartAsync(),
-            Mongo.StartAsync());
+            Mongo.StartAsync()).ConfigureAwait(false);
 
         // The production Program.cs reads infra connection strings from
         // configuration *during* its Main body — BEFORE WebApplicationFactory's

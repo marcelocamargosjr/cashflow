@@ -26,12 +26,12 @@ public abstract class ConsolidationWorkerTestBase : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        Host = await ConsolidationWorkerHost.StartAsync(Fixture);
+        Host = await ConsolidationWorkerHost.StartAsync(Fixture).ConfigureAwait(false);
     }
 
     public async Task DisposeAsync()
     {
-        await Host.DisposeAsync();
-        await DatabaseReset.ResetMongoAsync(Fixture.Mongo.GetConnectionString(), Host.MongoDatabaseName);
+        await Host.DisposeAsync().ConfigureAwait(false);
+        await DatabaseReset.ResetMongoAsync(Fixture.Mongo.GetConnectionString(), Host.MongoDatabaseName).ConfigureAwait(false);
     }
 }

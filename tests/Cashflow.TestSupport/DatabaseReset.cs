@@ -28,16 +28,22 @@ public static class DatabaseReset
 
     public static async Task<Respawner> CreatePostgresRespawnerAsync(string connectionString)
     {
-        await using var conn = new NpgsqlConnection(connectionString);
-        await conn.OpenAsync().ConfigureAwait(false);
+        var conn = new NpgsqlConnection(connectionString);
+        await using (conn.ConfigureAwait(false))
+        {
+            await conn.OpenAsync().ConfigureAwait(false);
         return await Respawner.CreateAsync(conn, PostgresOptions).ConfigureAwait(false);
+        }
     }
 
     public static async Task ResetPostgresAsync(Respawner respawner, string connectionString)
     {
-        await using var conn = new NpgsqlConnection(connectionString);
-        await conn.OpenAsync().ConfigureAwait(false);
+        var conn = new NpgsqlConnection(connectionString);
+        await using (conn.ConfigureAwait(false))
+        {
+            await conn.OpenAsync().ConfigureAwait(false);
         await respawner.ResetAsync(conn).ConfigureAwait(false);
+        }
     }
 
     public static async Task ResetMongoAsync(string connectionString, string database)

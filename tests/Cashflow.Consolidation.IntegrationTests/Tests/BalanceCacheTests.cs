@@ -39,9 +39,9 @@ public sealed class BalanceCacheTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _factory.DisposeAsync();
-        await DatabaseReset.ResetMongoAsync(_fixture.Mongo.GetConnectionString(), _mongoDatabase);
-        await DatabaseReset.ResetRedisAsync(_fixture.Redis.GetConnectionString());
+        await _factory.DisposeAsync().ConfigureAwait(false);
+        await DatabaseReset.ResetMongoAsync(_fixture.Mongo.GetConnectionString(), _mongoDatabase).ConfigureAwait(false);
+        await DatabaseReset.ResetRedisAsync(_fixture.Redis.GetConnectionString()).ConfigureAwait(false);
     }
 
     [Fact]
@@ -114,6 +114,6 @@ public sealed class BalanceCacheTests : IAsyncLifetime
             LastUpdatedAt = DateTime.UtcNow,
             Revision = 1,
             LastAppliedEventId = null
-        });
+        }).ConfigureAwait(false);
     }
 }

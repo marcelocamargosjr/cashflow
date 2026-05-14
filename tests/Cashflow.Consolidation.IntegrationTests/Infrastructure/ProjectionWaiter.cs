@@ -29,12 +29,12 @@ public static class ProjectionWaiter
         {
             var doc = await mongo.DailyBalances
                 .Find(d => d.Id == id)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
             if (doc is not null && predicate(doc))
                 return doc;
 
-            await Task.Delay(step, cancellationToken);
+            await Task.Delay(step, cancellationToken).ConfigureAwait(false);
         }
 
         throw new TimeoutException(
@@ -49,6 +49,6 @@ public static class ProjectionWaiter
         return await mongo.ProcessedEvents
             .CountDocumentsAsync(
                 Builders<ProcessedEventDoc>.Filter.Eq(d => d.Id, eventId),
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 }

@@ -26,26 +26,26 @@ internal sealed class ExceptionToProblemDetailsMiddleware : IMiddleware
         {
             _logger.LogInformation(ex, "Validation failure");
             var errors = ex.Errors
-                .GroupBy(e => string.IsNullOrEmpty(e.PropertyName) ? "_" : e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+                .GroupBy(e => string.IsNullOrEmpty(e.PropertyName) ? "_" : e.PropertyName, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray(), StringComparer.Ordinal);
 
             await WriteProblemAsync(
                 context,
-                ProblemDetailsExtensions.ValidationProblem("Validation failed.", errors, context));
+                ProblemDetailsExtensions.ValidationProblem("Validation failed.", errors, context)).ConfigureAwait(false);
         }
         catch (DomainException ex)
         {
             _logger.LogInformation(ex, "Domain rule violation");
             await WriteProblemAsync(
                 context,
-                ProblemDetailsExtensions.ValidationProblem(ex.Message, httpContext: context));
+                ProblemDetailsExtensions.ValidationProblem(ex.Message, httpContext: context)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception");
             await WriteProblemAsync(
                 context,
-                ProblemDetailsExtensions.Internal("An unexpected error occurred.", context));
+                ProblemDetailsExtensions.Internal("An unexpected error occurred.", context)).ConfigureAwait(false);
         }
     }
 

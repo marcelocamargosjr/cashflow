@@ -42,6 +42,7 @@ public sealed class LedgerApiFactory : WebApplicationFactory<Cashflow.Ledger.Api
         {
             cfg.Sources.Clear();
             cfg.AddInMemoryCollection(new Dictionary<string, string?>
+(StringComparer.Ordinal)
             {
                 ["ConnectionStrings:Postgres"] = _fixture.Postgres.GetConnectionString(),
                 ["RabbitMq:Host"] = _fixture.Rabbit.Hostname,
@@ -77,9 +78,12 @@ public sealed class LedgerApiFactory : WebApplicationFactory<Cashflow.Ledger.Api
             .UseNpgsql(PostgresConnectionString, npg => npg.MigrationsHistoryTable("__EFMigrationsHistory", "ledger"))
             .Options;
 #pragma warning disable ASP0000 // intentional: standalone DbContext to migrate before host start.
-        await using var db = new LedgerDbContext(opts, new ServiceCollection().BuildServiceProvider(), new SystemClock());
+        var db = new LedgerDbContext(opts, new ServiceCollection().BuildServiceProvider(), new SystemClock());
 #pragma warning restore ASP0000
-        await db.Database.MigrateAsync().ConfigureAwait(false);
+        await using (db.ConfigureAwait(false))
+        {
+            await db.Database.MigrateAsync().ConfigureAwait(false);
+        }
     }
 
     /// <summary>

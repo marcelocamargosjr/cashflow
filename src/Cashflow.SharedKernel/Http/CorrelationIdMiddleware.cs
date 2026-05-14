@@ -26,7 +26,7 @@ public sealed class CorrelationIdMiddleware
 
         using (LogContext.PushProperty(LogContextKey, correlationId))
         {
-            await _next(context);
+            await _next(context).ConfigureAwait(false);
         }
     }
 

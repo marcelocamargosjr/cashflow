@@ -36,7 +36,7 @@ internal sealed class ReverseEntryCommandHandler(
         {
             entry.Reverse(request.Reason, _clock.UtcNow);
         }
-        catch (DomainException ex) when (ex.Code == "entry.already_reversed")
+        catch (DomainException ex) when (string.Equals(ex.Code, "entry.already_reversed", StringComparison.Ordinal))
         {
             return LedgerErrors.AlreadyReversed;
         }

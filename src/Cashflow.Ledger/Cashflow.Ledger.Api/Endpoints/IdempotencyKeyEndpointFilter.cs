@@ -20,6 +20,7 @@ internal sealed class IdempotencyKeyEndpointFilter : IEndpointFilter
             return Results.Problem(ProblemDetailsExtensions.ValidationProblem(
                 "Header 'Idempotency-Key' is required for this operation.",
                 errors: new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                 {
                     ["Idempotency-Key"] = new[] { "header is required" }
                 },
@@ -31,6 +32,7 @@ internal sealed class IdempotencyKeyEndpointFilter : IEndpointFilter
             return Results.Problem(ProblemDetailsExtensions.ValidationProblem(
                 "Header 'Idempotency-Key' must be a valid UUID.",
                 errors: new Dictionary<string, string[]>
+(StringComparer.Ordinal)
                 {
                     ["Idempotency-Key"] = new[] { "must be a UUID" }
                 },
