@@ -30,7 +30,7 @@ RUN apk add --no-cache tzdata icu-data-full icu-libs
 ENV DOTNET_RUNNING_IN_CONTAINER=true \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-RUN addgroup -S app && adduser -S app -G app
+# A imagem aspnet:9.0-alpine já provê o usuário `app` por default.
 USER app
 
 COPY --from=build /app/publish .

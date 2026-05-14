@@ -1,0 +1,40 @@
+{
+  "rabbit_version": "3.13.0",
+  "vhosts": [
+    { "name": "/" }
+  ],
+  "exchanges": [
+    {
+      "name": "cashflow.dlx",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "cashflow.dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "cashflow.dlx",
+      "vhost": "/",
+      "destination": "cashflow.dlq",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    }
+  ],
+  "policies": [],
+  "parameters": [],
+  "users": [],
+  "permissions": []
+}

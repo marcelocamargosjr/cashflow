@@ -82,12 +82,18 @@ var keycloakAuthority = builder.Configuration["Keycloak:Authority"]
     ?? throw new InvalidOperationException("Keycloak:Authority missing");
 var keycloakAudience = builder.Configuration["Keycloak:Audience"] ?? "cashflow-api";
 var requireHttpsMetadata = builder.Configuration.GetValue<bool?>("Keycloak:RequireHttpsMetadata") ?? !builder.Environment.IsDevelopment();
+// Quando rodando em container, o iss do JWT é http://localhost:8080/... (visto pelo
+// browser), mas a API precisa buscar JWKS pela DNS interna (`http://keycloak:8080/...`).
+// MetadataAddress sobrescreve a discovery URL sem mudar o ValidIssuer — §07 §3.1.1.
+var keycloakMetadataAddress = builder.Configuration["Keycloak:MetadataAddress"];
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = keycloakAuthority;
+        if (!string.IsNullOrWhiteSpace(keycloakMetadataAddress))
+            options.MetadataAddress = keycloakMetadataAddress;
         options.Audience = keycloakAudience;
         options.RequireHttpsMetadata = requireHttpsMetadata;
         // Sem o mapping, o claim "role" do Keycloak vira ClaimTypes.Role
@@ -111,12 +117,16 @@ builder.Services.AddCashflowAuthorization();
 var postgresConn = builder.Configuration.GetConnectionString("Postgres")!;
 var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
 var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], out var rp) ? rp : 5672;
-var keycloakJwksUrl = $"{keycloakAuthority.TrimEnd('/')}/protocol/openid-connect/certs";
+// Health check usa a discovery URL interna (mesma que o JwtBearer) para que o probe
+// passe mesmo quando o `localhost` do iss não é roteável de dentro do container.
+var keycloakHealthUrl = !string.IsNullOrWhiteSpace(keycloakMetadataAddress)
+    ? keycloakMetadataAddress
+    : $"{keycloakAuthority.TrimEnd('/')}/.well-known/openid-configuration";
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(postgresConn, name: "postgres", tags: new[] { "ready", "db" })
     .AddCheck("rabbitmq", new RabbitMqHealthCheck(rabbitHost, rabbitPort), tags: new[] { "ready", "broker" })
-    .AddUrlGroup(new Uri(keycloakJwksUrl), name: "keycloak-jwks", tags: new[] { "ready", "auth" });
+    .AddUrlGroup(new Uri(keycloakHealthUrl), name: "keycloak-discovery", tags: new[] { "ready", "auth" });
 
 // ====== Rate limiter (defense-in-depth — Gateway é o teto principal) ======
 builder.Services.AddRateLimiter(opt =>

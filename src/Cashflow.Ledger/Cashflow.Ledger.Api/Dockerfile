@@ -36,8 +36,7 @@ ENV ASPNETCORE_URLS=http://+:8080 \
 
 EXPOSE 8080
 
-# Non-root user
-RUN addgroup -S app && adduser -S app -G app
+# A imagem aspnet:9.0-alpine já provê o usuário `app` por default (sem precisar criar).
 USER app
 
 COPY --from=build /app/publish .

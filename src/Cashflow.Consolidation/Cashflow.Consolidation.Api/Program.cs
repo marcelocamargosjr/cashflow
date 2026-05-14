@@ -30,12 +30,16 @@ var keycloakAudience = builder.Configuration["Keycloak:Audience"] ?? "cashflow-a
 var requireHttpsMetadata =
     builder.Configuration.GetValue<bool?>("Keycloak:RequireHttpsMetadata")
     ?? !builder.Environment.IsDevelopment();
+// Discovery URL interna para JWKS quando rodando em container — §07 §3.1.1.
+var keycloakMetadataAddress = builder.Configuration["Keycloak:MetadataAddress"];
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = keycloakAuthority;
+        if (!string.IsNullOrWhiteSpace(keycloakMetadataAddress))
+            options.MetadataAddress = keycloakMetadataAddress;
         options.Audience = keycloakAudience;
         options.RequireHttpsMetadata = requireHttpsMetadata;
         options.MapInboundClaims = false;
@@ -60,13 +64,15 @@ var redisConn = builder.Configuration["Redis:ConnectionString"]
     ?? throw new InvalidOperationException("Redis:ConnectionString missing");
 var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
 var rabbitPort = int.TryParse(builder.Configuration["RabbitMq:Port"], out var rp) ? rp : 5672;
-var keycloakJwksUrl = $"{keycloakAuthority.TrimEnd('/')}/protocol/openid-connect/certs";
+var keycloakHealthUrl = !string.IsNullOrWhiteSpace(keycloakMetadataAddress)
+    ? keycloakMetadataAddress
+    : $"{keycloakAuthority.TrimEnd('/')}/.well-known/openid-configuration";
 
 builder.Services.AddHealthChecks()
     .AddCheck<MongoHealthCheck>("mongo", tags: new[] { "ready", "db" })
     .AddRedis(redisConn, name: "redis", tags: new[] { "ready", "cache" })
     .AddCheck("rabbitmq", new RabbitMqHealthCheck(rabbitHost, rabbitPort), tags: new[] { "ready", "broker" })
-    .AddUrlGroup(new Uri(keycloakJwksUrl), name: "keycloak-jwks", tags: new[] { "ready", "auth" });
+    .AddUrlGroup(new Uri(keycloakHealthUrl), name: "keycloak-discovery", tags: new[] { "ready", "auth" });
 
 // ====== Problem Details ======
 builder.Services.AddProblemDetails(options =>

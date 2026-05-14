@@ -1,37 +1,94 @@
-# Compose para validar checkpoints F3 (Postgres + RabbitMQ + Keycloak) e
-# F4 (adiciona Mongo + Redis). F5 expande com Gateway YARP, observability, etc.
+# ============================================================================
+#  Cashflow — Docker Compose orquestrador único (07 §1).
 #
-# Uso:
-#   docker compose -f infra/docker-compose.yml --profile core up -d
-#   docker compose -f infra/docker-compose.yml --profile core down            # preserva volumes
-#   docker compose -f infra/docker-compose.yml --profile core down -v         # limpa volumes
+#  Profiles:
+#    core   — infra de runtime (Postgres, Mongo, Rabbit, Redis, Keycloak).
+#    app    — serviços .NET (Gateway, Ledger, Consolidation API + Worker).
+#    tools  — UIs auxiliares (pgAdmin, Mongo Express, RedisInsight).
+#    perf   — k6 (F7).
+#
+#  Convenções:
+#    - Tags fixas em TODAS imagens (nunca `:latest`) — §07 §1.1.
+#    - Healthchecks reais; depends_on com `condition: service_healthy`.
+#    - Volumes nomeados; networks separadas (`cashflow-net` / `observability-net`).
+#    - `extra_hosts: ["localhost:host-gateway"]` em cada serviço .NET para que o
+#      `iss=http://localhost:8080/realms/cashflow` do JWT bata no validador
+#      JwtBearer rodando dentro de container — §07 §3.1.1.
+#
+#  Uso típico (Makefile alvos em §07 §6):
+#    docker compose -f infra/docker-compose.yml --profile core --profile app up -d
+#    docker compose -f infra/docker-compose.yml down
+# ============================================================================
 
 name: cashflow
 
 x-restart: &restart
   restart: unless-stopped
 
+x-app-env: &app-env
+  ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+  Keycloak__Authority: ${Keycloak__Authority}
+  Keycloak__Audience: ${Keycloak__Audience}
+  Keycloak__RequireHttpsMetadata: ${Keycloak__RequireHttpsMetadata:-false}
+  # MetadataAddress separa o issuer (string match com `iss`=http://localhost:...)
+  # da discovery URL real (DNS interno do compose). Sem isso o JwtBearer tenta
+  # buscar JWKS via `localhost` dentro do container e cai em loopback (§07 §3.1.1).
+  Keycloak__MetadataAddress: ${Keycloak__MetadataAddress}
+  RabbitMq__Host: ${RabbitMq__Host}
+  RabbitMq__Port: ${RabbitMq__Port}
+  RabbitMq__VirtualHost: ${RabbitMq__VirtualHost:-/}
+  RabbitMq__Username: ${RabbitMq__Username}
+  RabbitMq__Password: ${RabbitMq__Password}
+  OTel__Endpoint: ${OTel__Endpoint}
+
 services:
+
+  # ==================== CORE ====================
+
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16.3-alpine
     profiles: ["core"]
     <<: *restart
     container_name: cashflow-postgres
     environment:
-      POSTGRES_USER: cashflow
-      POSTGRES_PASSWORD: cashflow
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: postgres
     ports:
       # 5433 no host evita conflito com instalações nativas de PostgreSQL
       # (a porta padrão 5432 frequentemente já está ocupada em estações dev).
       - "5433:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    networks: [cashflow-net]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cashflow -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres"]
       interval: 5s
       timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:7.0.12
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      # 27018 no host evita conflito com mongod nativo no Windows.
+      - "27018:27017"
+    volumes:
+      - mongodata:/data/db
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks: [cashflow-net]
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "echo 'db.runCommand(\"ping\").ok' | mongosh --quiet --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin"
+      interval: 5s
+      timeout: 10s
       retries: 10
 
   rabbitmq:
@@ -40,17 +97,39 @@ services:
     <<: *restart
     container_name: cashflow-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: cashflow
-      RABBITMQ_DEFAULT_PASS: cashflow
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "5672:5672"
       - "15672:15672"
+      - "15692:15692"
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
+      - rabbitdata:/var/lib/rabbitmq
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks: [cashflow-net]
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 5s
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
       timeout: 10s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    profiles: ["core"]
+    <<: *restart
+    container_name: cashflow-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks: [cashflow-net]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
       retries: 10
 
   keycloak:
@@ -63,65 +142,215 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
-      KC_DB_USERNAME: cashflow
-      KC_DB_PASSWORD: cashflow
-      KC_HEALTH_ENABLED: "true"
-      KC_HTTP_ENABLED: "true"
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # ====== Issuer alignment (§07 §3.1.1) ======
+      # KC_HOSTNAME=localhost garante que o `iss` do JWT seja
+      #   http://localhost:8080/realms/cashflow
+      # — o mesmo valor que o JwtBearer das APIs/Gateway usa em `Authority`.
+      # Containers .NET resolvem `localhost` ao Keycloak via `extra_hosts`.
+      # KC_HOSTNAME precisa ser URL completa quando usamos backchannel-dynamic
+      # (Keycloak 25 valida na inicialização). Frontend = http://localhost:8080.
+      KC_HOSTNAME: http://localhost:8080
       KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      # Discovery: jwks_uri/token_endpoint refletem o Host da request quando
+      # acessados via DNS interna (`http://keycloak:8080/...`). Sem isso, o
+      # discovery doc devolve URLs com `localhost`, e o JwtBearer dentro de
+      # container faz fetch em loopback (404) — checkpoint F5 quebra com 401.
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: edge
+      KC_HEALTH_ENABLED: "true"
     ports:
       - "8080:8080"
     volumes:
+      - keycloakdata:/opt/keycloak/data
       - ./keycloak/realm-cashflow.json:/opt/keycloak/data/import/realm-cashflow.json:ro
+    networks: [cashflow-net]
     healthcheck:
+      # Keycloak 25 expõe /health/ready em :9000 (management interface).
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nhost: localhost\\r\\n\\r\\n' >&3 && head -1 <&3 | grep -q 200"]
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 30
       start_period: 60s
 
-  mongo:
-    image: mongo:7
-    profiles: ["core"]
-    <<: *restart
-    container_name: cashflow-mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: cashflow
-      MONGO_INITDB_ROOT_PASSWORD: cashflow
-    ports:
-      # 27018 no host evita conflito com instalações nativas de MongoDB
-      # (o serviço Windows mongod frequentemente já está ocupando 27017).
-      - "27018:27017"
-    volumes:
-      - mongo-data:/data/db
-      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
-    healthcheck:
-      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh --quiet --username cashflow --password cashflow --authenticationDatabase admin"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
+  # ==================== APP ====================
 
-  redis:
-    image: redis:7-alpine
-    profiles: ["core"]
+  ledger-api:
+    build:
+      context: ..
+      dockerfile: src/Cashflow.Ledger/Cashflow.Ledger.Api/Dockerfile
+    image: cashflow/ledger-api:dev
+    profiles: ["app"]
     <<: *restart
-    container_name: cashflow-redis
-    command: ["redis-server", "--appendonly", "yes"]
+    container_name: cashflow-ledger-api
+    depends_on:
+      postgres: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      keycloak: { condition: service_healthy }
+    environment:
+      <<: *app-env
+      ConnectionStrings__Postgres: ${ConnectionStrings__Postgres}
     ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
+      - "8001:8080"
+    networks: [cashflow-net]
+    extra_hosts:
+      # `iss` do JWT vem como http://localhost:8080/realms/cashflow; precisamos
+      # resolver localhost → host (Docker Desktop publica :8080 do Keycloak).
+      - "localhost:host-gateway"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health/ready || exit 1"]
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 12
+      start_period: 30s
+
+  consolidation-api:
+    build:
+      context: ..
+      dockerfile: src/Cashflow.Consolidation/Cashflow.Consolidation.Api/Dockerfile
+    image: cashflow/consolidation-api:dev
+    profiles: ["app"]
+    <<: *restart
+    container_name: cashflow-consolidation-api
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      keycloak: { condition: service_healthy }
+    environment:
+      <<: *app-env
+      Mongo__ConnectionString: ${Mongo__ConnectionString}
+      Redis__ConnectionString: ${Redis__ConnectionString}
+    ports:
+      - "8002:8080"
+    networks: [cashflow-net]
+    extra_hosts:
+      - "localhost:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  consolidation-worker:
+    build:
+      context: ..
+      dockerfile: src/Cashflow.Consolidation/Cashflow.Consolidation.Worker/Dockerfile
+    image: cashflow/consolidation-worker:dev
+    profiles: ["app"]
+    <<: *restart
+    container_name: cashflow-consolidation-worker
+    depends_on:
+      mongo: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    environment:
+      <<: *app-env
+      Mongo__ConnectionString: ${Mongo__ConnectionString}
+      Redis__ConnectionString: ${Redis__ConnectionString}
+    networks: [cashflow-net]
+    extra_hosts:
+      - "localhost:host-gateway"
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: src/Cashflow.Gateway/Dockerfile
+    image: cashflow/gateway:dev
+    profiles: ["app"]
+    <<: *restart
+    container_name: cashflow-gateway
+    depends_on:
+      keycloak: { condition: service_healthy }
+      ledger-api: { condition: service_healthy }
+      consolidation-api: { condition: service_healthy }
+    environment:
+      <<: *app-env
+    ports:
+      - "8000:8080"
+    networks: [cashflow-net]
+    extra_hosts:
+      - "localhost:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  # ==================== TOOLS ====================
+
+  pgadmin:
+    image: dpage/pgadmin4:8.10
+    profiles: ["tools"]
+    <<: *restart
+    container_name: cashflow-pgadmin
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cashflow.local
+      PGADMIN_DEFAULT_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    networks: [cashflow-net]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    profiles: ["tools"]
+    <<: *restart
+    container_name: cashflow-mongo-express
+    depends_on:
+      mongo: { condition: service_healthy }
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH: "false"
+    ports:
+      - "8081:8081"
+    networks: [cashflow-net]
+
+  redisinsight:
+    image: redis/redisinsight:2.56
+    profiles: ["tools"]
+    <<: *restart
+    container_name: cashflow-redisinsight
+    ports:
+      - "5540:5540"
+    networks: [cashflow-net]
+
+  # ==================== PERF ====================
+
+  k6:
+    image: grafana/k6:0.53.0
+    profiles: ["perf"]
+    container_name: cashflow-k6
+    networks: [cashflow-net]
+    volumes:
+      - ../perf/k6:/scripts:ro
+
+networks:
+  cashflow-net:
+    driver: bridge
+  observability-net:
+    driver: bridge
 
 volumes:
-  postgres-data:
-  rabbitmq-data:
-  mongo-data:
-  redis-data:
+  pgdata: {}
+  mongodata: {}
+  rabbitdata: {}
+  redisdata: {}
+  keycloakdata: {}
