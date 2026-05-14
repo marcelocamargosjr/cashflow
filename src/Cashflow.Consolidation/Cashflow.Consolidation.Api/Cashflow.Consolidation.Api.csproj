@@ -8,12 +8,19 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="AspNetCore.HealthChecks.MongoDb" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj" />
     <ProjectReference Include="..\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\Cashflow.Contracts\Cashflow.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
