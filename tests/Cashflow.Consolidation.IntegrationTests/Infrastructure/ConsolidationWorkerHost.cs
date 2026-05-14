@@ -35,8 +35,7 @@ public sealed class ConsolidationWorkerHost : IAsyncDisposable
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-(StringComparer.Ordinal)
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
         {
             ["Mongo:ConnectionString"] = fixture.Mongo.GetConnectionString(),
             ["Mongo:Database"] = database,

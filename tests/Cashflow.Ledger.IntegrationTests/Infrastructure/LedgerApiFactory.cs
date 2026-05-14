@@ -28,8 +28,7 @@ public sealed class LedgerApiFactory : WebApplicationFactory<Cashflow.Ledger.Api
         builder.ConfigureAppConfiguration((_, cfg) =>
         {
             cfg.Sources.Clear();
-            cfg.AddInMemoryCollection(new Dictionary<string, string?>
-(StringComparer.Ordinal)
+            cfg.AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
             {
                 ["ConnectionStrings:Postgres"] = _fixture.Postgres.GetConnectionString(),
                 ["RabbitMq:Host"] = _fixture.Rabbit.Hostname,

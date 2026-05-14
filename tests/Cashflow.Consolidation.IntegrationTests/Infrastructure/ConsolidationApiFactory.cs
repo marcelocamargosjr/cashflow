@@ -26,8 +26,7 @@ public sealed class ConsolidationApiFactory : WebApplicationFactory<Cashflow.Con
         builder.ConfigureAppConfiguration((_, cfg) =>
         {
             cfg.Sources.Clear();
-            cfg.AddInMemoryCollection(new Dictionary<string, string?>
-(StringComparer.Ordinal)
+            cfg.AddInMemoryCollection(new Dictionary<string, string?>(StringComparer.Ordinal)
             {
                 ["Mongo:ConnectionString"] = _fixture.Mongo.GetConnectionString(),
                 ["Mongo:Database"] = _mongoDatabase,
