@@ -445,7 +445,7 @@ services:
     networks: [cashflow-net]
 
   redisinsight:
-    image: redis/redisinsight:2.56
+    image: redis/redisinsight:3.4
     profiles: ["tools"]
     <<: *restart
     container_name: cashflow-redisinsight
