@@ -1,9 +1,13 @@
-name: ci
+name: CI
 
-# Runs on every PR + main pushes. Triggers the whole .NET pipeline:
-# restore → build (warnings = errors) → unit + integration + architecture tests
-# with coverage. Integration tests rely on Testcontainers, which talks to the
-# host Docker daemon — `ubuntu-latest` ships with it preinstalled.
+# Pipeline conforme `07-INFRA-E-DEVOPS.md §5.1`:
+#   build-test  → restore + build + unit + arch + coverage gates (Domain ≥90 / App ≥80)
+#   integration → Testcontainers (Postgres / Mongo / Rabbit / Redis)
+#   k6-smoke    → compose up core+app, roda perf/k6/balance-smoke.js
+#   build-push  → bake 4 imagens p/ GHCR (sha + latest) + Trivy HIGH/CRITICAL = 0
+#
+# Apenas o build-push gera publicações; ele depende de todos os anteriores e
+# só roda em pushes para `main`.
 
 on:
   push:
@@ -11,28 +15,30 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOCKER_BUILDKIT: '1'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
-    name: build + test (.NET ${{ matrix.dotnet }})
+  build-test:
+    name: build + test (Domain ≥90% / Application ≥80%)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        dotnet: ['9.0.x']
-    env:
-      DOTNET_NOLOGO: 'true'
-      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
-      # Testcontainers honors these to discover the Docker socket and behave
-      # well in ephemeral CI runners.
-      TESTCONTAINERS_RYUK_DISABLED: 'false'
-      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 'false'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET ${{ matrix.dotnet }}
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: NuGet cache
         uses: actions/cache@v4
@@ -46,32 +52,17 @@ jobs:
         run: dotnet restore cashflow.sln
 
       - name: Build (Release, warnings as errors)
-        # Directory.Build.props sets TreatWarningsAsErrors=true in Release, so this
-        # step catches any analyzer / nullability / xUnit warning that snuck in.
         run: dotnet build cashflow.sln -c Release --no-restore
 
       - name: Unit + Architecture tests
-        # We run unit and architecture tests separately from integration tests
-        # because they are fast and provide quick signal if a structural rule
-        # is broken — saving the long Testcontainers wait.
         run: |
           dotnet test tests/Cashflow.SharedKernel.UnitTests/Cashflow.SharedKernel.UnitTests.csproj -c Release --no-build --logger trx
-          dotnet test tests/Cashflow.Ledger.UnitTests/Cashflow.Ledger.UnitTests.csproj -c Release --no-build --logger trx
-          dotnet test tests/Cashflow.ArchitectureTests/Cashflow.ArchitectureTests.csproj -c Release --no-build --logger trx
+          dotnet test tests/Cashflow.Ledger.UnitTests/Cashflow.Ledger.UnitTests.csproj         -c Release --no-build --logger trx
+          dotnet test tests/Cashflow.ArchitectureTests/Cashflow.ArchitectureTests.csproj       -c Release --no-build --logger trx
 
-      - name: Integration tests (Testcontainers)
-        # Pulls Postgres / Mongo / Rabbit / Redis images on demand and spins up
-        # ephemeral containers per fixture. Allow extra time for first-run image pulls.
-        run: |
-          dotnet test tests/Cashflow.Ledger.IntegrationTests/Cashflow.Ledger.IntegrationTests.csproj \
-            -c Release --no-build --logger trx -- xunit.parallelizeAssembly=false
-          dotnet test tests/Cashflow.Consolidation.IntegrationTests/Cashflow.Consolidation.IntegrationTests.csproj \
-            -c Release --no-build --logger trx -- xunit.parallelizeAssembly=false
-
-      - name: Coverage (Domain + Application gates)
-        # Coverlet's XPlat collector emits Cobertura per project; we run only the
-        # unit-test projects here to keep coverage focused on the layers we gate on
-        # (Domain ≥ 90%, Application ≥ 80% — see `08-TESTES.md §7`).
+      - name: Coverage collection
+        # Coverlet's XPlat collector emits Cobertura per project. We only collect on
+        # unit-test projects — Domain + Application coverage is what the gate checks.
         run: |
           dotnet test tests/Cashflow.Ledger.UnitTests/Cashflow.Ledger.UnitTests.csproj \
             -c Release --no-build \
@@ -82,14 +73,22 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults/Coverage
 
-      - name: Generate coverage report
+      - name: Generate coverage report + threshold gate
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
           reportgenerator \
             -reports:./TestResults/Coverage/**/coverage.cobertura.xml \
             -targetdir:./TestResults/CoverageReport \
-            -reporttypes:'Html;Cobertura;TextSummary'
+            -reporttypes:'Html;Cobertura;TextSummary' \
+            -assemblyfilters:'+Cashflow.*.Domain;+Cashflow.*.Application;+Cashflow.SharedKernel' \
+            -classfilters:'-*Tests*'
           cat ./TestResults/CoverageReport/Summary.txt
+          # Parse per-assembly Line coverage out of the text summary.
+          DOMAIN=$(awk '/Cashflow\..*\.Domain/{flag=1} flag && /Line coverage/{print $3; exit}' ./TestResults/CoverageReport/Summary.txt | tr -d '%')
+          APP=$(awk    '/Cashflow\..*\.Application/{flag=1} flag && /Line coverage/{print $3; exit}' ./TestResults/CoverageReport/Summary.txt | tr -d '%')
+          echo "Domain coverage: ${DOMAIN:-0}% | Application coverage: ${APP:-0}%"
+          awk -v d="${DOMAIN:-0}" 'BEGIN{exit !(d+0 >= 90)}' || { echo "::error::Domain coverage ${DOMAIN}% < 90% (08-TESTES §7)"; exit 1; }
+          awk -v a="${APP:-0}"    'BEGIN{exit !(a+0 >= 80)}' || { echo "::error::Application coverage ${APP}% < 80% (08-TESTES §7)"; exit 1; }
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -106,3 +105,160 @@ jobs:
           name: test-results
           path: '**/TestResults/*.trx'
           retention-days: 7
+
+  integration-tests:
+    name: integration tests (Testcontainers)
+    runs-on: ubuntu-latest
+    needs: [build-test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: NuGet cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore + Build
+        run: |
+          dotnet restore cashflow.sln
+          dotnet build cashflow.sln -c Release --no-restore
+
+      - name: Ledger integration tests
+        run: |
+          dotnet test tests/Cashflow.Ledger.IntegrationTests/Cashflow.Ledger.IntegrationTests.csproj \
+            -c Release --no-build --logger trx -- xunit.parallelizeAssembly=false
+
+      - name: Consolidation integration tests
+        run: |
+          dotnet test tests/Cashflow.Consolidation.IntegrationTests/Cashflow.Consolidation.IntegrationTests.csproj \
+            -c Release --no-build --logger trx -- xunit.parallelizeAssembly=false
+
+      - name: Upload integration test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
+          path: '**/TestResults/*.trx'
+          retention-days: 7
+
+  k6-smoke:
+    name: k6 smoke (perf/k6/balance-smoke.js)
+    runs-on: ubuntu-latest
+    needs: [build-test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Compose up (core + app)
+        # The compose file expects an .env file alongside it. We seed one from the
+        # versioned example so the build args resolve. Secrets stay placeholder —
+        # the smoke test only needs the stack reachable, not real auth flow.
+        run: |
+          cp infra/.env.example infra/.env || true
+          docker compose -f infra/docker-compose.yml --profile core --profile app up -d --wait --wait-timeout 180
+          docker compose -f infra/docker-compose.yml ps
+
+      - name: Wait for gateway readiness
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health >/dev/null 2>&1; then
+              echo "gateway up"; exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::gateway did not become healthy in 150s"
+          docker compose -f infra/docker-compose.yml logs --no-color --tail=200
+          exit 1
+
+      - name: Run k6 smoke
+        run: |
+          docker compose -f infra/docker-compose.yml --profile perf \
+            run --rm k6 run /scripts/balance-smoke.js
+
+      - name: Compose logs on failure
+        if: failure()
+        run: docker compose -f infra/docker-compose.yml logs --no-color --tail=300
+
+      - name: Compose down
+        if: always()
+        run: docker compose -f infra/docker-compose.yml down -v --remove-orphans
+
+  build-push:
+    name: build + push GHCR (Trivy HIGH/CRITICAL = 0)
+    runs-on: ubuntu-latest
+    needs: [build-test, integration-tests, k6-smoke]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      packages: write
+      contents: read
+    env:
+      GHCR_OWNER: ${{ github.repository_owner }}
+      GIT_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bake + push (4 imagens)
+        # docker-bake.hcl publica ghcr.io/${owner}/cashflow-<service>:{sha-<SHA>,latest}
+        uses: docker/bake-action@v5
+        with:
+          files: ./docker-bake.hcl
+          push: true
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+
+      - name: Trivy scan (ledger-api)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/cashflow-ledger-api:sha-${{ github.sha }}
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+
+      - name: Trivy scan (consolidation-api)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/cashflow-consolidation-api:sha-${{ github.sha }}
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+
+      - name: Trivy scan (consolidation-worker)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/cashflow-consolidation-worker:sha-${{ github.sha }}
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+
+      - name: Trivy scan (gateway)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/cashflow-gateway:sha-${{ github.sha }}
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table

@@ -1,0 +1,109 @@
+# Dependabot — conforme `07-INFRA-E-DEVOPS.md §5.2`.
+# Cadências:
+#   NuGet            → diário  (back-end .NET 9, OWASP A06)
+#   Docker           → semanal (imagens base nos Dockerfiles + compose)
+#   npm              → diário  (frontend MAY — ativa quando package.json existir)
+#   github-actions   → semanal (workflows do .github)
+
+version: 2
+
+updates:
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "06:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels: ["deps", "nuget"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      microsoft-aspnetcore:
+        patterns:
+          - "Microsoft.AspNetCore.*"
+          - "Microsoft.Extensions.*"
+      microsoft-ef:
+        patterns:
+          - "Microsoft.EntityFrameworkCore*"
+          - "Npgsql.EntityFrameworkCore.*"
+      opentelemetry:
+        patterns:
+          - "OpenTelemetry*"
+      masstransit:
+        patterns:
+          - "MassTransit*"
+      testing:
+        patterns:
+          - "xunit*"
+          - "Testcontainers*"
+          - "FluentAssertions"
+          - "NSubstitute"
+          - "Bogus"
+          - "NetArchTest.*"
+          - "coverlet.*"
+
+  - package-ecosystem: docker
+    directory: "/src/Cashflow.Ledger/Cashflow.Ledger.Api"
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["deps", "docker"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: docker
+    directory: "/src/Cashflow.Consolidation/Cashflow.Consolidation.Api"
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["deps", "docker"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: docker
+    directory: "/src/Cashflow.Consolidation/Cashflow.Consolidation.Worker"
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["deps", "docker"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: docker
+    directory: "/src/Cashflow.Gateway"
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["deps", "docker"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: docker-compose
+    directory: "/infra"
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["deps", "docker"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: npm
+    directory: "/frontend"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 5
+    labels: ["deps", "npm"]
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["deps", "ci"]
+    commit-message:
+      prefix: "chore(ci)"

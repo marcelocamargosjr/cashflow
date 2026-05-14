@@ -2,11 +2,13 @@
 
 > Plataforma event-driven em **.NET 9** que registra lançamentos financeiros (créditos/débitos) e mantém uma projeção diária consolidada por comerciante. Construída para sobreviver à indisponibilidade do consolidado e sustentar **50 req/s** de consulta com **< 5% de erro** (NFR literal do desafio).
 
-[![ci](https://img.shields.io/badge/ci-pendente_F9-lightgrey)](#)
-[![coverage-domain](https://img.shields.io/badge/coverage_domain-≥%2090%25-brightgreen)](#)
-[![coverage-application](https://img.shields.io/badge/coverage_application-≥%2080%25-brightgreen)](#)
+[![CI](https://github.com/marcelocamargosjr/cashflow/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marcelocamargosjr/cashflow/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/marcelocamargosjr/cashflow/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/marcelocamargosjr/cashflow/actions/workflows/codeql.yml)
+[![coverage-domain](https://img.shields.io/badge/coverage_domain-≥%2090%25-brightgreen)](#10-como-rodar-os-testes)
+[![coverage-application](https://img.shields.io/badge/coverage_application-≥%2080%25-brightgreen)](#10-como-rodar-os-testes)
 [![nfr-50rps](https://img.shields.io/badge/nfr_50rps-0%25%20err%20%2F%20p95%2053ms-brightgreen)](#11-validação-do-nfr-de-50-reqs-make-perf)
 [![chaos-isolation](https://img.shields.io/badge/chaos_isolation-100%2F100%20OK-brightgreen)](#12-demonstração-de-isolamento-make-chaos-validate)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#17-licença)
 
 ---
 
@@ -424,7 +426,85 @@ Itens fora do MVP por adicionarem risco sem provar nada novo:
 
 ---
 
-## 17. Licença
+## 17. CI/CD e branch protection
+
+Pipeline em `.github/workflows/ci.yml` (jobs em ordem):
+
+| Job | Gate |
+|---|---|
+| `build-test` | restore → build (`/warnaserror`) → unit + arch + coverage. **Falha se** Domain < 90% ou Application < 80%. |
+| `integration-tests` | Testcontainers (Postgres / Mongo / Rabbit / Redis) — Ledger + Consolidation. |
+| `k6-smoke` | `docker compose up core+app --wait` → `perf/k6/balance-smoke.js`. Thresholds: `http_req_failed < 10%`, `p95 < 1500ms`. |
+| `build-push` | Só em `main` push. `docker buildx bake --push` das 4 imagens → `ghcr.io/<owner>/cashflow-<service>:{sha-<SHA>,latest}` → **Trivy** (`HIGH,CRITICAL`, `exit-code 1`). |
+
+Workflows complementares:
+
+| Workflow | Cadência | Cobre |
+|---|---|---|
+| `.github/workflows/codeql.yml` | push/PR + segunda 06:00 UTC | C# (build manual) + JavaScript/TypeScript |
+| `.github/dependabot.yml` | NuGet diário · Docker semanal · npm diário · GitHub Actions semanal | OWASP A06 (componentes vulneráveis) |
+
+### Branch protection em `main`
+
+Configurada em **Settings → Branches → Branch protection rules** com a regra `main`:
+
+- ✅ **Require a pull request before merging** — sem push direto.
+- ✅ **Require approvals: 1** review aprovado.
+- ✅ **Dismiss stale pull request approvals when new commits are pushed**.
+- ✅ **Require status checks to pass before merging** — checks obrigatórios:
+  - `build-test` (CI)
+  - `integration-tests` (CI)
+  - `k6-smoke` (CI)
+  - `analyze (csharp)` (CodeQL)
+  - `analyze (javascript-typescript)` (CodeQL)
+- ✅ **Require branches to be up to date before merging**.
+- ✅ **Require conversation resolution before merging**.
+- ✅ **Do not allow bypassing the above settings** (vale até para admins).
+- ⛔ **Allow force pushes / deletions** — desligados.
+
+> Para reaplicar via `gh`:
+> ```bash
+> gh api -X PUT "repos/marcelocamargosjr/cashflow/branches/main/protection" \
+>   -H "Accept: application/vnd.github+json" \
+>   --input - <<'JSON'
+> {
+>   "required_status_checks": {
+>     "strict": true,
+>     "contexts": [
+>       "build-test", "integration-tests", "k6-smoke",
+>       "analyze (csharp)", "analyze (javascript-typescript)"
+>     ]
+>   },
+>   "enforce_admins": true,
+>   "required_pull_request_reviews": {
+>     "required_approving_review_count": 1,
+>     "dismiss_stale_reviews": true,
+>     "require_code_owner_reviews": false
+>   },
+>   "restrictions": null,
+>   "allow_force_pushes": false,
+>   "allow_deletions": false,
+>   "required_conversation_resolution": true
+> }
+> JSON
+> ```
+
+### Imagens publicadas
+
+Após merge em `main` o job `build-push` publica em **GitHub Container Registry**:
+
+```
+ghcr.io/marcelocamargosjr/cashflow-ledger-api:sha-<SHA>           (e :latest)
+ghcr.io/marcelocamargosjr/cashflow-consolidation-api:sha-<SHA>    (e :latest)
+ghcr.io/marcelocamargosjr/cashflow-consolidation-worker:sha-<SHA> (e :latest)
+ghcr.io/marcelocamargosjr/cashflow-gateway:sha-<SHA>              (e :latest)
+```
+
+Critério de release: **Trivy reporta 0 vulnerabilidades HIGH/CRITICAL** nas 4 imagens (`07-INFRA §3.4 — OWASP A06/A08`).
+
+---
+
+## 18. Licença
 
 MIT. Veja `LICENSE` (a adicionar antes do release `v1.0.0`).
 

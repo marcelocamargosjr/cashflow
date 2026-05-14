@@ -1,0 +1,63 @@
+name: CodeQL
+
+# SAST semanal conforme `07-INFRA-E-DEVOPS.md §5.2`.
+# Cobre C# (back-ends) e JavaScript/TypeScript (frontend Next.js opcional + scripts k6).
+#
+# - Push em `main` e PRs para main → scan rápido (mudou código → revalida).
+# - Schedule semanal segundas 06:00 UTC → captura novas regras CodeQL sem mudança no repo.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build-mode: manual
+          - language: javascript-typescript
+            build-mode: none
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-and-quality
+
+      - name: Setup .NET
+        if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build (C# manual)
+        if: matrix.language == 'csharp'
+        run: |
+          dotnet restore cashflow.sln
+          dotnet build cashflow.sln -c Release --no-restore
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'
