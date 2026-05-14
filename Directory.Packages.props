@@ -122,7 +122,7 @@
     <PackageVersion Include="Testcontainers.MongoDb" Version="4.0.0" />
     <PackageVersion Include="Testcontainers.RabbitMq" Version="4.0.0" />
     <PackageVersion Include="Testcontainers.Redis" Version="4.0.0" />
-    <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="Respawn" Version="7.0.0" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="9.0.14" />
