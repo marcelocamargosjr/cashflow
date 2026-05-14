@@ -19,6 +19,10 @@
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.14" />
   </ItemGroup>
 
+  <ItemGroup Label="Gateway (YARP)">
+    <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
+  </ItemGroup>
+
   <ItemGroup Label="EF Core / Postgres">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.14" />
