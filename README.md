@@ -8,7 +8,7 @@
 [![coverage-application](https://img.shields.io/badge/coverage_application-≥%2080%25-brightgreen)](#10-como-rodar-os-testes)
 [![nfr-50rps](https://img.shields.io/badge/nfr_50rps-0%25%20err%20%2F%20p95%2053ms-brightgreen)](#11-validação-do-nfr-de-50-reqs-make-perf)
 [![chaos-isolation](https://img.shields.io/badge/chaos_isolation-100%2F100%20OK-brightgreen)](#12-demonstração-de-isolamento-make-chaos-validate)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#17-licença)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#18-licença)
 
 ---
 
