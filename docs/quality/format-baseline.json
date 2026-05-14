@@ -1,0 +1,1112 @@
+[
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "e34f7f50-292f-482a-a186-73819750469c"
+      },
+      "Id": "8aa18eca-73d8-4531-b4d5-026666a3cfb4"
+    },
+    "FileName": "20260514051620_CreateEntries.cs",
+    "FilePath": "C:\\Users\\marce\\Downloads\\cashflow\\src\\Cashflow.Ledger\\Cashflow.Ledger.Infrastructure\\Persistence\\Migrations\\20260514051620_CreateEntries.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 1,
+        "CharNumber": 14,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 2,
+        "CharNumber": 48,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 4,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 6,
+        "CharNumber": 64,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 7,
+        "CharNumber": 2,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 23,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 51,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 6,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 27,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 70,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 43,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 33,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 17,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 33,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 19,
+        "CharNumber": 34,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 21,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 22,
+        "CharNumber": 76,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 23,
+        "CharNumber": 85,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 24,
+        "CharNumber": 89,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 25,
+        "CharNumber": 121,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 26,
+        "CharNumber": 115,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 27,
+        "CharNumber": 88,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 109,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 89,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 30,
+        "CharNumber": 135,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 31,
+        "CharNumber": 124,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 32,
+        "CharNumber": 114,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 114,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 34,
+        "CharNumber": 120,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 35,
+        "CharNumber": 97,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 36,
+        "CharNumber": 19,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 37,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 38,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 39,
+        "CharNumber": 63,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 40,
+        "CharNumber": 91,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 41,
+        "CharNumber": 20,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 43,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 44,
+        "CharNumber": 50,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 45,
+        "CharNumber": 34,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 46,
+        "CharNumber": 34,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 47,
+        "CharNumber": 64,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 52,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 50,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 51,
+        "CharNumber": 46,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 34,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 53,
+        "CharNumber": 34,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 54,
+        "CharNumber": 69,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 55,
+        "CharNumber": 31,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 57,
+        "CharNumber": 91,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 58,
+        "CharNumber": 100,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 59,
+        "CharNumber": 34,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 60,
+        "CharNumber": 98,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 61,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 27,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 64,
+        "CharNumber": 72,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 66,
+        "CharNumber": 86,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 68,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 33,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 70,
+        "CharNumber": 35,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 72,
+        "CharNumber": 101,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 73,
+        "CharNumber": 75,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 74,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 75,
+        "CharNumber": 6,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 76,
+        "CharNumber": 2,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "e34f7f50-292f-482a-a186-73819750469c"
+      },
+      "Id": "57448470-b326-447b-9ca8-ee6b7dbf6fb4"
+    },
+    "FileName": "20260514051647_AddMassTransitOutbox.cs",
+    "FilePath": "C:\\Users\\marce\\Downloads\\cashflow\\src\\Cashflow.Ledger\\Cashflow.Ledger.Infrastructure\\Persistence\\Migrations\\20260514051647_AddMassTransitOutbox.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 1,
+        "CharNumber": 14,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 2,
+        "CharNumber": 48,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 3,
+        "CharNumber": 54,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 5,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 7,
+        "CharNumber": 64,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 8,
+        "CharNumber": 2,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 9,
+        "CharNumber": 23,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 10,
+        "CharNumber": 58,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 11,
+        "CharNumber": 6,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 12,
+        "CharNumber": 27,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 13,
+        "CharNumber": 70,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 14,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 15,
+        "CharNumber": 43,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 16,
+        "CharNumber": 36,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 18,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 19,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 20,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 21,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 22,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 23,
+        "CharNumber": 82,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 24,
+        "CharNumber": 80,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 25,
+        "CharNumber": 104,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 26,
+        "CharNumber": 105,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 27,
+        "CharNumber": 106,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 28,
+        "CharNumber": 92,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 29,
+        "CharNumber": 19,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 30,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 31,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 32,
+        "CharNumber": 73,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 33,
+        "CharNumber": 20,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 35,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 36,
+        "CharNumber": 39,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 37,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 38,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 39,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 40,
+        "CharNumber": 89,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 41,
+        "CharNumber": 126,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 42,
+        "CharNumber": 108,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 43,
+        "CharNumber": 106,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 44,
+        "CharNumber": 82,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 45,
+        "CharNumber": 85,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 46,
+        "CharNumber": 87,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 47,
+        "CharNumber": 88,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 48,
+        "CharNumber": 81,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 49,
+        "CharNumber": 83,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 50,
+        "CharNumber": 121,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 51,
+        "CharNumber": 87,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 52,
+        "CharNumber": 80,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 53,
+        "CharNumber": 87,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 54,
+        "CharNumber": 86,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 55,
+        "CharNumber": 84,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 56,
+        "CharNumber": 82,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 57,
+        "CharNumber": 122,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 58,
+        "CharNumber": 127,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 59,
+        "CharNumber": 124,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 60,
+        "CharNumber": 121,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 61,
+        "CharNumber": 110,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 62,
+        "CharNumber": 19,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 63,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 64,
+        "CharNumber": 18,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 65,
+        "CharNumber": 81,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 66,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 67,
+        "CharNumber": 71,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 68,
+        "CharNumber": 49,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 69,
+        "CharNumber": 54,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 70,
+        "CharNumber": 55,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 71,
+        "CharNumber": 54,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 72,
+        "CharNumber": 20,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 74,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 75,
+        "CharNumber": 54,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 76,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 77,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 78,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 80,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 81,
+        "CharNumber": 57,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 82,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 83,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 84,
+        "CharNumber": 43,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 86,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 87,
+        "CharNumber": 88,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 88,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 89,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 90,
+        "CharNumber": 90,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 91,
+        "CharNumber": 31,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 93,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 94,
+        "CharNumber": 66,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 95,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 96,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 97,
+        "CharNumber": 65,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 98,
+        "CharNumber": 31,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 100,
+        "CharNumber": 42,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 101,
+        "CharNumber": 48,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 102,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 103,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 104,
+        "CharNumber": 36,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 105,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 107,
+        "CharNumber": 27,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 108,
+        "CharNumber": 72,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 109,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 110,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 111,
+        "CharNumber": 39,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 112,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 4 caracteres por \u0027\\n\\n\u0027."
+      },
+      {
+        "LineNumber": 114,
+        "CharNumber": 40,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 115,
+        "CharNumber": 37,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 116,
+        "CharNumber": 38,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 117,
+        "CharNumber": 10,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 118,
+        "CharNumber": 6,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      },
+      {
+        "LineNumber": 119,
+        "CharNumber": 2,
+        "DiagnosticId": "ENDOFLINE",
+        "FormatDescription": "Corrigir o final do marcador de linha. Substituir 2 caracteres por \u0027\\n\u0027."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "e34f7f50-292f-482a-a186-73819750469c"
+      },
+      "Id": "8aa18eca-73d8-4531-b4d5-026666a3cfb4"
+    },
+    "FileName": "20260514051620_CreateEntries.cs",
+    "FilePath": "C:\\Users\\marce\\Downloads\\cashflow\\src\\Cashflow.Ledger\\Cashflow.Ledger.Infrastructure\\Persistence\\Migrations\\20260514051620_CreateEntries.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 1,
+        "CharNumber": 1,
+        "DiagnosticId": "CHARSET",
+        "FormatDescription": "Corrigir a codifica\u00E7\u00E3o de arquivo."
+      }
+    ]
+  },
+  {
+    "DocumentId": {
+      "ProjectId": {
+        "Id": "e34f7f50-292f-482a-a186-73819750469c"
+      },
+      "Id": "57448470-b326-447b-9ca8-ee6b7dbf6fb4"
+    },
+    "FileName": "20260514051647_AddMassTransitOutbox.cs",
+    "FilePath": "C:\\Users\\marce\\Downloads\\cashflow\\src\\Cashflow.Ledger\\Cashflow.Ledger.Infrastructure\\Persistence\\Migrations\\20260514051647_AddMassTransitOutbox.cs",
+    "FileChanges": [
+      {
+        "LineNumber": 1,
+        "CharNumber": 1,
+        "DiagnosticId": "CHARSET",
+        "FormatDescription": "Corrigir a codifica\u00E7\u00E3o de arquivo."
+      }
+    ]
+  }
+]

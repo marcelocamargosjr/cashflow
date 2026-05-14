@@ -1,0 +1,457 @@
+===== docs/quality/baseline.txt — F7.1 Code Hardening baseline =====
+date(UTC): 2026-05-14T18:21:48Z
+branch: chore/code-hardening
+commit: 2ca4909ca963ba8b14c51fed172db03985ede337
+
+----- [1] dotnet build -c Release -warnaserror -----
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Cashflow.Contracts -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\bin\Release\net9.0\Cashflow.Contracts.dll
+  Cashflow.Consolidation.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Release\net9.0\Cashflow.Consolidation.UnitTests.dll
+  Cashflow.TestSupport -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Release\net9.0\Cashflow.TestSupport.dll
+  Cashflow.SharedKernel -> C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\bin\Release\net9.0\Cashflow.SharedKernel.dll
+  Cashflow.Ledger.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\bin\Release\net9.0\Cashflow.Ledger.Domain.dll
+  Cashflow.Consolidation.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\bin\Release\net9.0\Cashflow.Consolidation.Domain.dll
+  Cashflow.SharedKernel.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\bin\Release\net9.0\Cashflow.SharedKernel.UnitTests.dll
+  Cashflow.Consolidation.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\bin\Release\net9.0\Cashflow.Consolidation.Application.dll
+  Cashflow.Ledger.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\bin\Release\net9.0\Cashflow.Ledger.Application.dll
+  Cashflow.Gateway -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Gateway\bin\Release\net9.0\Cashflow.Gateway.dll
+  Cashflow.Consolidation.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\bin\Release\net9.0\Cashflow.Consolidation.Infrastructure.dll
+  Cashflow.Ledger.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\bin\Release\net9.0\Cashflow.Ledger.Infrastructure.dll
+  Cashflow.Ledger.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\bin\Release\net9.0\Cashflow.Ledger.UnitTests.dll
+  Cashflow.Consolidation.Worker -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\bin\Release\net9.0\Cashflow.Consolidation.Worker.dll
+  Cashflow.Consolidation.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\bin\Release\net9.0\Cashflow.Consolidation.Api.dll
+  Cashflow.Consolidation.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\bin\Release\net9.0\Cashflow.Consolidation.IntegrationTests.dll
+  Cashflow.Ledger.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\bin\Release\net9.0\Cashflow.Ledger.Api.dll
+  Cashflow.ArchitectureTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\bin\Release\net9.0\Cashflow.ArchitectureTests.dll
+  Cashflow.Ledger.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\bin\Release\net9.0\Cashflow.Ledger.IntegrationTests.dll
+
+Compilação com êxito.
+    0 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:08.21
+
+----- [2] dotnet test (logger console;verbosity=minimal) -----
+  Determinando os projetos a serem restaurados...
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\Cashflow.Contracts.csproj restaurado (em 252 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Gateway\Cashflow.Gateway.csproj restaurado (em 571 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj restaurado (em 568 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\Cashflow.Consolidation.Domain.csproj restaurado (em 568 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj restaurado (em 579 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\Cashflow.Ledger.UnitTests.csproj restaurado (em 594 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\Cashflow.SharedKernel.UnitTests.csproj restaurado (em 565 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\Cashflow.Consolidation.UnitTests.csproj restaurado (em 272 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\Cashflow.Ledger.Application.csproj restaurado (em 564 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\Cashflow.Consolidation.Api.csproj restaurado (em 602 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\Cashflow.Consolidation.Worker.csproj restaurado (em 588 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\Cashflow.Ledger.Domain.csproj restaurado (em 38 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj restaurado (em 600 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\Cashflow.TestSupport.csproj restaurado (em 65 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj restaurado (em 49 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\Cashflow.Ledger.IntegrationTests.csproj restaurado (em 670 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\Cashflow.ArchitectureTests.csproj restaurado (em 67 ms).
+  C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\Cashflow.Ledger.Api.csproj restaurado (em 67 ms).
+  C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\Cashflow.Consolidation.IntegrationTests.csproj restaurado (em 76 ms).
+  Cashflow.Consolidation.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Debug\net9.0\Cashflow.Consolidation.UnitTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Debug\net9.0\Cashflow.Consolidation.UnitTests.dll (.NETCoreApp,Version=v9.0)
+  Cashflow.SharedKernel -> C:\Users\marce\Downloads\cashflow\src\Cashflow.SharedKernel\bin\Debug\net9.0\Cashflow.SharedKernel.dll
+Versão do VSTest 17.14.1 (x64)
+  Cashflow.TestSupport -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Debug\net9.0\Cashflow.TestSupport.dll
+
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Debug\net9.0\Cashflow.TestSupport.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+Processo testhost para fonte(s) 'C:\Users\marce\Downloads\cashflow\tests\Cashflow.TestSupport\bin\Debug\net9.0\Cashflow.TestSupport.dll' encerrado com erro: Error:
+  An assembly specified in the application dependencies manifest (Cashflow.TestSupport.deps.json) was not found:
+    package: 'Azure.Core', version: '1.6.0'
+    path: 'lib/netstandard2.0/Azure.Core.dll'
+. Verifique os logs de diagnóstico para mais informações.
+
+Execução de Teste Anulada.
+  Cashflow.SharedKernel.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\bin\Debug\net9.0\Cashflow.SharedKernel.UnitTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.SharedKernel.UnitTests\bin\Debug\net9.0\Cashflow.SharedKernel.UnitTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+  Cashflow.Contracts -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Contracts\bin\Debug\net9.0\Cashflow.Contracts.dll
+Não há nenhum teste disponível em C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.UnitTests\bin\Debug\net9.0\Cashflow.Consolidation.UnitTests.dll. Verifique se o detector e os executores de teste estão registrados e se as configurações de versão da estrutura da plataforma & são apropriadas e tente novamente.
+
+
+Aprovado!  – Com falha:     0, Aprovado:    23, Ignorado:     0, Total:    23, Duração: 33 ms - Cashflow.SharedKernel.UnitTests.dll (net9.0)
+  Cashflow.Ledger.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Domain\bin\Debug\net9.0\Cashflow.Ledger.Domain.dll
+  Cashflow.Consolidation.Domain -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\bin\Debug\net9.0\Cashflow.Consolidation.Domain.dll
+  Cashflow.Ledger.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Application\bin\Debug\net9.0\Cashflow.Ledger.Application.dll
+  Cashflow.Consolidation.Application -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\bin\Debug\net9.0\Cashflow.Consolidation.Application.dll
+  Cashflow.Ledger.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\bin\Debug\net9.0\Cashflow.Ledger.Infrastructure.dll
+  Cashflow.Ledger.UnitTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\bin\Debug\net9.0\Cashflow.Ledger.UnitTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.UnitTests\bin\Debug\net9.0\Cashflow.Ledger.UnitTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+  Cashflow.Ledger.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Api\bin\Debug\net9.0\Cashflow.Ledger.Api.dll
+  Cashflow.Ledger.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\bin\Debug\net9.0\Cashflow.Ledger.IntegrationTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Ledger.IntegrationTests\bin\Debug\net9.0\Cashflow.Ledger.IntegrationTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+
+Aprovado!  – Com falha:     0, Aprovado:    42, Ignorado:     0, Total:    42, Duração: 96 ms - Cashflow.Ledger.UnitTests.dll (net9.0)
+  Cashflow.Consolidation.Infrastructure -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\bin\Debug\net9.0\Cashflow.Consolidation.Infrastructure.dll
+  Cashflow.Consolidation.Worker -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\bin\Debug\net9.0\Cashflow.Consolidation.Worker.dll
+
+Aprovado!  – Com falha:     0, Aprovado:     4, Ignorado:     0, Total:     4, Duração: 3 s - Cashflow.Ledger.IntegrationTests.dll (net9.0)
+  Cashflow.Consolidation.Api -> C:\Users\marce\Downloads\cashflow\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\bin\Debug\net9.0\Cashflow.Consolidation.Api.dll
+  Cashflow.ArchitectureTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\bin\Debug\net9.0\Cashflow.ArchitectureTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.ArchitectureTests\bin\Debug\net9.0\Cashflow.ArchitectureTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+  Cashflow.Consolidation.IntegrationTests -> C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\bin\Debug\net9.0\Cashflow.Consolidation.IntegrationTests.dll
+Execução de teste para C:\Users\marce\Downloads\cashflow\tests\Cashflow.Consolidation.IntegrationTests\bin\Debug\net9.0\Cashflow.Consolidation.IntegrationTests.dll (.NETCoreApp,Version=v9.0)
+Versão do VSTest 17.14.1 (x64)
+
+Iniciando execução de teste, espere...
+1 arquivos de teste no total corresponderam ao padrão especificado.
+
+Aprovado!  – Com falha:     0, Aprovado:    11, Ignorado:     0, Total:    11, Duração: 2 s - Cashflow.ArchitectureTests.dll (net9.0)
+
+Aprovado!  – Com falha:     0, Aprovado:     4, Ignorado:     0, Total:     4, Duração: 16 s - Cashflow.Consolidation.IntegrationTests.dll (net9.0)
+
+----- [3] grep -rn Console. src tests --include=*.cs -----
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:19:Console.WriteLine("[BOOT] entering Program.Main");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:20:Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:23:Console.WriteLine("[BOOT] CreateBuilder done");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:24:Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:27:Console.WriteLine("[BOOT] observability registered");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:28:Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:225:Console.WriteLine("[BOOT] app built, environment=" + app.Environment.EnvironmentName);
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:228:Console.WriteLine("[BOOT] Postgres connection string in use: " + sanitized);
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:229:Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:246:    Console.WriteLine("[BOOT] applying migrations...");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:247:    Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:261:        Console.WriteLine("[BOOT][mig] DbContext created manually");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:262:        Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:265:        Console.WriteLine("[BOOT] migrations applied");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:269:        Console.Error.WriteLine("[BOOT][ERROR] migration failed: " + ex);
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:270:        Console.Error.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:273:    Console.Out.Flush();
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:276:Console.WriteLine("[BOOT] starting host...");
+src/Cashflow.Ledger/Cashflow.Ledger.Api/Program.cs:277:Console.Out.Flush();
+
+----- [4] dotnet list package --vulnerable --include-transitive -----
+
+As fontes a seguir foram usadas:
+   https://api.nuget.org/v3/index.json
+
+O projeto fornecido `Cashflow.SharedKernel` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Contracts` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Gateway` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Api` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Application` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Domain` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Infrastructure` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Consolidation.Api` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto fornecido `Cashflow.Consolidation.Application` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Domain` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Consolidation.Infrastructure` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto `Cashflow.Consolidation.Worker` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto `Cashflow.ArchitectureTests` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo      Resolvido   Severidade   URL do aviso                                     
+   > SharpCompress        0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier             1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+
+O projeto fornecido `Cashflow.SharedKernel.UnitTests` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.UnitTests` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Ledger.IntegrationTests` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo            Resolvido   Severidade   URL do aviso                                     
+   > Azure.Identity             1.3.0       Moderate     https://github.com/advisories/GHSA-m5vv-6r4h-3vj9
+                                            Moderate     https://github.com/advisories/GHSA-wvxc-855f-jvrv
+                                            High         https://github.com/advisories/GHSA-5mfx-4wcx-rv27
+   > SharpCompress              0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier                   1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+   > System.Drawing.Common      5.0.0       Critical     https://github.com/advisories/GHSA-rxg9-xrhp-64gj
+   > System.Formats.Asn1        5.0.0       High         https://github.com/advisories/GHSA-447r-wph3-92pm
+
+O projeto fornecido `Cashflow.Consolidation.UnitTests` não tem nenhum pacote vulnerável, considerando as fontes atuais.
+O projeto `Cashflow.Consolidation.IntegrationTests` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo            Resolvido   Severidade   URL do aviso                                     
+   > Azure.Identity             1.3.0       Moderate     https://github.com/advisories/GHSA-m5vv-6r4h-3vj9
+                                            Moderate     https://github.com/advisories/GHSA-wvxc-855f-jvrv
+                                            High         https://github.com/advisories/GHSA-5mfx-4wcx-rv27
+   > SharpCompress              0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier                   1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+   > System.Drawing.Common      5.0.0       Critical     https://github.com/advisories/GHSA-rxg9-xrhp-64gj
+   > System.Formats.Asn1        5.0.0       High         https://github.com/advisories/GHSA-447r-wph3-92pm
+
+O projeto `Cashflow.TestSupport` tem os pacotes vulneráveis a seguir
+   [net9.0]: 
+   Pacote Transitivo            Resolvido   Severidade   URL do aviso                                     
+   > Azure.Identity             1.3.0       Moderate     https://github.com/advisories/GHSA-m5vv-6r4h-3vj9
+                                            Moderate     https://github.com/advisories/GHSA-wvxc-855f-jvrv
+                                            High         https://github.com/advisories/GHSA-5mfx-4wcx-rv27
+   > SharpCompress              0.30.1      Moderate     https://github.com/advisories/GHSA-6c8g-7p36-r338
+   > Snappier                   1.0.0       High         https://github.com/advisories/GHSA-pggp-6c3x-2xmx
+   > System.Drawing.Common      5.0.0       Critical     https://github.com/advisories/GHSA-rxg9-xrhp-64gj
+   > System.Formats.Asn1        5.0.0       High         https://github.com/advisories/GHSA-447r-wph3-92pm
+
+
+----- [5] dotnet list package --deprecated -----
+
+As fontes a seguir foram usadas:
+   https://api.nuget.org/v3/index.json
+
+O projeto fornecido `Cashflow.SharedKernel` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Contracts` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Gateway` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Api` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Application` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Domain` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Ledger.Infrastructure` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Api` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Application` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Domain` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Infrastructure` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto fornecido `Cashflow.Consolidation.Worker` não tem nenhum pacote preterido, de acordo com as fontes atuais.
+O projeto `Cashflow.ArchitectureTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.SharedKernel.UnitTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Ledger.UnitTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Ledger.IntegrationTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Consolidation.UnitTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.Consolidation.IntegrationTests` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+O projeto `Cashflow.TestSupport` tem os seguintes pacotes preteridos
+   [net9.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido   Motivos   Alternativo      
+   > xunit                       2.9.2        2.9.2       Legacy    xunit.v3 >= 0.0.0
+
+
+----- [6] dotnet format --verify-no-changes --report docs/quality/format-baseline.json -----
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(1,14): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(2,48): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(4,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(6,64): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(7,2): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(8,23): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(9,51): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(10,6): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(11,27): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(12,70): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(13,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(14,43): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(15,33): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(17,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(18,33): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(19,34): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(20,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(21,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(22,76): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(23,85): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(24,89): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(25,121): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(26,115): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(27,88): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(28,109): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(29,89): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(30,135): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(31,124): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(32,114): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(33,114): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(34,120): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(35,97): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(36,19): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(37,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(38,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(39,63): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(40,91): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(41,20): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(43,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(44,50): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(45,34): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(46,34): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(47,64): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(48,52): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(50,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(51,46): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(52,34): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(53,34): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(54,69): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(55,31): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(57,91): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(58,100): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(59,34): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(60,98): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(61,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(63,27): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(64,72): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(65,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(66,86): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(68,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(69,33): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(70,35): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(72,101): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(73,75): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(74,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(75,6): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(76,2): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(1,14): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(2,48): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(3,54): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(5,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(7,64): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(8,2): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(9,23): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(10,58): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(11,6): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(12,27): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(13,70): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(14,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(15,43): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(16,36): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(18,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(19,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(20,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(21,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(22,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(23,82): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(24,80): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(25,104): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(26,105): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(27,106): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(28,92): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(29,19): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(30,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(31,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(32,73): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(33,20): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(35,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(36,39): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(37,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(38,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(39,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(40,89): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(41,126): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(42,108): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(43,106): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(44,82): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(45,85): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(46,87): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(47,88): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(48,81): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(49,83): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(50,121): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(51,87): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(52,80): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(53,87): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(54,86): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(55,84): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(56,82): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(57,122): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(58,127): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(59,124): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(60,121): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(61,110): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(62,19): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(63,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(64,18): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(65,81): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(66,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(67,71): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(68,49): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(69,54): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(70,55): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(71,54): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(72,20): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(74,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(75,54): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(76,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(77,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(78,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(80,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(81,57): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(82,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(83,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(84,43): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(86,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(87,88): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(88,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(89,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(90,90): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(91,31): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(93,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(94,66): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(95,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(96,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(97,65): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(98,31): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(100,42): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(101,48): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(102,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(103,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(104,36): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(105,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(107,27): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(108,72): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(109,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(110,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(111,39): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(112,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 4 caracteres por '\n\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(114,40): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(115,37): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(116,38): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(117,10): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(118,6): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(119,2): error ENDOFLINE: Corrigir o final do marcador de linha. Substituir 2 caracteres por '\n'. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051620_CreateEntries.cs(1,1): error CHARSET: Corrigir a codificação de arquivo. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Persistence\Migrations\20260514051647_AddMassTransitOutbox.cs(1,1): error CHARSET: Corrigir a codificação de arquivo. [C:\Users\marce\Downloads\cashflow\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj]
+
+===== end baseline =====
