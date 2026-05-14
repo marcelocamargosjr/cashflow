@@ -6,7 +6,8 @@ internal static class HealthCheckServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var postgresConn = configuration.GetConnectionString("Postgres")!;
+        var postgresConn = configuration.GetConnectionString("Postgres")
+            ?? throw new InvalidOperationException("ConnectionStrings:Postgres missing");
         var rabbitHost = configuration["RabbitMq:Host"] ?? "localhost";
         var rabbitPort = int.TryParse(configuration["RabbitMq:Port"], System.Globalization.CultureInfo.InvariantCulture, out var rp) ? rp : 5672;
         var keycloakAuthority = configuration["Keycloak:Authority"]

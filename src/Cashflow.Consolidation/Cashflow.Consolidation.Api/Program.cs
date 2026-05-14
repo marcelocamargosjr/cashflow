@@ -53,8 +53,3 @@ if (app.Environment.IsDevelopment())
 }
 
 await app.RunAsync().ConfigureAwait(false);
-
-namespace Cashflow.Consolidation.Api
-{
-    public partial class Program;
-}

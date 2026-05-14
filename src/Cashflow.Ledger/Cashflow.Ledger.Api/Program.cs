@@ -81,7 +81,8 @@ if (app.Environment.IsDevelopment())
 #pragma warning disable S2139
     try
     {
-        var connectionString = app.Configuration.GetConnectionString("Postgres")!;
+        var connectionString = app.Configuration.GetConnectionString("Postgres")
+            ?? throw new InvalidOperationException("ConnectionStrings:Postgres missing");
         var opts = new DbContextOptionsBuilder<LedgerDbContext>()
             .UseNpgsql(connectionString, npg => npg.MigrationsHistoryTable("__EFMigrationsHistory", "ledger"))
             .Options;
@@ -108,10 +109,3 @@ if (app.Environment.IsDevelopment())
 
 bootLogger.LogInformation("Starting host...");
 await app.RunAsync().ConfigureAwait(false);
-
-// Exposed para WebApplicationFactory em integration tests. Namespace explícito
-// evita ambiguidade quando outros services também declaram `partial class Program`.
-namespace Cashflow.Ledger.Api
-{
-    public partial class Program;
-}

@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Cashflow.Ledger.Application.Entries.Commands.RegisterEntry;
 
-public sealed class RegisterEntryCommandValidator : AbstractValidator<RegisterEntryCommand>
+internal sealed class RegisterEntryCommandValidator : AbstractValidator<RegisterEntryCommand>
 {
     public RegisterEntryCommandValidator()
     {
