@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -23,5 +23,26 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+
+  <!--
+    F7.1: analyzers ligados em todos os projetos (src e tests).
+    PrivateAssets=all impede que esses analyzers entrem no fechamento NuGet de quem
+    consome os artefatos (Cashflow.Contracts é o único exposto). IncludeAssets força
+    inclusão apenas de analyzers/build, sem trazer runtime DLLs.
+  -->
+  <ItemGroup Label="Quality analyzers (F7.1)">
+    <PackageReference Include="SonarAnalyzer.CSharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Roslynator.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Meziantou.Analyzer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>

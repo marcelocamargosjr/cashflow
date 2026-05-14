@@ -106,6 +106,18 @@
     - System.IdentityModel.Tokens.Jwt: forja tokens JWT para o stub JwtBearer
       nos integration tests (sem precisar de Keycloak real).
   -->
+  <!--
+    F7.1: analyzers de qualidade aplicados a TODOS os projetos via Directory.Build.props.
+    Razão: enforcement de regras canônicas de code smells / anti-patterns / style sem
+    depender de scanner externo. PrivateAssets=all garante que analyzers não vazem
+    como dependência de pacotes consumidores. Versões fixas para reprodutibilidade.
+  -->
+  <ItemGroup Label="Quality analyzers (F7.1)">
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.25.0.139117" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.84" />
+  </ItemGroup>
+
   <ItemGroup Label="Integration / Architecture tests (F6)">
     <PackageVersion Include="Testcontainers" Version="4.0.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.0.0" />
