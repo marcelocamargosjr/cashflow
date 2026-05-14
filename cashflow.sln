@@ -1,21 +1,29 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68D194BA-F727-479E-AB7E-A9028E990193}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		global.json = global.json
+		NuGet.config = NuGet.config
+		README.md = README.md
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cashflow.Ledger", "Cashflow.Ledger", "{7AE191B6-3020-407B-A98D-31C80CD6EA49}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cashflow.Consolidation", "Cashflow.Consolidation", "{310552A0-4F1F-0EA3-9057-9A743507BA7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Api", "src\Cashflow.Consolidation\Cashflow.Consolidation.Api\Cashflow.Consolidation.Api.csproj", "{82B180A8-2790-4A1A-B373-F3A86A724E3C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Application", "src\Cashflow.Consolidation\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj", "{3C275510-7E84-47B6-8ADB-F37FEA9290F9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Domain", "src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\Cashflow.Consolidation.Domain.csproj", "{7DCF7FD8-26AD-40AE-943B-0C979AE2A6BA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Infrastructure", "src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj", "{67E50499-13FD-4F88-9037-CAC71A9A7F8B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Worker", "src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\Cashflow.Consolidation.Worker.csproj", "{825BCA04-F053-4F90-BFF4-514CD6017AF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.SharedKernel", "src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj", "{3813F50A-7BEA-4DF0-B312-652739289E09}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Contracts", "src\Cashflow.Contracts\Cashflow.Contracts.csproj", "{F74EEB03-623B-4399-B5E4-30905495729A}"
 EndProject
@@ -29,17 +37,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Ledger.Domain", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Ledger.Infrastructure", "src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj", "{026DE2BF-33B4-4B2E-B014-6F85B16C979F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.SharedKernel", "src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj", "{3813F50A-7BEA-4DF0-B312-652739289E09}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Api", "src\Cashflow.Consolidation\Cashflow.Consolidation.Api\Cashflow.Consolidation.Api.csproj", "{82B180A8-2790-4A1A-B373-F3A86A724E3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Application", "src\Cashflow.Consolidation\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj", "{3C275510-7E84-47B6-8ADB-F37FEA9290F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Domain", "src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\Cashflow.Consolidation.Domain.csproj", "{7DCF7FD8-26AD-40AE-943B-0C979AE2A6BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Infrastructure", "src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj", "{67E50499-13FD-4F88-9037-CAC71A9A7F8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.Worker", "src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\Cashflow.Consolidation.Worker.csproj", "{825BCA04-F053-4F90-BFF4-514CD6017AF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.ArchitectureTests", "tests\Cashflow.ArchitectureTests\Cashflow.ArchitectureTests.csproj", "{C0B2EDF1-867D-42C3-BE21-DA0BB23928C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.IntegrationTests", "tests\Cashflow.Consolidation.IntegrationTests\Cashflow.Consolidation.IntegrationTests.csproj", "{ACF14A43-A8C8-47D8-9A6B-6AF52F5E7B6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.SharedKernel.UnitTests", "tests\Cashflow.SharedKernel.UnitTests\Cashflow.SharedKernel.UnitTests.csproj", "{06D52799-0AC7-4BE6-9807-16BD2964F030}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.UnitTests", "tests\Cashflow.Consolidation.UnitTests\Cashflow.Consolidation.UnitTests.csproj", "{8DB5BC88-2E6E-4896-AF53-A0EDE20BF9D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Ledger.UnitTests", "tests\Cashflow.Ledger.UnitTests\Cashflow.Ledger.UnitTests.csproj", "{948AFEDD-E3E7-4993-BD82-D66B3F043895}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Ledger.IntegrationTests", "tests\Cashflow.Ledger.IntegrationTests\Cashflow.Ledger.IntegrationTests.csproj", "{902A9512-28FF-4F6C-ADB6-2ABFA1194134}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Ledger.UnitTests", "tests\Cashflow.Ledger.UnitTests\Cashflow.Ledger.UnitTests.csproj", "{948AFEDD-E3E7-4993-BD82-D66B3F043895}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.UnitTests", "tests\Cashflow.Consolidation.UnitTests\Cashflow.Consolidation.UnitTests.csproj", "{8DB5BC88-2E6E-4896-AF53-A0EDE20BF9D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cashflow.Consolidation.IntegrationTests", "tests\Cashflow.Consolidation.IntegrationTests\Cashflow.Consolidation.IntegrationTests.csproj", "{ACF14A43-A8C8-47D8-9A6B-6AF52F5E7B6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -255,28 +273,42 @@ Global
 		{948AFEDD-E3E7-4993-BD82-D66B3F043895}.Release|x64.Build.0 = Release|Any CPU
 		{948AFEDD-E3E7-4993-BD82-D66B3F043895}.Release|x86.ActiveCfg = Release|Any CPU
 		{948AFEDD-E3E7-4993-BD82-D66B3F043895}.Release|x86.Build.0 = Release|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Debug|x64.Build.0 = Debug|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Debug|x86.Build.0 = Debug|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Release|x64.ActiveCfg = Release|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Release|x64.Build.0 = Release|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Release|x86.ActiveCfg = Release|Any CPU
+		{06D52799-0AC7-4BE6-9807-16BD2964F030}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{7AE191B6-3020-407B-A98D-31C80CD6EA49} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{310552A0-4F1F-0EA3-9057-9A743507BA7F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{3813F50A-7BEA-4DF0-B312-652739289E09} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{F74EEB03-623B-4399-B5E4-30905495729A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{E93FBDDF-4486-4F0F-8AB7-1B22DCD1BFBF} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{CF3AB3D0-6108-4BF0-954E-018219E42385} = {7AE191B6-3020-407B-A98D-31C80CD6EA49}
+		{26862712-654B-4B17-AD59-8040372D5F25} = {7AE191B6-3020-407B-A98D-31C80CD6EA49}
+		{787FA7F8-5440-49A8-9CD3-601FF75FB783} = {7AE191B6-3020-407B-A98D-31C80CD6EA49}
+		{026DE2BF-33B4-4B2E-B014-6F85B16C979F} = {7AE191B6-3020-407B-A98D-31C80CD6EA49}
 		{82B180A8-2790-4A1A-B373-F3A86A724E3C} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
 		{3C275510-7E84-47B6-8ADB-F37FEA9290F9} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
 		{7DCF7FD8-26AD-40AE-943B-0C979AE2A6BA} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
 		{67E50499-13FD-4F88-9037-CAC71A9A7F8B} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
 		{825BCA04-F053-4F90-BFF4-514CD6017AF2} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{F74EEB03-623B-4399-B5E4-30905495729A} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{E93FBDDF-4486-4F0F-8AB7-1B22DCD1BFBF} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{CF3AB3D0-6108-4BF0-954E-018219E42385} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{26862712-654B-4B17-AD59-8040372D5F25} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{787FA7F8-5440-49A8-9CD3-601FF75FB783} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{026DE2BF-33B4-4B2E-B014-6F85B16C979F} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{3813F50A-7BEA-4DF0-B312-652739289E09} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{C0B2EDF1-867D-42C3-BE21-DA0BB23928C2} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{ACF14A43-A8C8-47D8-9A6B-6AF52F5E7B6D} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{8DB5BC88-2E6E-4896-AF53-A0EDE20BF9D6} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{902A9512-28FF-4F6C-ADB6-2ABFA1194134} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
-		{948AFEDD-E3E7-4993-BD82-D66B3F043895} = {310552A0-4F1F-0EA3-9057-9A743507BA7F}
+		{C0B2EDF1-867D-42C3-BE21-DA0BB23928C2} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{ACF14A43-A8C8-47D8-9A6B-6AF52F5E7B6D} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{8DB5BC88-2E6E-4896-AF53-A0EDE20BF9D6} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{902A9512-28FF-4F6C-ADB6-2ABFA1194134} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{948AFEDD-E3E7-4993-BD82-D66B3F043895} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{06D52799-0AC7-4BE6-9807-16BD2964F030} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

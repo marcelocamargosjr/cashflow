@@ -6,12 +6,35 @@
   </PropertyGroup>
 
   <!--
-    F0: apenas os pacotes embarcados pelos templates do `dotnet new` (webapi/worker/xunit).
-    Demais versões serão adicionadas a partir da fase F1 conforme dependências forem introduzidas.
+    F0: pacotes embarcados pelos templates do `dotnet new` (webapi/worker/xunit).
+    F1: adicionados Serilog, OpenTelemetry, Polly v8 e FluentAssertions para SharedKernel
+        e seus testes (ver `09-PLANO-EXECUCAO.md §F1`).
   -->
   <ItemGroup Label="ASP.NET / Hosting">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Serilog">
+    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.1.1" />
+    <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageVersion Include="Serilog.Enrichers.Span" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="OpenTelemetry">
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
+  </ItemGroup>
+
+  <ItemGroup Label="Resilience">
+    <PackageVersion Include="Polly" Version="8.5.0" />
+    <PackageVersion Include="Polly.Core" Version="8.5.0" />
   </ItemGroup>
 
   <ItemGroup Label="Test stack (xUnit)">
@@ -19,6 +42,7 @@
     <PackageVersion Include="xunit" Version="2.9.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.2" />
   </ItemGroup>
 
 </Project>
