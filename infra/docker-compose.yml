@@ -116,7 +116,7 @@ services:
       retries: 10
 
   redis:
-    image: redis:7.4-alpine
+    image: redis:8.6-alpine
     profiles: ["core"]
     <<: *restart
     container_name: cashflow-redis
