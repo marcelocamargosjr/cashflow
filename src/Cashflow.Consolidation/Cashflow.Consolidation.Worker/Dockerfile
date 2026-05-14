@@ -22,7 +22,7 @@ WORKDIR /src/src/Cashflow.Consolidation/Cashflow.Consolidation.Worker
 RUN dotnet publish "Cashflow.Consolidation.Worker.csproj" -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 # Runtime stage — aspnet image carries the AspNetCore framework reference shared via Cashflow.SharedKernel.
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 WORKDIR /app
 
 RUN apk add --no-cache tzdata icu-data-full icu-libs
