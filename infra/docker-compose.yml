@@ -456,7 +456,7 @@ services:
   # ==================== PERF ====================
 
   k6:
-    image: grafana/k6:0.53.0
+    image: grafana/k6:2.0.0
     profiles: ["perf"]
     container_name: cashflow-k6
     networks: [cashflow-net]
