@@ -18,7 +18,7 @@ WORKDIR /src/src/Cashflow.Gateway
 RUN dotnet publish "Cashflow.Gateway.csproj" -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 WORKDIR /app
 
 RUN apk add --no-cache tzdata icu-data-full icu-libs curl
