@@ -1,21 +1,44 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Cashflow.Ledger.IntegrationTests</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cashflow.Ledger\Cashflow.Ledger.Api\Cashflow.Ledger.Api.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Ledger\Cashflow.Ledger.Application\Cashflow.Ledger.Application.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Ledger\Cashflow.Ledger.Domain\Cashflow.Ledger.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Ledger\Cashflow.Ledger.Infrastructure\Cashflow.Ledger.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Contracts\Cashflow.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj" />
+    <ProjectReference Include="..\Cashflow.TestSupport\Cashflow.TestSupport.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="MongoDB.Driver" />
+    <PackageReference Include="Respawn" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
   </ItemGroup>
 
 </Project>

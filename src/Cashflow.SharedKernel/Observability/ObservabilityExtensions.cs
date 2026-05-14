@@ -28,7 +28,15 @@ public static class ObservabilityExtensions
         string serviceName,
         string serviceVersion)
     {
-        var otelEndpoint = builder.Configuration[OtelEndpointConfigKey] ?? DefaultOtelEndpoint;
+        var raw = builder.Configuration[OtelEndpointConfigKey];
+        // appsettings.json declares values like `${OTEL_EXPORTER_OTLP_ENDPOINT}`. In
+        // production those are resolved by docker-compose's env_file substitution; in
+        // tests / dev they may stay as the literal placeholder. Treat any unresolved
+        // placeholder OR empty value as "fall back to default" — passing the literal
+        // to `new Uri(...)` would throw UriFormatException at startup.
+        var otelEndpoint = !string.IsNullOrWhiteSpace(raw) && !raw.StartsWith("${", StringComparison.Ordinal)
+            ? raw
+            : DefaultOtelEndpoint;
         var environment = builder.Environment.EnvironmentName;
 
         ConfigureSerilog(builder, serviceName, serviceVersion, otelEndpoint, environment);

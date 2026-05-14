@@ -1,21 +1,43 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Cashflow.Consolidation.IntegrationTests</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cashflow.Consolidation\Cashflow.Consolidation.Api\Cashflow.Consolidation.Api.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Consolidation\Cashflow.Consolidation.Application\Cashflow.Consolidation.Application.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Consolidation\Cashflow.Consolidation.Domain\Cashflow.Consolidation.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Consolidation\Cashflow.Consolidation.Infrastructure\Cashflow.Consolidation.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Consolidation\Cashflow.Consolidation.Worker\Cashflow.Consolidation.Worker.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.Contracts\Cashflow.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Cashflow.SharedKernel\Cashflow.SharedKernel.csproj" />
+    <ProjectReference Include="..\Cashflow.TestSupport\Cashflow.TestSupport.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="MongoDB.Driver" />
+    <PackageReference Include="StackExchange.Redis" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
   </ItemGroup>
 
 </Project>

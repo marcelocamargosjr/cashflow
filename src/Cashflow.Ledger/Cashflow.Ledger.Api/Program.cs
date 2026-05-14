@@ -235,19 +235,14 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(o => o.Title = "Cashflow Ledger");
 }
 
-// Inicia o host (Kestrel + MassTransit). Depois aplica migrations em Dev.
-Console.WriteLine("[BOOT] starting host...");
-Console.Out.Flush();
-await app.StartAsync().ConfigureAwait(false);
-Console.WriteLine("[BOOT] host started; addresses=" + string.Join(",", app.Urls));
-Console.Out.Flush();
-
 if (app.Environment.IsDevelopment())
 {
     // Apply migrations on startup — Development only (§05 §1.6).
     // Constrói o DbContext manualmente para evitar deadlock que ocorre ao resolver
     // IPublishEndpoint pelo container DI enquanto o BusOutbox EF ainda está nas
-    // últimas etapas da inicialização do bus.
+    // últimas etapas da inicialização do bus. Migrations vão ANTES do RunAsync
+    // para manter o padrão WebApplicationFactory-friendly: o entrypoint só
+    // bloqueia em RunAsync, sem split Start/WaitForShutdown (que confunde WAF).
     Console.WriteLine("[BOOT] applying migrations...");
     Console.Out.Flush();
     try
@@ -273,15 +268,18 @@ if (app.Environment.IsDevelopment())
     {
         Console.Error.WriteLine("[BOOT][ERROR] migration failed: " + ex);
         Console.Error.Flush();
-        await app.StopAsync().ConfigureAwait(false);
         throw;
     }
     Console.Out.Flush();
 }
 
-Console.WriteLine("[BOOT] waiting for shutdown");
+Console.WriteLine("[BOOT] starting host...");
 Console.Out.Flush();
-await app.WaitForShutdownAsync().ConfigureAwait(false);
+await app.RunAsync().ConfigureAwait(false);
 
-// Exposed para WebApplicationFactory em integration tests futuros.
-public partial class Program;
+// Exposed para WebApplicationFactory em integration tests. Namespace explícito
+// evita ambiguidade quando outros services também declaram `partial class Program`.
+namespace Cashflow.Ledger.Api
+{
+    public partial class Program;
+}

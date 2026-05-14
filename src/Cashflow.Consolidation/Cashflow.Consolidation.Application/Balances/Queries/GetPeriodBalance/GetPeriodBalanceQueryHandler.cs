@@ -9,7 +9,7 @@ namespace Cashflow.Consolidation.Application.Balances.Queries.GetPeriodBalance;
 /// Period balance hits Mongo directly: caching a 31-day window per merchant per request
 /// blows up cardinality with little benefit. Daily lookup remains cached individually.
 /// </summary>
-public sealed class GetPeriodBalanceQueryHandler
+internal sealed class GetPeriodBalanceQueryHandler
     : IRequestHandler<GetPeriodBalanceQuery, Result<PeriodBalanceDto>>
 {
     private readonly IDailyBalanceReadRepository _repository;

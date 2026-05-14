@@ -10,7 +10,7 @@ namespace Cashflow.Consolidation.Application.Balances.Queries.GetCurrentBalance;
 /// Delegates to <see cref="GetDailyBalanceQuery"/> using <c>TodayInBusinessZone</c>.
 /// Caching/staleness behavior is inherited from the daily handler.
 /// </summary>
-public sealed class GetCurrentBalanceQueryHandler
+internal sealed class GetCurrentBalanceQueryHandler
     : IRequestHandler<GetCurrentBalanceQuery, Result<DailyBalanceDto>>
 {
     private readonly ISender _sender;

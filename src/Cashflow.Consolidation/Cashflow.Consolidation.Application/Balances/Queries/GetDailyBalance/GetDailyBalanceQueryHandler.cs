@@ -12,7 +12,7 @@ namespace Cashflow.Consolidation.Application.Balances.Queries.GetDailyBalance;
 /// Stampede-protected via a short-lived lock; on lock contention we wait briefly and
 /// retry the cache before falling through to Mongo unguarded (graceful degradation).
 /// </summary>
-public sealed class GetDailyBalanceQueryHandler
+internal sealed class GetDailyBalanceQueryHandler
     : IRequestHandler<GetDailyBalanceQuery, Result<DailyBalanceDto>>
 {
     private static readonly TimeSpan StampedeWait = TimeSpan.FromMilliseconds(100);

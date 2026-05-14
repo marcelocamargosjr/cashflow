@@ -154,4 +154,7 @@ if (app.Environment.IsDevelopment())
 
 await app.RunAsync().ConfigureAwait(false);
 
-public partial class Program;
+namespace Cashflow.Consolidation.Api
+{
+    public partial class Program;
+}

@@ -96,4 +96,28 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.14" />
   </ItemGroup>
 
+  <!--
+    F6: integration + architecture tests stack.
+    - Testcontainers: Postgres/Mongo/Rabbit/Redis ephemeral em CI e local.
+    - Respawn: limpa tabelas Postgres entre tests sem dropar schema.
+    - NetArchTest.Rules: invariantes estruturais da arquitetura (Domain isolado etc).
+    - Microsoft.AspNetCore.Mvc.Testing: WebApplicationFactory<Program>.
+    - Microsoft.AspNetCore.TestHost: TestServer auxiliar.
+    - System.IdentityModel.Tokens.Jwt: forja tokens JWT para o stub JwtBearer
+      nos integration tests (sem precisar de Keycloak real).
+  -->
+  <ItemGroup Label="Integration / Architecture tests (F6)">
+    <PackageVersion Include="Testcontainers" Version="4.0.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.0.0" />
+    <PackageVersion Include="Testcontainers.MongoDb" Version="4.0.0" />
+    <PackageVersion Include="Testcontainers.RabbitMq" Version="4.0.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="4.0.0" />
+    <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="9.0.14" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.14" />
+  </ItemGroup>
+
 </Project>
