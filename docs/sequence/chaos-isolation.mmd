@@ -1,0 +1,51 @@
+---
+title: Cashflow — Isolamento Ledger × Consolidation (NFR-A-01)
+---
+sequenceDiagram
+    autonumber
+    actor Op as Operador (make chaos-validate)
+    actor Merchant as Merchant (100 POSTs)
+    participant API as Ledger.Api
+    participant DB as PostgreSQL (Outbox)
+    participant MQ as RabbitMQ
+    participant WRK as Consolidation.Worker
+    participant MGO as MongoDB
+
+    note over Op: Fase 1 — derruba Consolidation
+    Op->>WRK: docker compose stop consolidation-worker
+    Op->>MGO: docker compose stop mongo
+    Op->>API: (consolidation-api também parado)
+
+    note over Op,Merchant: Fase 2 — 100 POSTs em Ledger (alvo: 100/100 = 201)
+    loop 100 vezes
+        Merchant->>+API: POST /api/v1/entries<br/>JWT + Idempotency-Key
+        API->>+DB: BEGIN<br/>INSERT entry + idempotency_key + OutboxMessage<br/>COMMIT
+        DB-->>-API: OK
+        API-->>-Merchant: 201 Created
+    end
+    note over API,DB: Outbox cresce ~100 msgs pending<br/>(broker disponível mas worker offline →<br/>publish OK, consume parado)
+
+    note over MQ: Mensagens enfileiradas no RabbitMQ<br/>(durable queue, persistent delivery)
+
+    note over Op: Fase 3 — restaura Consolidation
+    Op->>MGO: docker compose start mongo
+    Op->>WRK: docker compose start consolidation-worker
+    Op->>API: (consolidation-api também restart)
+
+    rect rgb(245, 250, 245)
+    note over WRK,MGO: Worker drena backlog idempotente
+        loop até processed_events alcançar 100
+            WRK->>+MQ: Consume EntryRegisteredV1
+            MQ-->>-WRK: message
+            WRK->>+MGO: FindOneAndUpdate atomic<br/>filter $ne LastEventId<br/>$inc totals + $set lastEventId
+            MGO-->>-WRK: upsert / no-op (replay safe)
+        end
+    end
+
+    note over Op: Fase 4 — verifica catch-up
+    Op->>+API: GET /balances/{merchantId}/daily?date=2026-05-13
+    API->>MGO: findOne daily_balance
+    MGO-->>API: doc com entriesCount = 100
+    API-->>-Op: 200 OK
+
+    Note over Op,MGO: Saída real 100/100 201. Catch-up em ~22s (timeout 90s). NFR-A-01 OK. Ledger continuou aceitando entries com Consolidation completamente offline.

@@ -1,0 +1,26 @@
+---
+title: Cashflow — C4 Context (nível 1)
+---
+%%{init: { "theme": "default" } }%%
+C4Context
+    title Cashflow — Diagrama de Contexto (C4 nível 1)
+
+    Person(merchant, "Comerciante", "Operador do caixa — registra lançamentos e consulta saldo do dia.")
+    Person(admin, "Administrador", "Operador da plataforma — gestão de merchants, inspeção de DLQ, reproject sob demanda.")
+
+    System(cashflow, "Cashflow", "Plataforma de fluxo de caixa: registra lançamentos (write-side) e mantém projeção diária consolidada (read-side).")
+
+    System_Ext(keycloak, "Keycloak (OIDC IdP)", "Provedor de identidade — emite e valida JWTs para merchants e admins.")
+    System_Ext(observability, "Grafana Stack", "Loki (logs), Tempo (traces), Prometheus (métricas) — observabilidade ponta-a-ponta via OTel.")
+    System_Ext(edgeTls, "Edge TLS / WAF (prod)", "Azure App Gateway / Cloudflare / Nginx — terminação TLS + HSTS + filtros L7. Em dev: ausente, HTTP direto.")
+
+    Rel(merchant, edgeTls, "Acessa", "HTTPS (prod) / HTTP localhost:8000 (dev)")
+    Rel(admin, edgeTls, "Acessa", "HTTPS (prod) / HTTP localhost:8000 (dev)")
+    Rel(edgeTls, cashflow, "Encaminha", "HTTP (rede privada)")
+
+    Rel(cashflow, keycloak, "Valida JWT, fetcha JWKS", "OIDC discovery")
+    Rel(merchant, keycloak, "Login / refresh token", "OIDC Auth Code (frontend) / Password grant (CI/k6/chaos)")
+
+    Rel(cashflow, observability, "Exporta logs, traces, métricas", "OTLP gRPC :4317")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

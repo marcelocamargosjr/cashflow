@@ -1,0 +1,341 @@
+openapi: 3.0.3
+info:
+  title: Cashflow.Ledger API
+  version: "1.0.0"
+  description: |
+    Write-side do sistema Cashflow. Registra lançamentos (créditos/débitos) com
+    invariantes de domínio (Money, EntryStatus state machine, Idempotency-Key) e
+    publica eventos de integração (`EntryRegisteredV1`, `EntryReversedV1`) via
+    **Outbox MassTransit** na mesma transação do Postgres.
+
+    - **Auth:** Bearer JWT emitido por Keycloak (realm `cashflow`).
+    - **Idempotência:** header `Idempotency-Key` (Guid) obrigatório em `POST /entries` e `POST /entries/{id}/reverse`. Replay devolve `201` com header `Idempotent-Replayed: true`.
+    - **Tempo:** `entryDate` é `DateOnly` (data de competência, sem timezone). `createdAt`/`updatedAt` são `DateTimeOffset` em UTC.
+    - **Moeda:** ISO-4217 alpha-3 (ex.: `"BRL"`).
+  contact:
+    name: Cashflow team
+    url: https://github.com/marcelocamargosjr/cashflow
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8000/ledger
+    description: Gateway local (dev)
+  - url: http://localhost:8001
+    description: Ledger.Api direto (dev — defesa em profundidade)
+  - url: https://api.cashflow.example.com/ledger
+    description: Produção (TLS terminado no edge)
+tags:
+  - name: entries
+    description: Lançamentos contábeis (Credit / Debit).
+  - name: admin
+    description: Endpoints administrativos (somente Development / role `admin`).
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/entries:
+    post:
+      tags: [entries]
+      summary: Registra um novo lançamento (idempotente).
+      operationId: RegisterEntry
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterEntryRequest"
+            examples:
+              creditoVenda:
+                summary: Crédito de venda PDV
+                value:
+                  type: Credit
+                  amount: { value: 150.00, currency: BRL }
+                  description: Venda PDV terminal 03
+                  category: Sales
+                  entryDate: "2026-05-14"
+              debitoFornecedor:
+                summary: Débito a fornecedor
+                value:
+                  type: Debit
+                  amount: { value: 2900.00, currency: BRL }
+                  description: NF 1234 Fornecedor X
+                  category: Suppliers
+                  entryDate: "2026-05-14"
+      responses:
+        "201":
+          description: Created
+          headers:
+            Idempotent-Replayed:
+              description: Presente como `true` quando a request foi um replay (mesmo `Idempotency-Key` já visto).
+              schema: { type: string, enum: ["true"] }
+            Location:
+              description: URI da entry criada.
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EntryDto" }
+        "400": { $ref: "#/components/responses/ValidationProblem" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    get:
+      tags: [entries]
+      summary: Lista lançamentos do merchant autenticado (paginado).
+      operationId: ListEntries
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          example: "2026-05-01"
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          example: "2026-05-14"
+        - name: type
+          in: query
+          required: false
+          schema: { type: string, enum: [Credit, Debit] }
+        - name: category
+          in: query
+          required: false
+          schema: { type: string, maxLength: 64 }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: size
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedEntryDto" }
+        "400": { $ref: "#/components/responses/ValidationProblem" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/v1/entries/{id}:
+    get:
+      tags: [entries]
+      summary: Obtém um lançamento por id.
+      operationId: GetEntry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EntryDto" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/v1/entries/{id}/reverse:
+    post:
+      tags: [entries]
+      summary: Estorna um lançamento confirmado (gera `EntryReversedV1`).
+      operationId: ReverseEntry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/CorrelationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReverseEntryRequest" }
+            examples:
+              estornoErroDigitacao:
+                summary: Estorno por erro de digitação
+                value: { reason: "Valor digitado errado — correto era 150.00" }
+      responses:
+        "200":
+          description: OK — lançamento estornado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EntryDto" }
+        "400": { $ref: "#/components/responses/ValidationProblem" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: Lançamento já estornado.
+          content:
+            application/problem+json:
+              schema: { $ref: "#/components/schemas/ProblemDetails" }
+  /admin/seed:
+    post:
+      tags: [admin]
+      summary: Popula dados de demo (somente Development; role admin).
+      operationId: AdminSeed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                days: { type: integer, minimum: 1, maximum: 365, default: 30 }
+                entriesPerDay: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        "202": { description: Accepted — seed iniciado. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT emitido por Keycloak. Claims relevantes:
+        - `sub` — subject (username);
+        - `merchantId` — UUID do merchant (obrigatório em chamadas de negócio);
+        - `role` — array de strings (`merchant`, `admin`).
+  parameters:
+    IdempotencyKey:
+      in: header
+      name: Idempotency-Key
+      required: true
+      schema: { type: string, format: uuid }
+      description: |
+        Chave única (Guid) por operação. Reenvio com mesma chave retorna o
+        mesmo recurso (201) com header `Idempotent-Replayed: true`.
+    CorrelationId:
+      in: header
+      name: X-Correlation-Id
+      required: false
+      schema: { type: string }
+      description: ID de correlação propagado em logs/traces. Se ausente, o gateway gera.
+  responses:
+    Unauthorized:
+      description: Token ausente ou inválido.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    Forbidden:
+      description: Token válido mas sem permissão para o recurso (resource-based).
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    NotFound:
+      description: Recurso não encontrado.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    ValidationProblem:
+      description: Erro de validação (RFC 7807).
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    Conflict:
+      description: "Conflito (ex.: invariante violada)."
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    RateLimited:
+      description: Rate limit excedido (120 req/s/merchant em consolidation; 30 req/s em ledger write).
+      headers:
+        Retry-After:
+          description: Segundos para próxima tentativa.
+          schema: { type: integer }
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+  schemas:
+    RegisterEntryRequest:
+      type: object
+      required: [type, amount, description, entryDate]
+      properties:
+        type:
+          type: string
+          enum: [Credit, Debit]
+        amount: { $ref: "#/components/schemas/MoneyRequest" }
+        description:
+          type: string
+          maxLength: 200
+        category:
+          type: string
+          maxLength: 64
+          nullable: true
+        entryDate:
+          type: string
+          format: date
+          description: Data de competência (sem timezone). Não pode ser futura.
+    ReverseEntryRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 5
+          maxLength: 500
+    MoneyRequest:
+      type: object
+      required: [value, currency]
+      properties:
+        value:
+          type: number
+          format: decimal
+          minimum: 0.01
+          multipleOf: 0.01
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: BRL
+          description: ISO-4217 alpha-3.
+    EntryDto:
+      type: object
+      required: [id, merchantId, type, amount, description, entryDate, status, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid, description: "Guid v7 — k-sortable." }
+        merchantId: { type: string, format: uuid }
+        type: { type: string, enum: [Credit, Debit] }
+        amount: { $ref: "#/components/schemas/MoneyRequest" }
+        description: { type: string }
+        category: { type: string, nullable: true }
+        entryDate: { type: string, format: date }
+        status: { type: string, enum: [Confirmed, Reversed] }
+        reversalReason: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    PagedEntryDto:
+      type: object
+      required: [items, page, size, total, hasNext]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/EntryDto" }
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer }
+        hasNext: { type: boolean }
+    ProblemDetails:
+      type: object
+      description: RFC 7807 Problem Details.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        correlationId: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }

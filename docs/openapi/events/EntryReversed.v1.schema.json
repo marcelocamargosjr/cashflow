@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cashflow.example.com/schemas/EntryReversed.v1.schema.json",
+  "title": "EntryReversedV1",
+  "description": "Integration event publicado pelo Cashflow.Ledger via Outbox MassTransit quando um lançamento é estornado. Carrega SNAPSHOT da entry original (type/amount/currency/entryDate/category) para que o consumer decremente a projeção autonomamente, SEM chamar o Ledger sincronamente — preservando NFR-A-01 (isolamento). Idempotência via `$ne lastEventId` no consumer.",
+  "$comment": "Origem: src/Cashflow.Contracts/V1/EntryReversedV1.cs.",
+  "type": "object",
+  "required": [
+    "eventId",
+    "occurredOn",
+    "merchantId",
+    "entryId",
+    "type",
+    "amount",
+    "currency",
+    "entryDate",
+    "reason"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "occurredOn": { "type": "string", "format": "date-time" },
+    "merchantId": { "type": "string", "format": "uuid" },
+    "entryId": { "type": "string", "format": "uuid" },
+    "type": {
+      "type": "string",
+      "enum": ["Credit", "Debit"],
+      "description": "SNAPSHOT — type da entry original. Determina qual total decrementar."
+    },
+    "amount": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "multipleOf": 0.01,
+      "description": "SNAPSHOT — mesmo value usado em EntryRegisteredV1."
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "SNAPSHOT — ISO-4217 alpha-3."
+    },
+    "entryDate": {
+      "type": "string",
+      "format": "date",
+      "description": "SNAPSHOT — localiza o documento daily_balance."
+    },
+    "category": {
+      "type": ["string", "null"],
+      "maxLength": 64,
+      "description": "SNAPSHOT — localiza o byCategory bucket."
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 500,
+      "description": "Motivo do estorno informado pelo merchant."
+    },
+    "version": { "type": "integer", "const": 1 }
+  },
+  "examples": [
+    {
+      "eventId": "0192d4f2-c1aa-7a05-bb06-4e7a0b3f1c08",
+      "occurredOn": "2026-05-14T11:00:00.0000Z",
+      "merchantId": "0193e7a8-d8f0-7c5e-9b21-3f9f8a4d1c00",
+      "entryId": "0192d4e1-c45f-7a9b-bb01-2f5a8c1d0e2f",
+      "type": "Credit",
+      "amount": 150.00,
+      "currency": "BRL",
+      "entryDate": "2026-05-14",
+      "category": "Sales",
+      "reason": "Valor digitado errado — correto era 150.00",
+      "version": 1
+    }
+  ]
+}

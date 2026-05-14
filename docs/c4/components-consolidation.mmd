@@ -1,0 +1,73 @@
+---
+title: Cashflow.Consolidation — C4 Components (nível 3)
+---
+%%{init: { "theme": "default" } }%%
+C4Component
+    title Cashflow.Consolidation — Componentes (C4 nível 3)
+
+    Container_Boundary(api, "Cashflow.Consolidation.Api") {
+        Component(balancesEp, "BalancesEndpoints", "Minimal API extension", "GET /{merchantId}/daily, /period, /current. RequireMerchant + resource-based check (httpContext.CanAccessMerchant).")
+        Component(authzC, "AuthorizationPolicies", "Policies", "RequireMerchant. Resource check verifica merchantId no path == claim merchantId.")
+        Component(healthEpC, "HealthChecks", "Endpoints /health/live, /health/ready", "Mongo + Redis + RabbitMQ + Keycloak.")
+    }
+
+    Container_Boundary(appC, "Cashflow.Consolidation.Application") {
+        Component(getDailyH, "GetDailyBalanceHandler", "MediatR Handler", "Cache aside: tenta Redis, em miss tenta stampede lock e busca Mongo. Polly pipeline 'mongo-read' (Timeout 2s + CB + Retry 3x).")
+        Component(getPeriodH, "GetPeriodBalanceHandler", "MediatR Handler", "Itera N dias e agrega via daily handler (com cache compartilhado).")
+        Component(getCurrentH, "GetCurrentBalanceHandler", "MediatR Handler", "Lê IClock.TodayInBusinessZone e delega ao GetDailyBalanceHandler.")
+        Component(cacheAbs, "IBalanceCache", "Interface", "GetAsync, SetAsync, TryAcquireLockAsync. Implementada em Infrastructure por RedisBalanceCache.")
+        Component(repoAbsC, "IDailyBalanceRepository", "Interface", "Find one e Find period — implementada por MongoDailyBalanceRepository.")
+        Component(validatorsC, "FluentValidation Validators", "Validators", "Validam date <= today, period span <= 90d, etc.")
+    }
+
+    Container_Boundary(domainC, "Cashflow.Consolidation.Domain") {
+        Component(readModel, "DailyBalanceReadModel", "Domain model", "MerchantId, Date, TotalCredits, TotalDebits, Balance, EntriesCount, ByCategory[], LastUpdatedAt, Revision, LastEventId.")
+        Component(catBucket, "CategoryBucket", "VO", "Category, Credit, Debit, Count — composição do read model.")
+    }
+
+    Container_Boundary(infraC, "Cashflow.Consolidation.Infrastructure") {
+        Component(mongoCtx, "MongoContext", "DI wrapper", "Resolve IMongoCollection<DailyBalanceDoc> + processed_events.")
+        Component(mongoRepo, "MongoDailyBalanceRepository", "Repository", "Implementa IDailyBalanceRepository — Find indexado por (merchantId, date).")
+        Component(redisCache, "RedisBalanceCache", "Cache impl", "StackExchange.Redis — SET NX EX 5 (lock) + SET EX 60 (cache).")
+        Component(projector, "ProjectionService", "Application service", "FindOneAndUpdate atômico com filtro $ne EventId. Aplica $inc por type/category.")
+    }
+
+    Container_Boundary(workerB, "Cashflow.Consolidation.Worker") {
+        Component(consEntryReg, "EntryRegisteredConsumer", "MassTransit Consumer", "Consume EntryRegisteredV1 — chama IProjectionService.ApplyAsync.")
+        Component(consEntryRev, "EntryReversedConsumer", "MassTransit Consumer", "Consume EntryReversedV1 — aplica decremento (snapshot do evento).")
+        Component(mtRetry, "Retry/DLQ Setup", "MassTransit config", "UseMessageRetry exponential 5x; venenosa → DLQ _skipped.")
+    }
+
+    ContainerDb(mongo, "MongoDB", "7.0", "daily_balance + processed_events (TTL 7d)")
+    ContainerDb(redis, "Redis", "7.4", "Cache (TTL 60s)")
+    Container(broker, "RabbitMQ", "3.13", "EntryRegisteredV1 / EntryReversedV1 queues + DLQ")
+    Container(idp, "Keycloak", "25.0", "JWT issuer")
+
+    Rel(balancesEp, authzC, "RequireAuthorization")
+    Rel(balancesEp, getDailyH, "Send via ISender")
+    Rel(balancesEp, getPeriodH, "Send")
+    Rel(balancesEp, getCurrentH, "Send")
+
+    Rel(getDailyH, cacheAbs, "GetAsync / TryAcquireLockAsync")
+    Rel(getDailyH, repoAbsC, "GetAsync(merchantId, date) — miss only")
+    Rel(getPeriodH, getDailyH, "Aggregates N dias")
+    Rel(getCurrentH, getDailyH, "Hoje em America/Sao_Paulo")
+
+    Rel(cacheAbs, redisCache, "Implemented by")
+    Rel(redisCache, redis, "RESP :6379")
+
+    Rel(repoAbsC, mongoRepo, "Implemented by")
+    Rel(mongoRepo, mongoCtx, "Uses")
+    Rel(mongoCtx, mongo, "Mongo driver :27017")
+
+    Rel(consEntryReg, projector, "ApplyAsync(EntryRegisteredV1)")
+    Rel(consEntryRev, projector, "ApplyAsync(EntryReversedV1)")
+    Rel(projector, mongoCtx, "FindOneAndUpdate (atomic)")
+
+    Rel(consEntryReg, broker, "Consume (AMQP)")
+    Rel(consEntryRev, broker, "Consume (AMQP)")
+    Rel(mtRetry, broker, "Retry + DLQ topology")
+
+    Rel(authzC, idp, "Validates JWT")
+
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")

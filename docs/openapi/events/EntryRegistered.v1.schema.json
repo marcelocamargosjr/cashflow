@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cashflow.example.com/schemas/EntryRegistered.v1.schema.json",
+  "title": "EntryRegisteredV1",
+  "description": "Integration event publicado pelo Cashflow.Ledger via Outbox MassTransit quando um lançamento é confirmado. Consumido por Cashflow.Consolidation.Worker para atualizar a projeção daily_balance no Mongo. Idempotência garantida via filtro `$ne lastEventId` no FindOneAndUpdate.",
+  "$comment": "Origem: src/Cashflow.Contracts/V1/EntryRegisteredV1.cs (record sealed). Namespace AMQP: Cashflow.Contracts.V1:EntryRegisteredV1.",
+  "type": "object",
+  "required": [
+    "eventId",
+    "occurredOn",
+    "merchantId",
+    "entryId",
+    "type",
+    "amount",
+    "currency",
+    "entryDate"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Identificador único do evento. Guid v7 k-sortable. Usado para idempotência do consumer (`$ne lastEventId`)."
+    },
+    "occurredOn": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp UTC da emissão pelo publisher (após COMMIT no Postgres)."
+    },
+    "merchantId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID do merchant — chave de roteamento da projeção (parte do índice composto no Mongo)."
+    },
+    "entryId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID da Entry persistida no Postgres."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["Credit", "Debit"],
+      "description": "Tipo do lançamento. Determina se incrementa totalCredits ou totalDebits."
+    },
+    "amount": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "multipleOf": 0.01,
+      "description": "Valor monetário em decimal (NUNCA double). 2 casas decimais."
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 3,
+      "pattern": "^[A-Z]{3}$",
+      "description": "Código ISO-4217 alpha-3 (ex.: BRL)."
+    },
+    "entryDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de competência do lançamento (sem timezone). Localiza o documento daily_balance."
+    },
+    "category": {
+      "type": ["string", "null"],
+      "maxLength": 64,
+      "description": "Categoria do lançamento (Sales, Suppliers, Taxes, ...). Localiza o byCategory bucket no documento."
+    },
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versão do schema (constante neste schema). Eventos futuros usam .V2 em namespace separado."
+    }
+  },
+  "examples": [
+    {
+      "eventId": "0192d4e1-9a3f-7a01-bb02-2c5e8d1f4a02",
+      "occurredOn": "2026-05-14T10:32:11.4321Z",
+      "merchantId": "0193e7a8-d8f0-7c5e-9b21-3f9f8a4d1c00",
+      "entryId": "0192d4e1-c45f-7a9b-bb01-2f5a8c1d0e2f",
+      "type": "Credit",
+      "amount": 150.00,
+      "currency": "BRL",
+      "entryDate": "2026-05-14",
+      "category": "Sales",
+      "version": 1
+    },
+    {
+      "eventId": "0192d4f0-1b2c-7a03-bb04-3d6f9a2e5b07",
+      "occurredOn": "2026-05-14T10:35:00.0000Z",
+      "merchantId": "0193e7a8-d8f0-7c5e-9b21-3f9f8a4d1c00",
+      "entryId": "0192d4f0-c500-7c10-bc23-4e2a5c1d0e30",
+      "type": "Debit",
+      "amount": 2900.00,
+      "currency": "BRL",
+      "entryDate": "2026-05-14",
+      "category": "Suppliers",
+      "version": 1
+    }
+  ]
+}

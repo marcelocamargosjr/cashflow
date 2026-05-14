@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: Cashflow.Consolidation API
+  version: "1.0.0"
+  description: |
+    Read-side do sistema Cashflow. Serve a projeção `daily_balance` (1 documento
+    por `(merchantId, date)`) com **cache aside Redis** (TTL 60s) e **stampede
+    lock** (`SET NX EX 5`) no miss.
+
+    Atualizações são **eventually consistent** — propagam-se via consumer
+    MassTransit a partir dos eventos `EntryRegisteredV1` / `EntryReversedV1`
+    publicados pelo Ledger.
+
+    - **Auth:** Bearer JWT (mesmo realm `cashflow` do Ledger).
+    - **Resource check:** `merchantId` no path **deve** ser igual ao claim
+      `merchantId` do token (admins podem acessar qualquer merchant).
+    - **NFR-P-01:** 50 req/s sustentado × 60s, `http_req_failed < 5%`,
+      `p(95) < 500ms` agregado.
+  contact:
+    name: Cashflow team
+    url: https://github.com/marcelocamargosjr/cashflow
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8000/consolidation
+    description: Gateway local (dev)
+  - url: http://localhost:8002
+    description: Consolidation.Api direto (dev)
+  - url: https://api.cashflow.example.com/consolidation
+    description: Produção
+tags:
+  - name: balances
+    description: Saldos consolidados (daily / period / current).
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/balances/{merchantId}/daily:
+    get:
+      tags: [balances]
+      summary: Saldo consolidado de um dia.
+      operationId: GetDailyBalance
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: date
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          example: "2026-05-14"
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: OK — saldo do dia (pode ser zero se sem lançamentos).
+          headers:
+            Cache-Status:
+              description: HIT ou MISS — sinaliza se o conteúdo veio do Redis.
+              schema: { type: string, enum: [HIT, MISS] }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DailyBalanceDto" }
+        "400": { $ref: "#/components/responses/ValidationProblem" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /api/v1/balances/{merchantId}/period:
+    get:
+      tags: [balances]
+      summary: Saldo agregado em um intervalo + breakdown diário.
+      operationId: GetPeriodBalance
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PeriodBalanceDto" }
+        "400": { $ref: "#/components/responses/ValidationProblem" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/v1/balances/{merchantId}/current:
+    get:
+      tags: [balances]
+      summary: Saldo de "hoje" (em `America/Sao_Paulo`).
+      operationId: GetCurrentBalance
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: "#/components/parameters/CorrelationId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DailyBalanceDto" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    CorrelationId:
+      in: header
+      name: X-Correlation-Id
+      required: false
+      schema: { type: string }
+  responses:
+    Unauthorized:
+      description: Token ausente ou inválido.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    Forbidden:
+      description: Token válido mas merchantId do path != claim do JWT (e usuário não é admin).
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    ValidationProblem:
+      description: RFC 7807 validation.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+    RateLimited:
+      description: Rate limit excedido (120 req/s/merchant).
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetails" }
+  schemas:
+    DailyBalanceDto:
+      type: object
+      required:
+        - merchantId
+        - date
+        - totalCredits
+        - totalDebits
+        - balance
+        - entriesCount
+        - byCategory
+        - lastUpdatedAt
+        - revision
+        - cache
+      properties:
+        merchantId: { type: string, format: uuid }
+        date: { type: string, format: date }
+        totalCredits: { type: number, format: decimal, minimum: 0 }
+        totalDebits: { type: number, format: decimal, minimum: 0 }
+        balance: { type: number, format: decimal, description: totalCredits - totalDebits }
+        entriesCount: { type: integer, minimum: 0 }
+        byCategory:
+          type: array
+          items: { $ref: "#/components/schemas/CategoryBucketDto" }
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Timestamp UTC da última aplicação do consumer (proxy do lag).
+        revision:
+          type: integer
+          format: int64
+          description: Contador monotônico — incrementa a cada apply.
+        cache: { $ref: "#/components/schemas/CacheInfo" }
+    PeriodBalanceDto:
+      type: object
+      required: [merchantId, from, to, totalCredits, totalDebits, balance, entriesCount, days]
+      properties:
+        merchantId: { type: string, format: uuid }
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        totalCredits: { type: number, format: decimal }
+        totalDebits: { type: number, format: decimal }
+        balance: { type: number, format: decimal }
+        entriesCount: { type: integer }
+        days:
+          type: array
+          items: { $ref: "#/components/schemas/DailyBalanceDto" }
+    CategoryBucketDto:
+      type: object
+      required: [category, credit, debit, count]
+      properties:
+        category: { type: string, maxLength: 64 }
+        credit: { type: number, format: decimal, minimum: 0 }
+        debit: { type: number, format: decimal, minimum: 0 }
+        count: { type: integer, minimum: 0 }
+    CacheInfo:
+      type: object
+      required: [hit, ageSeconds]
+      properties:
+        hit:
+          type: boolean
+          description: true se o payload veio do cache Redis.
+        ageSeconds:
+          type: integer
+          description: Idade do payload no cache no momento da leitura.
+    ProblemDetails:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        correlationId: { type: string }

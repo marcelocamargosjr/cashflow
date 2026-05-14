@@ -1,0 +1,49 @@
+---
+title: Cashflow — Registrar lançamento (POST /ledger/api/v1/entries)
+---
+sequenceDiagram
+    autonumber
+    actor Merchant as Merchant (terminal POS)
+    participant GW as Gateway (YARP)
+    participant API as Ledger.Api
+    participant DB as PostgreSQL
+    participant OUT as Outbox dispatcher (MassTransit)
+    participant MQ as RabbitMQ
+    participant WRK as Consolidation.Worker
+    participant CACHE as Redis (cache)
+    participant MGO as MongoDB
+
+    Merchant->>+GW: POST /ledger/api/v1/entries<br/>Bearer JWT + Idempotency-Key
+    GW->>GW: Valida JWT (cache JWKS 5min)
+    GW->>GW: Rate-limit sliding window<br/>(entry-write-policy 30/s/merchant)
+    GW->>+API: Proxy → POST /api/v1/entries<br/>X-Correlation-Id, traceparent
+    API->>API: IdempotencyKeyEndpointFilter (header check)
+    API->>API: RegisterEntryCommand → ValidationBehavior
+
+    rect rgb(245, 245, 250)
+    note over API,DB: TX única — entry + outbox + idempotency_key
+        API->>+DB: BEGIN
+        API->>DB: INSERT entries (id Guid v7, ...)
+        API->>DB: INSERT idempotency_keys (merchant_id, key) UNIQUE
+        API->>DB: INSERT messaging.OutboxMessage (EntryRegisteredV1)
+        API->>DB: COMMIT
+        DB-->>-API: OK
+    end
+
+    API-->>-GW: 201 Created<br/>{id, status: "Confirmed", ...}
+    GW-->>-Merchant: 201 Created
+
+    note over OUT,MQ: Após o commit, dispatcher polleia OutboxMessage<br/>(SKIP LOCKED, QueryDelay 1s)
+    OUT->>+DB: SELECT ... FOR UPDATE SKIP LOCKED
+    DB-->>-OUT: pending rows
+    OUT->>+MQ: BasicPublish Cashflow.Contracts.V1:EntryRegisteredV1
+    MQ-->>-OUT: ack
+    OUT->>DB: UPDATE OutboxMessage SET delivered
+
+    MQ->>+WRK: Deliver EntryRegisteredV1
+    WRK->>WRK: UseMessageRetry exp 5x (em caso de transient error)
+    WRK->>+MGO: FindOneAndUpdate filter:{merchantId, date, $ne LastEventId}<br/>$inc totals + $set lastEventId
+    MGO-->>-WRK: upsert / no-op (idempotente)
+    WRK-->>-MQ: ack
+
+    note over CACHE: Próximo GET /balances/.../daily<br/>hit cache stale por até 60s (TTL).<br/>Mecanismo cache aside lê do Mongo no miss.

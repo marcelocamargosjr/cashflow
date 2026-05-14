@@ -1,0 +1,49 @@
+---
+title: Cashflow — C4 Containers (nível 2)
+---
+%%{init: { "theme": "default" } }%%
+C4Container
+    title Cashflow — Diagrama de Containers (C4 nível 2)
+
+    Person(merchant, "Comerciante", "Operador do caixa")
+    Person(admin, "Admin", "Operador da plataforma")
+
+    System_Boundary(cf, "Cashflow") {
+        Container(gw, "Cashflow.Gateway", "YARP / .NET 9", "Reverse proxy: termina JWT, aplica rate-limit por merchant, transforma paths e propaga correlation/traceparent.")
+        Container(ledgerApi, "Cashflow.Ledger.Api", "ASP.NET Core 9 / .NET 9", "Write-side: comandos (Register/Reverse Entry), queries (Get/List), Outbox transacional MassTransit.")
+        Container(consApi, "Cashflow.Consolidation.Api", "ASP.NET Core 9 / .NET 9", "Read-side: queries de saldo (daily, period, current) com cache aside + stampede lock.")
+        Container(consWorker, "Cashflow.Consolidation.Worker", ".NET Worker Service 9", "Consumer MassTransit (EntryRegisteredV1, EntryReversedV1) — projeção idempotente no Mongo.")
+        ContainerDb(pg, "PostgreSQL", "16.3", "Banco do Ledger: entries, idempotency_keys + schema messaging (OutboxState / OutboxMessage).")
+        ContainerDb(mongo, "MongoDB", "7.0", "Banco da Consolidação: daily_balance + processed_events (TTL 7d).")
+        ContainerDb(redis, "Redis", "7.4", "Cache aside (TTL 60s) + stampede lock keys (SET NX EX 5).")
+        Container(broker, "RabbitMQ", "3.13 + Management", "Broker AMQP — exchanges EntryRegisteredV1 / EntryReversedV1 + DLQ (_skipped).")
+        Container(idp, "Keycloak", "25.0", "OIDC IdP — realm cashflow (clients, roles, protocol mappers para merchantId claim).")
+        Container(otel, "OTel Collector", "contrib 0.107", "Coleta OTLP → Loki (logs), Tempo (traces), Prometheus (métricas).")
+    }
+
+    System_Ext(grafana, "Grafana Stack", "Loki / Tempo / Prometheus / Grafana — provisionados via docker-compose.")
+
+    Rel(merchant, gw, "HTTP(S) :8000 — POST /ledger/api/v1/entries, GET /consolidation/api/v1/balances/...", "JSON")
+    Rel(admin, gw, "HTTP(S) :8000 — endpoints admin", "JSON")
+    Rel(gw, idp, "OIDC discovery + JWKS fetch (cache 5min)", "HTTP :8080")
+    Rel(gw, ledgerApi, "Proxy /ledger/* → /api/v1/*", "HTTP :8001")
+    Rel(gw, consApi, "Proxy /consolidation/* → /api/v1/*", "HTTP :8002")
+
+    Rel(ledgerApi, pg, "EF Core: Save entry + OutboxMessage atomically (SaveChangesAsync único)", "Npgsql :5432")
+    Rel(ledgerApi, broker, "Outbox dispatcher publica EntryRegisteredV1 / EntryReversedV1 (BusOutbox)", "AMQP :5672")
+    Rel(ledgerApi, idp, "Valida JWT (Authority=http://localhost:8080/realms/cashflow)", "HTTP")
+
+    Rel(consWorker, broker, "Consume EntryRegisteredV1 / EntryReversedV1 (UseMessageRetry exponential 5x)", "AMQP :5672")
+    Rel(consWorker, mongo, "FindOneAndUpdate (upsert + \\$inc + \\$ne EventId) — idempotência atômica", "Mongo driver :27017")
+
+    Rel(consApi, mongo, "Find daily_balance — read-only", "Mongo driver :27017")
+    Rel(consApi, redis, "GET / SET NX EX — cache aside + stampede lock", "RESP :6379")
+    Rel(consApi, idp, "Valida JWT", "HTTP")
+
+    Rel(gw, otel, "OTLP gRPC — traces + métricas do reverse proxy")
+    Rel(ledgerApi, otel, "OTLP gRPC — traces + métricas + logs")
+    Rel(consApi, otel, "OTLP gRPC — traces + métricas + logs")
+    Rel(consWorker, otel, "OTLP gRPC — traces + métricas + logs")
+    Rel(otel, grafana, "Loki / Tempo / Prometheus exporters")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")

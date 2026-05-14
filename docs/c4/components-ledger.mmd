@@ -1,0 +1,70 @@
+---
+title: Cashflow.Ledger — C4 Components (nível 3)
+---
+%%{init: { "theme": "default" } }%%
+C4Component
+    title Cashflow.Ledger — Componentes (C4 nível 3)
+
+    Container_Boundary(api, "Cashflow.Ledger.Api") {
+        Component(entriesEp, "EntriesEndpoints", "Minimal API extension", "MapPost /api/v1/entries, GET /, GET /{id}, POST /{id}/reverse. RequireAuthorization(RequireMerchant).")
+        Component(adminEp, "AdminEndpoints", "Minimal API extension", "POST /admin/seed (apenas Development). RequireAdmin.")
+        Component(idemFilter, "IdempotencyKeyEndpointFilter", "Endpoint filter", "Valida header Idempotency-Key (Guid não-vazio) antes do handler.")
+        Component(authz, "AuthorizationPolicies", "Policies", "RequireMerchant (role merchant), RequireAdmin (role admin). Resource-based check via httpContext.GetMerchantId().")
+        Component(exMw, "ExceptionToProblemDetailsMiddleware", "Middleware", "Converte exceptions não-tratadas em RFC 7807.")
+        Component(healthEp, "HealthChecks", "Endpoints /health/live e /health/ready", "Liveness e readiness probes (Postgres, RabbitMQ, Keycloak).")
+    }
+
+    Container_Boundary(app, "Cashflow.Ledger.Application") {
+        Component(registerCmd, "RegisterEntryCommandHandler", "MediatR Handler", "Cria Entry, persiste em IEntryRepository, dispara EntryRegisteredDomainEvent (→ EntryRegisteredV1 via Outbox).")
+        Component(reverseCmd, "ReverseEntryCommandHandler", "MediatR Handler", "Aplica Reverse() no aggregate; dispara EntryReversedDomainEvent → EntryReversedV1.")
+        Component(listQry, "ListEntriesQueryHandler", "MediatR Handler", "Lista paginada por intervalo de EntryDate + filtros (type, category).")
+        Component(getQry, "GetEntryQueryHandler", "MediatR Handler", "Lê uma entry por id; valida merchantId match.")
+        Component(validators, "FluentValidation Validators", "Validators", "Validam invariantes dos commands (Amount > 0, EntryDate <= today, Currency suportada).")
+        Component(behaviors, "Pipeline Behaviors", "MediatR behaviors", "ValidationBehavior, LoggingBehavior, UnitOfWorkBehavior.")
+        Component(repoAbs, "IEntryRepository", "Interface (Domain)", "Contrato de persistência — exposto pelo Domain, implementado em Infrastructure.")
+    }
+
+    Container_Boundary(domain, "Cashflow.Ledger.Domain") {
+        Component(entry, "Entry", "Aggregate Root", "Invariantes (Reverse só em Confirmed, etc.). Dispara EntryRegisteredDomainEvent / EntryReversedDomainEvent.")
+        Component(money, "Money", "Value Object", "Currency enum + decimal — Brl(value), Add, Subtract com guards.")
+        Component(events, "Domain Events", "Records", "EntryRegisteredDomainEvent, EntryReversedDomainEvent — convertidos para Integration Events.")
+    }
+
+    Container_Boundary(infra, "Cashflow.Ledger.Infrastructure") {
+        Component(dbCtx, "LedgerDbContext", "EF Core DbContext", "OnModelCreating registra IEntityTypeConfiguration<T> por entidade. UseNpgsql + EnableRetryOnFailure.")
+        Component(entryRepo, "EntryRepository", "Repository", "Implementa IEntryRepository — métodos por intenção, async, CancellationToken.")
+        Component(domainEventDispatcher, "DomainEventDispatcher", "MassTransit IPublishEndpoint adapter", "Converte Domain Event → Integration Event (V1) e enfileira via Outbox.")
+        Component(mtSetup, "MassTransit Setup", "DI extension", "AddMassTransit + AddEntityFrameworkOutbox<LedgerDbContext> + UsingRabbitMq + UseBusOutbox.")
+    }
+
+    ContainerDb(pg, "PostgreSQL", "16.3", "entries + idempotency_keys + messaging.OutboxState/OutboxMessage")
+    Container(broker, "RabbitMQ", "3.13", "Exchanges Cashflow.Contracts.V1:*")
+    Container(idp, "Keycloak", "25.0", "JWT issuer")
+
+    Rel(entriesEp, idemFilter, "Filter chain")
+    Rel(idemFilter, registerCmd, "Send via ISender")
+    Rel(entriesEp, registerCmd, "Send")
+    Rel(entriesEp, reverseCmd, "Send")
+    Rel(entriesEp, listQry, "Send")
+    Rel(entriesEp, getQry, "Send")
+    Rel(entriesEp, authz, "RequireAuthorization")
+
+    Rel(registerCmd, validators, "Through ValidationBehavior")
+    Rel(registerCmd, repoAbs, "AddAsync(entry)")
+    Rel(registerCmd, entry, "Entry.Register(...)")
+
+    Rel(reverseCmd, repoAbs, "GetByIdAsync + tracked update")
+    Rel(reverseCmd, entry, "entry.Reverse(reason)")
+
+    Rel(repoAbs, entryRepo, "Implemented by")
+    Rel(entryRepo, dbCtx, "Uses")
+    Rel(dbCtx, pg, "Npgsql :5432")
+
+    Rel(entry, events, "Raises")
+    Rel(events, domainEventDispatcher, "Dispatched after SaveChangesAsync")
+    Rel(domainEventDispatcher, mtSetup, "IPublishEndpoint")
+    Rel(mtSetup, broker, "Outbox → AMQP")
+
+    Rel(authz, idp, "Validates JWT (Bearer)")
+
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")

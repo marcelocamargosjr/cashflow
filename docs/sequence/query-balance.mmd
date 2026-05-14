@@ -1,0 +1,63 @@
+---
+title: Cashflow — Consultar saldo diário (GET /consolidation/api/v1/balances/{merchantId}/daily)
+---
+sequenceDiagram
+    autonumber
+    actor Merchant as Merchant
+    participant GW as Gateway (YARP)
+    participant API as Consolidation.Api
+    participant CACHE as Redis
+    participant MGO as MongoDB
+    participant POLLY as Polly pipeline<br/>(mongo-read)
+
+    Merchant->>+GW: GET /consolidation/api/v1/balances/{merchantId}/daily?date=2026-05-14<br/>Bearer JWT
+    GW->>GW: Valida JWT (JWKS cache)
+    GW->>GW: Rate-limit balance-read-policy<br/>(120/s/merchant — 2× NFR)
+    GW->>+API: Proxy + X-Correlation-Id + traceparent
+    API->>API: BalancesEndpoints — RequireMerchant policy
+    API->>API: Resource-based check<br/>(merchantId path == claim merchantId)
+    API->>API: GetDailyBalanceQuery → Handler
+
+    rect rgb(245, 250, 245)
+    note over API,CACHE: Cache aside (TTL 60s)
+        API->>+CACHE: GET daily_balance:{merchantId}:{date}
+        alt cache HIT (≥95% das req em estado estacionário)
+            CACHE-->>-API: payload JSON serializado
+            API-->>GW: 200 OK<br/>cache: {hit: true, ageSeconds: 12}
+            GW-->>Merchant: 200 OK
+        else cache MISS
+            CACHE-->>API: nil
+            API->>+CACHE: SET miss_lock:... NX EX 5
+            alt won lock (1 caller por janela)
+                CACHE-->>-API: OK (lock acquired)
+                rect rgb(252, 245, 245)
+                note over API,POLLY: Polly resilience pipeline
+                    API->>+POLLY: ExecuteAsync
+                    POLLY->>+MGO: db.daily_balance.findOne({merchantId, date})
+                    MGO-->>-POLLY: doc | null
+                    POLLY-->>-API: result (Timeout 2s / CB / Retry exp 3x)
+                end
+                API->>CACHE: SET daily_balance:... EX 60
+                API->>CACHE: DEL miss_lock:...
+                API-->>GW: 200 OK<br/>cache: {hit: false, ageSeconds: 0}
+                GW-->>Merchant: 200 OK
+            else lost lock (callers concorrentes)
+                CACHE-->>API: nil (key already exists)
+                note over API: Task.Delay(100ms)
+                API->>+CACHE: GET daily_balance:... (relê)
+                alt cache populated by winner
+                    CACHE-->>-API: payload
+                    API-->>GW: 200 OK<br/>cache: {hit: true}
+                    GW-->>Merchant: 200 OK
+                else still empty (winner crashed?)
+                    note over API: fallback: lê Mongo direto<br/>(proteção contra deadlock por crash do winner)
+                    API->>MGO: findOne (sem lock)
+                    MGO-->>API: doc
+                    API-->>GW: 200 OK
+                    GW-->>Merchant: 200 OK
+                end
+            end
+        end
+    end
+
+    Note over Merchant,MGO: NFR-P-02 P95 cache hit under 200ms (real 53ms). Aggregate under 500ms.
