@@ -33,7 +33,7 @@ public sealed class LedgerApiFactory : WebApplicationFactory<Cashflow.Ledger.Api
             {
                 ["ConnectionStrings:Postgres"] = _fixture.Postgres.GetConnectionString(),
                 ["RabbitMq:Host"] = _fixture.Rabbit.Hostname,
-                ["RabbitMq:Port"] = _fixture.Rabbit.GetMappedPublicPort(5672).ToString(),
+                ["RabbitMq:Port"] = _fixture.Rabbit.GetMappedPublicPort(5672).ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["RabbitMq:VirtualHost"] = "/",
                 ["RabbitMq:Username"] = "guest",
                 ["RabbitMq:Password"] = "guest",

@@ -26,11 +26,16 @@ public class DomainException : Exception
         Code = code;
     }
 
+    // Ctors padrão de Exception (CA1032). Code fica vazio pois esses overloads
+    // existem para conformidade da hierarquia — produção sempre usa um dos
+    // overloads com (code, message).
     public DomainException() : base()
     {
+        Code = string.Empty;
     }
 
     public DomainException(string? message, Exception? innerException) : base(message, innerException)
     {
+        Code = string.Empty;
     }
 }

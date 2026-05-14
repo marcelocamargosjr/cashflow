@@ -9,6 +9,8 @@ namespace Cashflow.Ledger.Api.Endpoints;
 internal sealed class IdempotencyKeyEndpointFilter : IEndpointFilter
 {
     private const string HeaderName = "Idempotency-Key";
+    private static readonly string[] HeaderRequiredMessages = ["header is required"];
+    private static readonly string[] MustBeUuidMessages = ["must be a UUID"];
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
@@ -19,10 +21,9 @@ internal sealed class IdempotencyKeyEndpointFilter : IEndpointFilter
         {
             return Results.Problem(ProblemDetailsExtensions.ValidationProblem(
                 "Header 'Idempotency-Key' is required for this operation.",
-                errors: new Dictionary<string, string[]>
-(StringComparer.Ordinal)
+                errors: new Dictionary<string, string[]>(StringComparer.Ordinal)
                 {
-                    ["Idempotency-Key"] = new[] { "header is required" }
+                    ["Idempotency-Key"] = HeaderRequiredMessages
                 },
                 httpContext: http));
         }
@@ -31,10 +32,9 @@ internal sealed class IdempotencyKeyEndpointFilter : IEndpointFilter
         {
             return Results.Problem(ProblemDetailsExtensions.ValidationProblem(
                 "Header 'Idempotency-Key' must be a valid UUID.",
-                errors: new Dictionary<string, string[]>
-(StringComparer.Ordinal)
+                errors: new Dictionary<string, string[]>(StringComparer.Ordinal)
                 {
-                    ["Idempotency-Key"] = new[] { "must be a UUID" }
+                    ["Idempotency-Key"] = MustBeUuidMessages
                 },
                 httpContext: http));
         }

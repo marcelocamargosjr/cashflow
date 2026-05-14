@@ -33,7 +33,7 @@ public sealed class ConsolidationApiFactory : WebApplicationFactory<Cashflow.Con
                 ["Mongo:Database"] = _mongoDatabase,
                 ["Redis:ConnectionString"] = _fixture.Redis.GetConnectionString(),
                 ["RabbitMq:Host"] = _fixture.Rabbit.Hostname,
-                ["RabbitMq:Port"] = _fixture.Rabbit.GetMappedPublicPort(5672).ToString(),
+                ["RabbitMq:Port"] = _fixture.Rabbit.GetMappedPublicPort(5672).ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["Keycloak:Authority"] = TestTokens.Issuer,
                 ["Keycloak:Audience"] = TestTokens.Audience,
                 ["Keycloak:MetadataAddress"] = TestTokens.Issuer + "/.well-known/openid-configuration",

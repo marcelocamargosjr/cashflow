@@ -57,7 +57,7 @@ public sealed class CashflowFixture : IAsyncLifetime
         // (e.g. `Keycloak__Authority` maps to `Keycloak:Authority`).
         Environment.SetEnvironmentVariable("ConnectionStrings__Postgres", Postgres.GetConnectionString());
         Environment.SetEnvironmentVariable("RabbitMq__Host", Rabbit.Hostname);
-        Environment.SetEnvironmentVariable("RabbitMq__Port", Rabbit.GetMappedPublicPort(5672).ToString());
+        Environment.SetEnvironmentVariable("RabbitMq__Port", Rabbit.GetMappedPublicPort(5672).ToString(System.Globalization.CultureInfo.InvariantCulture));
         Environment.SetEnvironmentVariable("RabbitMq__VirtualHost", "/");
         Environment.SetEnvironmentVariable("RabbitMq__Username", RabbitUser);
         Environment.SetEnvironmentVariable("RabbitMq__Password", RabbitPassword);
