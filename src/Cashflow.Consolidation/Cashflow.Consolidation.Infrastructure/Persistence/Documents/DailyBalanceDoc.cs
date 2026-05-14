@@ -27,8 +27,12 @@ public sealed class DailyBalanceDoc
     [BsonElement("entriesCount")]
     public int EntriesCount { get; set; }
 
+    // MA0016 silenciado: o driver Mongo serializa para BsonArray e precisa do
+    //   tipo concreto List<> para construir e suportar $push posicional.
+#pragma warning disable MA0016
     [BsonElement("byCategory")]
     public List<CategoryBucketDoc> ByCategory { get; set; } = new();
+#pragma warning restore MA0016
 
     [BsonElement("lastUpdatedAt")]
     public DateTime LastUpdatedAt { get; set; }

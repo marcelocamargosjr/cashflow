@@ -31,6 +31,10 @@ public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior
                 stopwatch.ElapsedMilliseconds);
             return response;
         }
+        // S2139: catch é intencional — registra a falha do request com timing
+        // (telemetria não-funcional) e re-emite para o middleware traduzir em
+        // ProblemDetails. Não há contextual handling a fazer aqui.
+#pragma warning disable S2139
         catch (Exception ex)
         {
             stopwatch.Stop();
@@ -41,5 +45,6 @@ public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior
                 stopwatch.ElapsedMilliseconds);
             throw;
         }
+#pragma warning restore S2139
     }
 }

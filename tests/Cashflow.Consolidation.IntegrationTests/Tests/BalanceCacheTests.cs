@@ -9,6 +9,9 @@ using StackExchange.Redis;
 
 namespace Cashflow.Consolidation.IntegrationTests.Tests;
 
+// CA1001 silenciado: a limpeza assíncrona de _factory é feita por
+//   IAsyncLifetime.DisposeAsync — xUnit invoca esse ciclo, não Dispose síncrono.
+#pragma warning disable CA1001
 [Collection(ConsolidationTestCollection.Name)]
 public sealed class BalanceCacheTests : IAsyncLifetime
 {
@@ -104,3 +107,4 @@ public sealed class BalanceCacheTests : IAsyncLifetime
         }).ConfigureAwait(false);
     }
 }
+#pragma warning restore CA1001

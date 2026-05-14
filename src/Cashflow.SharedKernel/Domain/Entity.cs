@@ -22,6 +22,11 @@ public abstract class Entity
 
     public override int GetHashCode() => HashCode.Combine(GetType(), Id);
 
+    // S3875 silenciado: operador == sobrescrito é o esperado para Entity em DDD
+    //   (identidade comparada por Id, não por referência). Equals/GetHashCode acima
+    //   é a fonte de verdade; estes operators redirecionam para ela.
+#pragma warning disable S3875
     public static bool operator ==(Entity? left, Entity? right) => Equals(left, right);
     public static bool operator !=(Entity? left, Entity? right) => !Equals(left, right);
+#pragma warning restore S3875
 }

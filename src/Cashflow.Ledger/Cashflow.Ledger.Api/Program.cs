@@ -218,7 +218,17 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 var bootLogger = app.Logger;
 bootLogger.LogInformation("App built. Environment={Environment}", app.Environment.EnvironmentName);
 var diagConn = app.Configuration.GetConnectionString("Postgres") ?? "(null)";
-var sanitized = System.Text.RegularExpressions.Regex.Replace(diagConn, "(?i)Password=[^;]*", "Password=***");
+// S2068 / MA0009 silenciados: o literal "Password=" é um pattern de mascaramento
+// para o log de conn-string, não uma credencial hardcoded. RegexOptions.NonBacktracking
+// + timeout de 1s blindam contra ReDoS no diagnóstico de boot.
+#pragma warning disable S2068
+var sanitized = System.Text.RegularExpressions.Regex.Replace(
+    diagConn,
+    "(?i)Password=[^;]*",
+    "Password=***",
+    System.Text.RegularExpressions.RegexOptions.NonBacktracking,
+    TimeSpan.FromSeconds(1));
+#pragma warning restore S2068
 bootLogger.LogInformation("Postgres connection string in use: {ConnectionString}", sanitized);
 
 if (app.Environment.IsDevelopment())
@@ -237,6 +247,9 @@ if (app.Environment.IsDevelopment())
     // para manter o padrão WebApplicationFactory-friendly: o entrypoint só
     // bloqueia em RunAsync, sem split Start/WaitForShutdown (que confunde WAF).
     bootLogger.LogInformation("Applying migrations...");
+    // S2139 silenciado: catch loga LogCritical e re-emite para falhar o boot.
+    // Não há "handle" possível aqui — uma migration que falha exige human review.
+#pragma warning disable S2139
     try
     {
         var connectionString = app.Configuration.GetConnectionString("Postgres")!;
@@ -263,6 +276,7 @@ if (app.Environment.IsDevelopment())
         bootLogger.LogCritical(ex, "Migration failed during startup");
         throw;
     }
+#pragma warning restore S2139
 }
 
 bootLogger.LogInformation("Starting host...");
