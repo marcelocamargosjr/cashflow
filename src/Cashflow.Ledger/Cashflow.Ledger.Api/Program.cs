@@ -16,16 +16,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
-Console.WriteLine("[BOOT] entering Program.Main");
-Console.Out.Flush();
-
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("[BOOT] CreateBuilder done");
-Console.Out.Flush();
 
 builder.AddCashflowObservability("cashflow.ledger.api", "1.0.0");
-Console.WriteLine("[BOOT] observability registered");
-Console.Out.Flush();
 
 builder.Services.AddSingleton<IClock, SystemClock>();
 
@@ -222,11 +215,11 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
     ResponseWriter = HealthChecksResponseWriter.WriteAsync
 });
 
-Console.WriteLine("[BOOT] app built, environment=" + app.Environment.EnvironmentName);
+var bootLogger = app.Logger;
+bootLogger.LogInformation("App built. Environment={Environment}", app.Environment.EnvironmentName);
 var diagConn = app.Configuration.GetConnectionString("Postgres") ?? "(null)";
 var sanitized = System.Text.RegularExpressions.Regex.Replace(diagConn, "(?i)Password=[^;]*", "Password=***");
-Console.WriteLine("[BOOT] Postgres connection string in use: " + sanitized);
-Console.Out.Flush();
+bootLogger.LogInformation("Postgres connection string in use: {ConnectionString}", sanitized);
 
 if (app.Environment.IsDevelopment())
 {
@@ -243,8 +236,7 @@ if (app.Environment.IsDevelopment())
     // últimas etapas da inicialização do bus. Migrations vão ANTES do RunAsync
     // para manter o padrão WebApplicationFactory-friendly: o entrypoint só
     // bloqueia em RunAsync, sem split Start/WaitForShutdown (que confunde WAF).
-    Console.WriteLine("[BOOT] applying migrations...");
-    Console.Out.Flush();
+    bootLogger.LogInformation("Applying migrations...");
     try
     {
         var connectionString = app.Configuration.GetConnectionString("Postgres")!;
@@ -260,24 +252,20 @@ if (app.Environment.IsDevelopment())
 #pragma warning restore ASP0000
         await using (db.ConfigureAwait(false))
         {
-            Console.WriteLine("[BOOT][mig] DbContext created manually");
-            Console.Out.Flush();
+            bootLogger.LogDebug("DbContext created manually");
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             await db.Database.MigrateAsync(cts.Token).ConfigureAwait(false);
-            Console.WriteLine("[BOOT] migrations applied");
+            bootLogger.LogInformation("Migrations applied");
         }
     }
     catch (Exception ex)
     {
-        Console.Error.WriteLine("[BOOT][ERROR] migration failed: " + ex);
-        Console.Error.Flush();
+        bootLogger.LogCritical(ex, "Migration failed during startup");
         throw;
     }
-    Console.Out.Flush();
 }
 
-Console.WriteLine("[BOOT] starting host...");
-Console.Out.Flush();
+bootLogger.LogInformation("Starting host...");
 await app.RunAsync().ConfigureAwait(false);
 
 // Exposed para WebApplicationFactory em integration tests. Namespace explícito
