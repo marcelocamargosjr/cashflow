@@ -1,0 +1,76 @@
+## .NET / Visual Studio / Rider / VS Code
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userprefs
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pubxml
+*.pubxml.user
+*.publishproj
+*.cache
+*.swp
+*.log
+*.tlog
+*.vs/
+.vs/
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sln.iml
+*.sln.docstates
+TestResults/
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+*.opencover.xml
+artifacts/
+project.lock.json
+project.fragment.lock.json
+.dotnet/
+
+## Tools and caches
+.tools/
+node_modules/
+.next/
+.turbo/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+## Secrets and env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.crt
+appsettings.Local.json
+appsettings.*.Local.json
+secrets.json
+
+## Docker / runtime data
+docker-data/
+infra/data/
+**/dump.rdb
+
+## OpenTelemetry / logs
+logs/
+*.log.json
+
+## Stryker
+StrykerOutput/

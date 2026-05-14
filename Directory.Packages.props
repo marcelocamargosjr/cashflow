@@ -1,0 +1,24 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!--
+    F0: apenas os pacotes embarcados pelos templates do `dotnet new` (webapi/worker/xunit).
+    Demais versões serão adicionadas a partir da fase F1 conforme dependências forem introduzidas.
+  -->
+  <ItemGroup Label="ASP.NET / Hosting">
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.14" />
+  </ItemGroup>
+
+  <ItemGroup Label="Test stack (xUnit)">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+  </ItemGroup>
+
+</Project>
