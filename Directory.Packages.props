@@ -13,9 +13,7 @@
         (Npgsql/Rabbit/Uris), JwtBearer, Swashbuckle, Scalar (ver §F3).
   -->
   <ItemGroup Label="ASP.NET / Hosting">
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.14" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.14" />
   </ItemGroup>
 
@@ -25,7 +23,6 @@
 
   <ItemGroup Label="EF Core / Postgres">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.14" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.14" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
@@ -40,7 +37,6 @@
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Rabbitmq" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
-    <PackageVersion Include="AspNetCore.HealthChecks.MongoDb" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
   </ItemGroup>
 
