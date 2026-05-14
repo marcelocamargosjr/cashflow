@@ -75,8 +75,8 @@
 
   <ItemGroup Label="Application / CQRS / Validation">
     <PackageVersion Include="MediatR" Version="12.4.1" />
-    <PackageVersion Include="FluentValidation" Version="11.10.0" />
-    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.14" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.14" />
