@@ -9,19 +9,6 @@ using StackExchange.Redis;
 
 namespace Cashflow.Consolidation.IntegrationTests.Tests;
 
-/// <summary>
-/// IT-07 — <c>GET /balances/{merchantId}/daily</c> cache-miss → cache-hit cycle.
-///
-/// Steps:
-///   1. Seed a daily-balance document directly in Mongo.
-///   2. First GET: cache empty, Redis key absent before the call; the handler hits
-///      Mongo and writes the cache. After the call, the key MUST exist.
-///   3. Second GET: handler reads the key from Redis (cache-hit path).
-///
-/// We don't have a high-fidelity hook to assert "this response came from cache",
-/// so we observe the side-effect (the Redis key materialized) plus the response
-/// equality between the two calls.
-/// </summary>
 [Collection(ConsolidationTestCollection.Name)]
 public sealed class BalanceCacheTests : IAsyncLifetime
 {

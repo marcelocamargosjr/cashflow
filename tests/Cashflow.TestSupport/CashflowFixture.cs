@@ -6,20 +6,6 @@ using Xunit;
 
 namespace Cashflow.TestSupport;
 
-/// <summary>
-/// Shared infra fixture for integration tests (`08-TESTES.md §4.2`).
-///
-/// Spins one ephemeral instance of Postgres / Mongo / RabbitMQ / Redis per xUnit
-/// collection. All four start in parallel during <see cref="InitializeAsync"/> and
-/// are torn down in parallel during <see cref="DisposeAsync"/>. Tests run inside
-/// the collection `cashflow` and share these endpoints — per-test isolation is
-/// handled by Respawn (Postgres) and the reset helpers (<see cref="DatabaseReset"/>)
-/// for Mongo / Redis.
-///
-/// Important: we DO NOT bind host ports — Testcontainers always picks free random
-/// ports. This lets the suite run on dev boxes where a native Postgres/Mongo is
-/// already bound on the default port.
-/// </summary>
 public sealed class CashflowFixture : IAsyncLifetime
 {
     public PostgreSqlContainer Postgres { get; } = new PostgreSqlBuilder()

@@ -9,11 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cashflow.Ledger.IntegrationTests.Tests;
 
-/// <summary>
-/// Integration scenarios for <c>POST /api/v1/entries</c> covering the success path
-/// (`IT-01`), idempotent replay (`IT-02`), and idempotency conflict on body
-/// divergence (`IT-03`) — see `08-TESTES.md §4.3`.
-/// </summary>
 public sealed class EntriesEndpointTests : LedgerIntegrationTestBase
 {
     public EntriesEndpointTests(CashflowFixture fixture) : base(fixture) { }

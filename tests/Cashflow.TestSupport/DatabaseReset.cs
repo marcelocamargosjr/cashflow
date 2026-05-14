@@ -5,17 +5,6 @@ using StackExchange.Redis;
 
 namespace Cashflow.TestSupport;
 
-/// <summary>
-/// Resets the test infra between integration tests. Each helper is best-effort —
-/// callers should invoke them once per test (e.g. via constructor) before exercising
-/// the system under test.
-///
-/// * Postgres: <see cref="Respawner"/> truncates `ledger` + `messaging` schemas while
-///   keeping <c>__EFMigrationsHistory</c> intact (so we don't re-run migrations).
-/// * Mongo: drops the entire database — collections + indexes are recreated lazily
-///   by the driver on first write.
-/// * Redis: <c>FLUSHALL</c> wipes the cache namespaces.
-/// </summary>
 public static class DatabaseReset
 {
     private static readonly RespawnerOptions PostgresOptions = new()

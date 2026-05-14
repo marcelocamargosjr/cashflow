@@ -7,11 +7,6 @@ using NetArchTest.Rules;
 
 namespace Cashflow.ArchitectureTests;
 
-/// <summary>
-/// Structural invariants for the Ledger bounded context (`08-TESTES.md §5`).
-/// These are the contract the rest of the suite relies on — anything that breaks
-/// here means the layering or domain encapsulation slipped.
-/// </summary>
 public sealed class LedgerArchitectureTests
 {
     private const string Infrastructure = "Cashflow.Ledger.Infrastructure";

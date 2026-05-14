@@ -3,10 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Cashflow.Consolidation.Api.Infrastructure;
 
-/// <summary>
-/// Defense-in-depth probe: opens a TCP socket on the broker. No management plugin
-/// or credentials needed; signals only that the AMQP port answers.
-/// </summary>
 internal sealed class RabbitMqHealthCheck : IHealthCheck
 {
     private readonly string _host;

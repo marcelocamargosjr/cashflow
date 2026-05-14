@@ -10,19 +10,6 @@ using MongoDB.Driver;
 
 namespace Cashflow.Consolidation.Worker.Consumers;
 
-/// <summary>
-/// Apply-first consumer for <see cref="EntryRegisteredV1"/>.
-///
-/// Order (patch C1 in `14-PATCHES-CIRURGICOS.md`):
-/// <list type="number">
-///   <item>Fast-path: skip if <c>processed_events</c> already contains this <c>EventId</c>.</item>
-///   <item>Apply the projection atomically with the <c>lastAppliedEventId</c> guard.</item>
-///   <item>Mark the event as processed.</item>
-/// </list>
-/// Correctness comes from step 2 (guard), NOT from step 1. If the broker redelivers
-/// after step 2 completed but step 3 failed, the next attempt re-runs step 2 — the
-/// guard blocks (ModifiedCount = 0) and the no-op marks step 3 again.
-/// </summary>
 public sealed class EntryRegisteredConsumer : IConsumer<EntryRegisteredV1>
 {
     private readonly MongoContext _mongo;

@@ -5,18 +5,6 @@ using Cashflow.TestSupport;
 
 namespace Cashflow.Ledger.IntegrationTests.Tests;
 
-/// <summary>
-/// IT-08 — the NFR-of-isolation regression.
-///
-/// The literal product requirement: <b>"if Consolidation is down, the Ledger
-/// must still return 201 on POST /entries"</b>. In this test setup, "Consolidation
-/// is down" is materialized by the fact that no consumer is wired up on the test
-/// host — only the Ledger.Api is running, hitting Postgres + RabbitMQ.
-///
-/// What this proves: events stay queued in the EF Outbox (or the broker) and the
-/// API path never blocks waiting for a downstream subscriber. 50 POSTs in tight
-/// loop, all 50 must come back 201 Created.
-/// </summary>
 public sealed class IsolationNfrTests : LedgerIntegrationTestBase
 {
     public IsolationNfrTests(CashflowFixture fixture) : base(fixture) { }

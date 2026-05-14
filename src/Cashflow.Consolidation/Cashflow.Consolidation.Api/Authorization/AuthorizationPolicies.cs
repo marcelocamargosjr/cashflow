@@ -9,10 +9,8 @@ internal static class AuthorizationPolicies
     public const string RequireMerchant = "RequireMerchant";
     public const string RequireAdmin = "RequireAdmin";
 
-    /// <summary>Custom Keycloak claim (per `07 §3.1.2`).</summary>
     public const string MerchantIdClaim = "merchantId";
 
-    /// <summary>Realm-role used for admin access.</summary>
     public const string AdminRole = "admin";
 
     public static IServiceCollection AddCashflowAuthorization(this IServiceCollection services)
@@ -39,10 +37,6 @@ internal static class AuthorizationPolicies
         return Guid.TryParse(raw, out var id) ? id : null;
     }
 
-    /// <summary>
-    /// Resource-based authorization for /balances/{merchantId}: the JWT's <c>merchantId</c>
-    /// claim must match the route value, OR the caller has the <c>admin</c> realm role.
-    /// </summary>
     public static bool CanAccessMerchant(this HttpContext httpContext, Guid merchantId)
     {
         if (HasRealmRole(httpContext.User, AdminRole))

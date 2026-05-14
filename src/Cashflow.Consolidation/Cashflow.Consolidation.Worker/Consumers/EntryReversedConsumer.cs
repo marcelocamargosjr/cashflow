@@ -10,10 +10,6 @@ using MongoDB.Driver;
 
 namespace Cashflow.Consolidation.Worker.Consumers;
 
-/// <summary>
-/// Apply-first consumer for <see cref="EntryReversedV1"/>. Same orchestration as
-/// <see cref="EntryRegisteredConsumer"/> — the projector handles sign via the snapshot.
-/// </summary>
 public sealed class EntryReversedConsumer : IConsumer<EntryReversedV1>
 {
     private readonly MongoContext _mongo;

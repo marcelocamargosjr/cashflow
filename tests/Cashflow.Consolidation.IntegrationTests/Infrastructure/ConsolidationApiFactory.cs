@@ -6,11 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cashflow.Consolidation.IntegrationTests.Infrastructure;
 
-/// <summary>
-/// WebApplicationFactory for the Consolidation API. Wires Mongo + Redis to the
-/// ephemeral containers and replaces JwtBearer with the local symmetric key so
-/// tests can mint <see cref="TestTokens"/> directly without a Keycloak round-trip.
-/// </summary>
 public sealed class ConsolidationApiFactory : WebApplicationFactory<Cashflow.Consolidation.Api.Program>
 {
     private readonly CashflowFixture _fixture;

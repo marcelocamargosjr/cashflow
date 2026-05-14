@@ -4,13 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Cashflow.TestSupport;
 
-/// <summary>
-/// Re-binds the JwtBearer handler on the WebApplicationFactory side to validate
-/// tokens minted by <see cref="TestTokens"/>: same issuer, same symmetric key,
-/// no remote discovery. The endpoints' Authorization policies stay untouched —
-/// they continue to require <c>merchantId</c> + <c>role</c> claims, which the
-/// test tokens already carry.
-/// </summary>
 public static class JwtTestAuthentication
 {
     public static IServiceCollection ReplaceJwtForTests(this IServiceCollection services)

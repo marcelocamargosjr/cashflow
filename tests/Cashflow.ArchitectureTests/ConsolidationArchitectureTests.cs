@@ -5,9 +5,6 @@ using NetArchTest.Rules;
 
 namespace Cashflow.ArchitectureTests;
 
-/// <summary>
-/// Structural invariants for the Consolidation bounded context.
-/// </summary>
 public sealed class ConsolidationArchitectureTests
 {
     private const string Infrastructure = "Cashflow.Consolidation.Infrastructure";

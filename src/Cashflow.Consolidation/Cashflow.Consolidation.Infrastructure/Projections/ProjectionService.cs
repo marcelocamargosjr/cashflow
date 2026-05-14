@@ -8,14 +8,6 @@ using MongoDB.Driver;
 
 namespace Cashflow.Consolidation.Infrastructure.Projections;
 
-/// <summary>
-/// Atomic projection updater. Uses a two-pass strategy:
-/// <list type="number">
-///   <item>Pass 1 — try to mutate an existing category bucket via array positional update.</item>
-///   <item>Pass 2 — if Pass 1 found no document/bucket, upsert the doc and $push a fresh bucket.</item>
-/// </list>
-/// Every filter carries the <c>lastAppliedEventId != evt.EventId</c> guard so retries are no-ops.
-/// </summary>
 public sealed class ProjectionService : IProjectionService
 {
     // Buckets need a non-null discriminator. The wire allows `Category = null`, so we

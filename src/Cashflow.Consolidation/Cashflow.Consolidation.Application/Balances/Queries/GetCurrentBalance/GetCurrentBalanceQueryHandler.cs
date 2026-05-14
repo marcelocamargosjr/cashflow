@@ -6,10 +6,6 @@ using MediatR;
 
 namespace Cashflow.Consolidation.Application.Balances.Queries.GetCurrentBalance;
 
-/// <summary>
-/// Delegates to <see cref="GetDailyBalanceQuery"/> using <c>TodayInBusinessZone</c>.
-/// Caching/staleness behavior is inherited from the daily handler.
-/// </summary>
 internal sealed class GetCurrentBalanceQueryHandler
     : IRequestHandler<GetCurrentBalanceQuery, Result<DailyBalanceDto>>
 {
