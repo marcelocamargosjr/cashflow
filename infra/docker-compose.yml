@@ -232,7 +232,7 @@ services:
       retries: 10
 
   loki:
-    image: grafana/loki:3.2.0
+    image: grafana/loki:3.7.2
     profiles: ["core"]
     <<: *restart
     container_name: cashflow-loki
