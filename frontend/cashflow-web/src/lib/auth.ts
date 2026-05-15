@@ -56,10 +56,16 @@ export const authOptions: AuthOptions = {
   providers: [
     KeycloakProvider({
       clientId: serverEnv.keycloakClientId,
+      // Public client (PKCE) — Keycloak rejeita autenticação com secret
+      // vazio se passado como string. Passamos string vazia (próprio default
+      // do tipo) e instruímos o openid-client a usar `none` no token endpoint.
       clientSecret: serverEnv.keycloakClientSecret,
       issuer: serverEnv.keycloakIssuer,
-      authorization: { params: { scope: "openid profile email" } },
+      authorization: { params: { scope: "openid" } },
       checks: ["pkce", "state"],
+      client: serverEnv.keycloakClientSecret
+        ? undefined
+        : { token_endpoint_auth_method: "none" },
     }),
   ],
   callbacks: {

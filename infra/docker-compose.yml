@@ -440,7 +440,9 @@ services:
       # e a discovery feita pelo NextAuth precisa resolver para o host.
       - "localhost:host-gateway"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
+      # Em alpine, `localhost` resolve para ::1 (IPv6) primeiro, mas o Next
+      # bind apenas em IPv4 (HOSTNAME=0.0.0.0). 127.0.0.1 garante o probe.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/api/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 8

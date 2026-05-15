@@ -32,6 +32,6 @@ USER nextjs
 EXPOSE 3001
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
-  CMD wget -qO- http://localhost:3001/api/health || exit 1
+  CMD wget -qO- http://127.0.0.1:3001/api/health || exit 1
 
 CMD ["node", "server.js"]
