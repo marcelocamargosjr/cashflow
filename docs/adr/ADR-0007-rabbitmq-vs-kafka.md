@@ -28,7 +28,7 @@ Volume estimado: < 1000 events/s sustentado por merchant; < 10k events/s em pico
 
 ### Opção A — RabbitMQ 3.13 + MassTransit — **escolhida**
 - Broker AMQP 0.9.1, fila durável, DLQ nativo via `x-dead-letter-exchange`.
-- **Prós:** DX excelente em .NET; **Outbox EF Core nativo** ([ADR-0008](ADR-0008-massimo-transit-outbox.md)); retry/circuit-breaker no consumer (`UseMessageRetry`, `UseCircuitBreaker`); Management UI; healthcheck simples.
+- **Prós:** DX excelente em .NET; **Outbox EF Core nativo** ([ADR-0008](ADR-0008-masstransit-outbox.md)); retry/circuit-breaker no consumer (`UseMessageRetry`, `UseCircuitBreaker`); Management UI; healthcheck simples.
 - **Contras:** sem replay nativo (mensagem consumida some); throughput máximo menor que Kafka para mesma máquina.
 
 ### Opção B — Apache Kafka 3.x + Confluent.Kafka
@@ -99,4 +99,4 @@ Após 5 tentativas, vai para `_skipped` (DLQ). Runbook ([`docs/runbook.md`](../r
 - [RabbitMQ 3.13 docs](https://www.rabbitmq.com/docs).
 - [MassTransit RabbitMQ transport](https://masstransit.io/documentation/transports/rabbitmq).
 - [Confluent — When NOT to use Kafka](https://www.confluent.io/blog/dont-use-apache-kafka-consumer-groups/).
-- ADRs relacionadas: [ADR-0001](ADR-0001-microsservicos-event-driven.md), [ADR-0008](ADR-0008-massimo-transit-outbox.md).
+- ADRs relacionadas: [ADR-0001](ADR-0001-microsservicos-event-driven.md), [ADR-0008](ADR-0008-masstransit-outbox.md).

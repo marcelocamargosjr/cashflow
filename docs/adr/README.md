@@ -11,7 +11,7 @@ Decisões estruturais do projeto em formato **MADR** (Markdown Architectural Dec
 | [ADR-0005](ADR-0005-postgres-write-side.md) | PostgreSQL 16 como write store do Ledger | Accepted | `dados`, `postgres` |
 | [ADR-0006](ADR-0006-mongo-read-side.md) | MongoDB 7 como read store da Consolidação | Accepted | `dados`, `mongodb` |
 | [ADR-0007](ADR-0007-rabbitmq-vs-kafka.md) | RabbitMQ + MassTransit em vez de Apache Kafka | Accepted | `mensageria`, `rabbitmq` |
-| [ADR-0008](ADR-0008-massimo-transit-outbox.md) | MassTransit `EntityFrameworkOutbox` em vez de Outbox manual | Accepted | `outbox`, `consistencia` |
+| [ADR-0008](ADR-0008-masstransit-outbox.md) | MassTransit `EntityFrameworkOutbox` em vez de Outbox manual | Accepted | `outbox`, `consistencia` |
 | [ADR-0009](ADR-0009-redis-cache.md) | Redis 7 como cache aside com stampede lock simples (sem Redlock) | Accepted | `cache`, `redis` |
 | [ADR-0010](ADR-0010-otel-observability.md) | OpenTelemetry + Grafana stack para observabilidade | Accepted | `otel`, `grafana` |
 | [ADR-0011](ADR-0011-keycloak-auth.md) | Keycloak 25 (OIDC) como Identity Provider | Accepted | `seguranca`, `keycloak`, `oidc` |

@@ -124,4 +124,4 @@ hostBuilder.UseSerilog((ctx, lc) => lc
 - [OpenTelemetry docs](https://opentelemetry.io/docs/).
 - [Grafana — Three pillars of observability](https://grafana.com/blog/2021/04/01/observability/).
 - [.NET OTel auto-instrumentation](https://github.com/open-telemetry/opentelemetry-dotnet/tree/main/src/OpenTelemetry.Instrumentation.AspNetCore).
-- ADRs relacionadas: [ADR-0007](ADR-0007-rabbitmq-vs-kafka.md), [ADR-0008](ADR-0008-massimo-transit-outbox.md).
+- ADRs relacionadas: [ADR-0007](ADR-0007-rabbitmq-vs-kafka.md), [ADR-0008](ADR-0008-masstransit-outbox.md).

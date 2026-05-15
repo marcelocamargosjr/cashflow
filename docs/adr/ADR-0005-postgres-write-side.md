@@ -19,7 +19,7 @@ O Ledger é a fonte de verdade dos lançamentos. As operações sobre ele exigem
 
 - **D1.** NFR-R-02 (MUST): Outbox transacional — "ou persiste e publica, ou nenhum dos dois".
 - **D2.** NFR-M-04 (SHOULD): migrations versionadas, idempotentes, com rollback.
-- **D3.** Suporte first-class do MassTransit Outbox EF Core ([ADR-0008](ADR-0008-massimo-transit-outbox.md)).
+- **D3.** Suporte first-class do MassTransit Outbox EF Core ([ADR-0008](ADR-0008-masstransit-outbox.md)).
 - **D4.** Ferramental local sem licença (Docker image oficial Alpine, ≈ 80 MB).
 
 ## Alternativas consideradas
@@ -91,4 +91,4 @@ Escolhemos **PostgreSQL 16.3-alpine** com:
 - [PostgreSQL 16 docs](https://www.postgresql.org/docs/16/index.html).
 - [MassTransit Postgres Outbox](https://masstransit.io/documentation/configuration/middleware/outbox).
 - [Npgsql provider docs](https://www.npgsql.org/efcore/).
-- ADRs relacionadas: [ADR-0004](ADR-0004-cqrs-fisico.md), [ADR-0008](ADR-0008-massimo-transit-outbox.md).
+- ADRs relacionadas: [ADR-0004](ADR-0004-cqrs-fisico.md), [ADR-0008](ADR-0008-masstransit-outbox.md).

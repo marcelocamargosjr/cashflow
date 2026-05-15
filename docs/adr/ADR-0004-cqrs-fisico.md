@@ -46,7 +46,7 @@ Precisamos decidir se separamos fisicamente (DBs diferentes) ou logicamente (mes
 
 Escolhemos a **Opção B — CQRS físico** com:
 
-- **Postgres 16** para o write side (transações ACID + EF Core + Outbox MassTransit em mesma TX — ver [ADR-0008](ADR-0008-massimo-transit-outbox.md)).
+- **Postgres 16** para o write side (transações ACID + EF Core + Outbox MassTransit em mesma TX — ver [ADR-0008](ADR-0008-masstransit-outbox.md)).
 - **MongoDB 7** para o read side (1 documento por `(merchantId, date)`, índice único composto, índice TTL em `processed_events` para idempotência — ver [ADR-0006](ADR-0006-mongo-read-side.md)).
 - **Redis** como cache aside ([ADR-0009](ADR-0009-redis-cache.md)).
 - **RabbitMQ** como veículo dos eventos ([ADR-0007](ADR-0007-rabbitmq-vs-kafka.md)).
@@ -84,4 +84,4 @@ Escolhemos a **Opção B — CQRS físico** com:
 - Greg Young, [CQRS Documents](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf).
 - Martin Fowler, [CQRS](https://martinfowler.com/bliki/CQRS.html).
 - Pat Helland, [Data on the Outside vs Data on the Inside](https://queue.acm.org/detail.cfm?id=3415014).
-- ADRs relacionadas: [ADR-0005](ADR-0005-postgres-write-side.md), [ADR-0006](ADR-0006-mongo-read-side.md), [ADR-0008](ADR-0008-massimo-transit-outbox.md), [ADR-0009](ADR-0009-redis-cache.md).
+- ADRs relacionadas: [ADR-0005](ADR-0005-postgres-write-side.md), [ADR-0006](ADR-0006-mongo-read-side.md), [ADR-0008](ADR-0008-masstransit-outbox.md), [ADR-0009](ADR-0009-redis-cache.md).

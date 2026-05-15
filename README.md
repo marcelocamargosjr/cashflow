@@ -76,7 +76,7 @@ Diagramas detalhados em [`docs/c4/`](docs/c4/) (Context, Containers, Components 
 | Write DB | PostgreSQL | 16.3 | ACID + JSONB + SKIP LOCKED — [ADR-0005](docs/adr/ADR-0005-postgres-write-side.md) |
 | Read DB | MongoDB | 7.0 | Documento por `(merchant, date)`, sem JOIN — [ADR-0006](docs/adr/ADR-0006-mongo-read-side.md) |
 | Broker | RabbitMQ + MassTransit | 3.13 / 8.x | DX + Outbox EF nativo — [ADR-0007](docs/adr/ADR-0007-rabbitmq-vs-kafka.md) |
-| Outbox | MassTransit EntityFrameworkOutbox | — | Sem código manual — [ADR-0008](docs/adr/ADR-0008-massimo-transit-outbox.md) |
+| Outbox | MassTransit EntityFrameworkOutbox | — | Sem código manual — [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md) |
 | Cache | Redis | 7.4 | TTL 60s + stampede lock — [ADR-0009](docs/adr/ADR-0009-redis-cache.md) |
 | AuthN | Keycloak OIDC | 25.0 | Realm importável, `merchantId` claim — [ADR-0011](docs/adr/ADR-0011-keycloak-auth.md) |
 | Gateway | YARP | 2.x | .NET nativo, JWT + rate-limit + transforms — [ADR-0012](docs/adr/ADR-0012-yarp-gateway.md) |
@@ -358,7 +358,7 @@ OK: NFR de isolamento validado.
     - Catch-up: ~22s (entriesCount=100).
 ```
 
-Mecanismo: a transação do Ledger grava na tabela `entries` **e** em `messaging.OutboxMessage` na mesma `SaveChanges`. Quando o Rabbit/Consolidation voltam, o dispatcher do MassTransit drena o Outbox em ordem; o consumer é idempotente via `processed_events.eventId` no Mongo (filtro `$ne` em `FindOneAndUpdate`, TTL 7d). Detalhes em [`docs/sequence/chaos-isolation.mmd`](docs/sequence/chaos-isolation.mmd) e [ADR-0008](docs/adr/ADR-0008-massimo-transit-outbox.md).
+Mecanismo: a transação do Ledger grava na tabela `entries` **e** em `messaging.OutboxMessage` na mesma `SaveChanges`. Quando o Rabbit/Consolidation voltam, o dispatcher do MassTransit drena o Outbox em ordem; o consumer é idempotente via `processed_events.eventId` no Mongo (filtro `$ne` em `FindOneAndUpdate`, TTL 7d). Detalhes em [`docs/sequence/chaos-isolation.mmd`](docs/sequence/chaos-isolation.mmd) e [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md).
 
 ---
 
@@ -399,7 +399,7 @@ Métricas custom exposed via Meter `Cashflow.*` (`/metrics` Prometheus). Dashboa
 | Consistência forte × eventual | **Eventual** (CQRS físico) | UI mostra "atualizado há Xs"; reverter cria evento, não rollback | Documentado em [ADR-0004](docs/adr/ADR-0004-cqrs-fisico.md); lag SLO < 5s |
 | 2 DBs físicos × CQRS lógico em 1 DB | **2 DBs físicos** | Mais operação (5+ containers) | `make up` único; isolamento real prova NFR-A-01 ([ADR-0005](docs/adr/ADR-0005-postgres-write-side.md), [ADR-0006](docs/adr/ADR-0006-mongo-read-side.md)) |
 | RabbitMQ × Kafka | **RabbitMQ** | Throughput menor (não precisamos); sem replay nativo | DLQ + Outbox dão durabilidade equivalente para o volume — [ADR-0007](docs/adr/ADR-0007-rabbitmq-vs-kafka.md) |
-| MassTransit Outbox × Outbox custom | **MassTransit nativo** | Menos controle fino do polling | Zero código de plumbing; SKIP LOCKED gerenciado — [ADR-0008](docs/adr/ADR-0008-massimo-transit-outbox.md) |
+| MassTransit Outbox × Outbox custom | **MassTransit nativo** | Menos controle fino do polling | Zero código de plumbing; SKIP LOCKED gerenciado — [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md) |
 | Cache stampede lock × Redlock | **`SET NX EX 5` simples** | Não é distributed lock formal (Kleppmann) | Aceitável para cache aside; janela de risco << TTL — [ADR-0009](docs/adr/ADR-0009-redis-cache.md) |
 | Rate-limit gateway × API | **Apenas no Gateway** | Burlar gateway abre as APIs | Network policy do Docker isola; header `X-Gateway-Token` opcional como defense-in-depth |
 | TLS no edge × mTLS interno | **TLS no edge** em prod / HTTP em dev | mTLS interno seria pesado para o desafio | HSTS sobre HTTP é inerte; documentado em [ADR-0014](docs/adr/ADR-0014-tls-edge-termination.md) |
@@ -486,7 +486,7 @@ Critério de release: **Trivy reporta 0 vulnerabilidades HIGH/CRITICAL** nas 4 i
 
 ## 18. Licença
 
-MIT. Veja `LICENSE` (a adicionar antes do release `v1.0.0`).
+MIT. Veja [`LICENSE`](LICENSE).
 
 ---
 
