@@ -5,6 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!--
+      TestSupport é uma biblioteca de utilitários (fixtures, builders, JWT issuer)
+      consumida pelos integration tests; NÃO contém testes próprios. Sem este flag,
+      `dotnet test sln` tenta descobrir testes aqui e o testhost falha ao resolver
+      transitivos (Azure.Core) — barulho que mascara o resultado dos test runs reais.
+    -->
+    <IsTestProject>false</IsTestProject>
     <RootNamespace>Cashflow.TestSupport</RootNamespace>
   </PropertyGroup>
 
