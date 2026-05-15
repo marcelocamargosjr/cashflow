@@ -195,23 +195,46 @@ jobs:
         # confidential client; `directAccessGrantsEnabled=true` enables this flow.
         id: token
         run: |
-          set -euo pipefail
-          for i in $(seq 1 30); do
+          set -uo pipefail
+          # 1) Wait until the realm endpoint responds — Keycloak 25 returns the
+          #    .well-known doc *after* the realm import finishes, so this is the
+          #    real readiness signal (the container's HTTP healthcheck flips much
+          #    earlier).
+          for i in $(seq 1 60); do
             if curl -fsS http://localhost:8080/realms/cashflow/.well-known/openid-configuration >/dev/null 2>&1; then
-              echo "keycloak realm reachable"; break
+              echo "keycloak realm reachable on attempt $i"
+              break
             fi
             sleep 5
           done
-          RESPONSE=$(curl -fsS -X POST http://localhost:8080/realms/cashflow/protocol/openid-connect/token \
-            -H "Content-Type: application/x-www-form-urlencoded" \
-            -d "client_id=cashflow-api" \
-            -d "client_secret=cashflow-api-secret" \
-            -d "grant_type=password" \
-            -d "username=merchant1@cashflow.local" \
-            -d "password=merchant123")
-          ACCESS=$(echo "$RESPONSE" | jq -r '.access_token')
-          if [ -z "$ACCESS" ] || [ "$ACCESS" = "null" ]; then
-            echo "::error::failed to acquire access token"; echo "$RESPONSE"; exit 1
+          # 2) Hit the token endpoint without `-f` so we can inspect the body
+          #    regardless of status. We retry a few times because users get
+          #    materialised after the realm doc is queryable.
+          ACCESS=""
+          for i in $(seq 1 12); do
+            HTTP_CODE=$(curl -sS -o /tmp/token.json -w '%{http_code}' \
+              -X POST http://localhost:8080/realms/cashflow/protocol/openid-connect/token \
+              -H "Content-Type: application/x-www-form-urlencoded" \
+              -d "client_id=cashflow-api" \
+              -d "client_secret=cashflow-api-secret" \
+              -d "grant_type=password" \
+              -d "username=merchant1@cashflow.local" \
+              -d "password=merchant123" || echo "000")
+            RESPONSE=$(cat /tmp/token.json 2>/dev/null || echo "{}")
+            if [ "$HTTP_CODE" = "200" ]; then
+              ACCESS=$(echo "$RESPONSE" | jq -r '.access_token // empty')
+              [ -n "$ACCESS" ] && break
+            fi
+            echo "attempt $i: HTTP=$HTTP_CODE body=$RESPONSE"
+            sleep 5
+          done
+          if [ -z "$ACCESS" ]; then
+            echo "::error::failed to acquire access token after retries"
+            echo "--- last keycloak response ---"
+            cat /tmp/token.json 2>/dev/null || true
+            echo "--- keycloak container logs (tail) ---"
+            docker logs --tail=200 cashflow-keycloak 2>&1 || true
+            exit 1
           fi
           # JWT is three base64url-encoded segments; decode the payload to read merchantId.
           PAYLOAD=$(echo "$ACCESS" | cut -d. -f2)
