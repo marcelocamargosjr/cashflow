@@ -57,7 +57,7 @@
     {
       "clientId": "cashflow-api",
       "name": "Cashflow API (confidential)",
-      "description": "Service account para CI/k6 e clients backend (client_credentials).",
+      "description": "Client confidential para back-end e scripts (CI/k6/chaos). Suporta `password` grant (uso primário em scripts e README) e `client_credentials` via service account.",
       "enabled": true,
       "publicClient": false,
       "secret": "cashflow-api-secret",

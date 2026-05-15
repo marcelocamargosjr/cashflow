@@ -20,31 +20,31 @@ sequenceDiagram
 
     rect rgb(245, 250, 245)
     note over API,CACHE: Cache aside (TTL 60s)
-        API->>+CACHE: GET daily_balance:{merchantId}:{date}
+        API->>+CACHE: GET balance:daily:{merchantId}:{yyyyMMdd}
         alt cache HIT (≥95% das req em estado estacionário)
             CACHE-->>-API: payload JSON serializado
             API-->>GW: 200 OK<br/>cache: {hit: true, ageSeconds: 12}
             GW-->>Merchant: 200 OK
         else cache MISS
             CACHE-->>API: nil
-            API->>+CACHE: SET miss_lock:... NX EX 5
+            API->>+CACHE: SET lock:balance:daily:... <lockId> NX EX 5
             alt won lock (1 caller por janela)
                 CACHE-->>-API: OK (lock acquired)
                 rect rgb(252, 245, 245)
                 note over API,POLLY: Polly resilience pipeline
                     API->>+POLLY: ExecuteAsync
-                    POLLY->>+MGO: db.daily_balance.findOne({merchantId, date})
+                    POLLY->>+MGO: db.daily_balances.findOne({_id: BuildId(merchantId,date)})
                     MGO-->>-POLLY: doc | null
                     POLLY-->>-API: result (Timeout 2s / CB / Retry exp 3x)
                 end
-                API->>CACHE: SET daily_balance:... EX 60
-                API->>CACHE: DEL miss_lock:...
+                API->>CACHE: SET balance:daily:... EX 60
+                API->>CACHE: EVAL Lua compare-and-delete (DEL só se valor == lockId)
                 API-->>GW: 200 OK<br/>cache: {hit: false, ageSeconds: 0}
                 GW-->>Merchant: 200 OK
             else lost lock (callers concorrentes)
                 CACHE-->>API: nil (key already exists)
                 note over API: Task.Delay(100ms)
-                API->>+CACHE: GET daily_balance:... (relê)
+                API->>+CACHE: GET balance:daily:... (relê)
                 alt cache populated by winner
                     CACHE-->>-API: payload
                     API-->>GW: 200 OK<br/>cache: {hit: true}

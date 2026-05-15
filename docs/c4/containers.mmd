@@ -14,7 +14,7 @@ C4Container
         Container(consApi, "Cashflow.Consolidation.Api", "ASP.NET Core 9 / .NET 9", "Read-side: queries de saldo (daily, period, current) com cache aside + stampede lock.")
         Container(consWorker, "Cashflow.Consolidation.Worker", ".NET Worker Service 9", "Consumer MassTransit (EntryRegisteredV1, EntryReversedV1) — projeção idempotente no Mongo.")
         ContainerDb(pg, "PostgreSQL", "16.3", "Banco do Ledger: entries, idempotency_keys + schema messaging (OutboxState / OutboxMessage).")
-        ContainerDb(mongo, "MongoDB", "7.0", "Banco da Consolidação: daily_balance + processed_events (TTL 7d).")
+        ContainerDb(mongo, "MongoDB", "7.0", "Banco da Consolidação: daily_balances + processed_events (TTL 7d).")
         ContainerDb(redis, "Redis", "7.4", "Cache aside (TTL 60s) + stampede lock keys (SET NX EX 5).")
         Container(broker, "RabbitMQ", "3.13 + Management", "Broker AMQP — exchanges EntryRegisteredV1 / EntryReversedV1 + DLQ (_skipped).")
         Container(idp, "Keycloak", "25.0", "OIDC IdP — realm cashflow (clients, roles, protocol mappers para merchantId claim).")
@@ -34,9 +34,9 @@ C4Container
     Rel(ledgerApi, idp, "Valida JWT (Authority=http://localhost:8080/realms/cashflow)", "HTTP")
 
     Rel(consWorker, broker, "Consume EntryRegisteredV1 / EntryReversedV1 (UseMessageRetry exponential 5x)", "AMQP :5672")
-    Rel(consWorker, mongo, "FindOneAndUpdate (upsert + \\$inc + \\$ne EventId) — idempotência atômica", "Mongo driver :27017")
+    Rel(consWorker, mongo, "Pre-check processed_events (Find+Insert) + UpdateOneAsync daily_balances Pass1/Pass2 com guard \\$ne LastAppliedEventId — idempotência em duas camadas", "Mongo driver :27017")
 
-    Rel(consApi, mongo, "Find daily_balance — read-only", "Mongo driver :27017")
+    Rel(consApi, mongo, "Find daily_balances por _id derivado (merchantId+date) — read-only", "Mongo driver :27017")
     Rel(consApi, redis, "GET / SET NX EX — cache aside + stampede lock", "RESP :6379")
     Rel(consApi, idp, "Valida JWT", "HTTP")
 

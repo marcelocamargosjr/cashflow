@@ -71,7 +71,11 @@ paths:
               description: Presente como `true` quando a request foi um replay (mesmo `Idempotency-Key` já visto).
               schema: { type: string, enum: ["true"] }
             Location:
-              description: URI da entry criada.
+              description: |
+                URI relativa da entry criada (`/api/v1/entries/{id}`). Atrás do
+                Gateway, o caminho público real é prefixado: `/ledger/api/v1/entries/{id}`.
+                O cliente deve reconstruir a URL absoluta combinando com o `Host`
+                e o prefixo de roteamento do Gateway.
               schema: { type: string, format: uri }
           content:
             application/json:
@@ -190,7 +194,10 @@ paths:
                 days: { type: integer, minimum: 1, maximum: 365, default: 30 }
                 entriesPerDay: { type: integer, minimum: 1, maximum: 100, default: 20 }
       responses:
-        "202": { description: Accepted — seed iniciado. }
+        "501":
+          description: |
+            Not Implemented — endpoint é um stub. Implementação prevista para F4/F11
+            (Bogus stack). Comportamento atual: devolve 501 sem efeito colateral.
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
 components:
@@ -246,7 +253,7 @@ components:
         application/problem+json:
           schema: { $ref: "#/components/schemas/ProblemDetails" }
     RateLimited:
-      description: Rate limit excedido (120 req/s/merchant em consolidation; 30 req/s em ledger write).
+      description: Rate limit excedido (120 req/s/merchant em consolidation read; 200 req/s/merchant em ledger write — sliding window de 1s, configurado em `GatewayServiceCollectionExtensions`).
       headers:
         Retry-After:
           description: Segundos para próxima tentativa.
@@ -283,6 +290,8 @@ components:
           minLength: 5
           maxLength: 500
     MoneyRequest:
+      # Equivalente a `AmountRequest` no C# (record record `AmountRequest(decimal Value, string Currency)`).
+      # Mantido o nome `MoneyRequest` no contrato OpenAPI por consistência com `Money` (Value Object) no Domain.
       type: object
       required: [value, currency]
       properties:

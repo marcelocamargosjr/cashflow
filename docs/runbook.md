@@ -28,7 +28,7 @@ docker logs --tail=200 cashflow-consolidation-worker | \
 # 4) Mongo — última revision aplicada
 docker exec -it cashflow-mongo mongosh -u cashflow -p CHANGE_ME_IN_PROD \
   --authenticationDatabase admin --eval \
-  "db.getSiblingDB('cashflow_consolidation').daily_balance.find({}, {merchantId:1, date:1, revision:1, lastUpdatedAt:1}).sort({lastUpdatedAt:-1}).limit(5).pretty()"
+  "db.getSiblingDB('cashflow_consolidation').daily_balances.find({}, {merchantId:1, date:1, revision:1, lastUpdatedAt:1}).sort({lastUpdatedAt:-1}).limit(5).pretty()"
 ```
 
 | Onde está o gargalo | Diagnóstico | Ação |
@@ -36,7 +36,7 @@ docker exec -it cashflow-mongo mongosh -u cashflow -p CHANGE_ME_IN_PROD \
 | `OutboxMessage.pending` > 1000 | Dispatcher do MassTransit não dá conta | Escalar `ledger-api` (mais réplicas); investigar lock contention; checar latência do Rabbit |
 | `messages_ready` cresce no Rabbit | Consumer offline ou lento | Ver §1.2; checar `cashflow-consolidation-worker` |
 | Worker logs sem `Consumed` recente | Consumer em retry/CB | Ver §2 (DLQ) |
-| Mongo `revision` antiga | Worker consumindo mas projection lenta | Profilar `findOneAndUpdate`; verificar índice `(merchantId, date)` |
+| Mongo `revision` antiga | Worker consumindo mas projection lenta | Profilar `updateOne` (Pass1/Pass2 em `daily_balances`); verificar índice composto `ix_merchant_date` (`{merchantId:1, date:-1}`) |
 
 ### 1.2 Verificar saúde do consumer
 
@@ -104,7 +104,7 @@ watch -n 1 'curl -sSu cashflow:CHANGE_ME_IN_PROD http://localhost:15672/api/queu
 docker exec -it cashflow-rabbitmq rabbitmqctl clear_parameter shovel replay-dlq
 ```
 
-> O consumer é idempotente via `$ne lastEventId` no Mongo, então replays não duplicam.
+> O consumer é idempotente em duas camadas: fast-path em `processed_events` (Find + Insert) e guard `$ne LastAppliedEventId` em `daily_balances` (UpdateOneAsync). Replays não duplicam.
 
 ### 3.2 Replay total da projeção (rebuild)
 
@@ -114,7 +114,7 @@ Esqueleto de endpoint `POST /admin/reproject?from=&to=` está planejado (evoluç
 # Truncar a projeção do merchant + reprocessar a partir do snapshot do evento
 docker exec -it cashflow-mongo mongosh -u cashflow -p CHANGE_ME_IN_PROD \
   --authenticationDatabase admin --eval \
-  "db.getSiblingDB('cashflow_consolidation').daily_balance.deleteMany({merchantId: '0193e7a8-d8f0-7c5e-9b21-3f9f8a4d1c00'})"
+  "db.getSiblingDB('cashflow_consolidation').daily_balances.deleteMany({merchantId: '0193e7a8-d8f0-7c5e-9b21-3f9f8a4d1c00'})"
 
 # Republicar os eventos a partir da tabela Ledger (script SQL custom — pendente).
 ```

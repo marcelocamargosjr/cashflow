@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cashflow.example.com/schemas/EntryRegistered.v1.schema.json",
   "title": "EntryRegisteredV1",
-  "description": "Integration event publicado pelo Cashflow.Ledger via Outbox MassTransit quando um lançamento é confirmado. Consumido por Cashflow.Consolidation.Worker para atualizar a projeção daily_balance no Mongo. Idempotência garantida via filtro `$ne lastEventId` no FindOneAndUpdate.",
+  "description": "Integration event publicado pelo Cashflow.Ledger via Outbox MassTransit quando um lançamento é confirmado. Consumido por Cashflow.Consolidation.Worker para atualizar a projeção `daily_balances` no Mongo. Idempotência em duas camadas: fast-path em `processed_events` (Find + InsertOne, com tratamento de DuplicateKey) e guard `$ne LastAppliedEventId` em `daily_balances` via UpdateOneAsync (Pass1/Pass2).",
   "$comment": "Origem: src/Cashflow.Contracts/V1/EntryRegisteredV1.cs (record sealed). Namespace AMQP: Cashflow.Contracts.V1:EntryRegisteredV1.",
   "type": "object",
   "required": [
@@ -20,7 +20,7 @@
     "eventId": {
       "type": "string",
       "format": "uuid",
-      "description": "Identificador único do evento. Guid v7 k-sortable. Usado para idempotência do consumer (`$ne lastEventId`)."
+      "description": "Identificador único do evento. Guid v7 k-sortable. Usado para idempotência do consumer (`$ne LastAppliedEventId` em `daily_balances` + chave `_id` em `processed_events`)."
     },
     "occurredOn": {
       "type": "string",
@@ -30,7 +30,7 @@
     "merchantId": {
       "type": "string",
       "format": "uuid",
-      "description": "ID do merchant — chave de roteamento da projeção (parte do índice composto no Mongo)."
+      "description": "ID do merchant — chave de roteamento da projeção (compõe o `_id` do documento `daily_balances` junto com `entryDate`)."
     },
     "entryId": {
       "type": "string",
@@ -58,7 +58,7 @@
     "entryDate": {
       "type": "string",
       "format": "date",
-      "description": "Data de competência do lançamento (sem timezone). Localiza o documento daily_balance."
+      "description": "Data de competência do lançamento (sem timezone). Localiza o documento na coleção `daily_balances`."
     },
     "category": {
       "type": ["string", "null"],

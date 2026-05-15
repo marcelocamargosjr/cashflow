@@ -38,7 +38,7 @@ C4Component
         Component(mtRetry, "Retry/DLQ Setup", "MassTransit config", "UseMessageRetry exponential 5x; venenosa → DLQ _skipped.")
     }
 
-    ContainerDb(mongo, "MongoDB", "7.0", "daily_balance + processed_events (TTL 7d)")
+    ContainerDb(mongo, "MongoDB", "7.0", "daily_balances + processed_events (TTL 7d)")
     ContainerDb(redis, "Redis", "7.4", "Cache (TTL 60s)")
     Container(broker, "RabbitMQ", "3.13", "EntryRegisteredV1 / EntryReversedV1 queues + DLQ")
     Container(idp, "Keycloak", "25.0", "JWT issuer")

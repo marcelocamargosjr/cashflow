@@ -17,7 +17,7 @@
 Dois bounded contexts independentes comunicando-se **apenas por eventos**:
 
 - **Ledger** (write-side, Postgres) — fonte de verdade dos lançamentos. Cada `POST /entries` persiste a entidade **e** o evento na mesma transação via **Outbox MassTransit**. Continua aceitando lançamentos mesmo se o Consolidado estiver offline.
-- **Consolidation** (read-side, MongoDB + Redis) — consumidor idempotente dos eventos. Mantém um documento `daily_balance` por `(merchantId, date)` otimizado para a query `GET /balances/{merchantId}/daily` com cache aside e stampede lock.
+- **Consolidation** (read-side, MongoDB + Redis) — consumidor idempotente dos eventos. Mantém um documento na coleção `daily_balances` por `(merchantId, date)` otimizado para a query `GET /balances/{merchantId}/daily` com cache aside e stampede lock.
 
 **Gateway YARP** termina autenticação JWT (Keycloak), aplica rate limit por merchant e roteia para os back-ends. Stack de observabilidade (OTel → Prometheus + Loki + Tempo + Grafana) emite traces ponta-a-ponta correlacionados por `correlationId`.
 
@@ -76,7 +76,7 @@ Diagramas detalhados em [`docs/c4/`](docs/c4/) (Context, Containers, Components 
 | Write DB | PostgreSQL | 16.3 | ACID + JSONB + SKIP LOCKED — [ADR-0005](docs/adr/ADR-0005-postgres-write-side.md) |
 | Read DB | MongoDB | 7.0 | Documento por `(merchant, date)`, sem JOIN — [ADR-0006](docs/adr/ADR-0006-mongo-read-side.md) |
 | Broker | RabbitMQ + MassTransit | 3.13 / 8.x | DX + Outbox EF nativo — [ADR-0007](docs/adr/ADR-0007-rabbitmq-vs-kafka.md) |
-| Outbox | MassTransit EntityFrameworkOutbox | — | Sem código manual — [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md) |
+| Outbox | MassTransit EntityFrameworkOutbox | — | Sem dispatcher próprio (há plumbing reflexivo no bootstrap) — [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md) |
 | Cache | Redis | 7.4 | TTL 60s + stampede lock — [ADR-0009](docs/adr/ADR-0009-redis-cache.md) |
 | AuthN | Keycloak OIDC | 25.0 | Realm importável, `merchantId` claim — [ADR-0011](docs/adr/ADR-0011-keycloak-auth.md) |
 | Gateway | YARP | 2.x | .NET nativo, JWT + rate-limit + transforms — [ADR-0012](docs/adr/ADR-0012-yarp-gateway.md) |
@@ -96,7 +96,7 @@ Apenas três dependências locais — **nenhuma instalação de .NET / Node / Po
 | Git | 2.40+ | `git --version` |
 | GNU Make | 4.x (Linux/macOS/WSL) | `make --version` |
 
-> **Windows nativo:** use `scripts/make-up.ps1` ou rode os comandos via WSL2/Git Bash.
+> **Windows nativo:** prefira **PowerShell 7+** (`pwsh`) ao Windows PowerShell 5.1. O wrapper `scripts/make-up.ps1` usa `$ErrorActionPreference = 'Stop'`, e em PS 5.1 a stderr de comandos nativos (típica em `docker pull`) é transformada em `NativeCommandError`, abortando o script no primeiro pull. Em PS 5.1, rode `docker compose -f infra/docker-compose.yml --env-file infra/.env --profile core --profile app up -d` diretamente, ou execute via WSL2 / Git Bash. Em PS 7+ ou WSL2/Git Bash o `make up` funciona normalmente.
 > **CPU/RAM recomendados:** 4 vCPUs / 8 GB RAM (stack completa com observabilidade).
 
 ---
@@ -111,13 +111,15 @@ make up                                # core + app: 15 containers, ~90s para he
 
 `make up` levanta:
 
-- **core**: Postgres, Mongo, Rabbit, Redis, Keycloak, OTel-Collector, Prometheus, Loki, Tempo, Grafana.
-- **app**: Gateway, Ledger.Api, Consolidation.Api, Consolidation.Worker.
+- **core** (10): Postgres, Mongo, Rabbit, Redis, Keycloak, OTel-Collector, Prometheus, Loki, Tempo, Grafana.
+- **app** (5): Gateway, Ledger.Api, Consolidation.Api, Consolidation.Worker, Frontend Next.js.
 
 Para popular dados (após `make up`):
 
 ```bash
-make seed       # 30 dias × 20 lançamentos por dia para o merchant1 do seed Keycloak
+make seed       # NÃO IMPLEMENTADO neste build — o endpoint POST /ledger/admin/seed
+                # é um stub que retorna 501 Not Implemented. Para gerar dados, use
+                # POST /ledger/api/v1/entries em loop (ver §8) ou via Swagger.
 ```
 
 Outros alvos: `make down` (stop), `make nuke` (apaga volumes), `make logs SERVICE=ledger-api`, `make test`, `make perf`, `make chaos-validate`, `make build`.
@@ -128,13 +130,14 @@ Outros alvos: `make down` (stop), `make nuke` (apaga volumes), `make logs SERVIC
 
 | Serviço | URL | Credenciais |
 |---|---|---|
+| Frontend Next.js | http://localhost:3001 | login via Keycloak (`merchant1@cashflow.local` / `merchant123`) |
 | Gateway (entrada única) | http://localhost:8000 | JWT obrigatório |
 | Ledger.Api (direto) | http://localhost:8001 | JWT obrigatório |
 | Consolidation.Api (direto) | http://localhost:8002 | JWT obrigatório |
 | Keycloak Admin Console | http://localhost:8080 | `admin` / `CHANGE_ME_IN_PROD` |
 | Keycloak Realm | http://localhost:8080/realms/cashflow | — |
 | RabbitMQ Management | http://localhost:15672 | `cashflow` / `CHANGE_ME_IN_PROD` |
-| pgAdmin (`tools` profile) | http://localhost:5050 | `admin@cashflow.local` / `CHANGE_ME_IN_PROD` |
+| pgAdmin (`tools` profile) | http://localhost:5050 | `admin@cashflow.local` / **mesma senha do `KEYCLOAK_ADMIN_PASSWORD`** (compartilhada via env var no compose, não a do Postgres) |
 | Mongo Express (`tools`) | http://localhost:8081 | sem auth (`ME_CONFIG_BASICAUTH=false`) |
 | RedisInsight (`tools`) | http://localhost:5540 | sem auth |
 | Grafana | http://localhost:3000 | `admin` / `admin` |
@@ -296,6 +299,8 @@ dotnet test tests/Cashflow.ArchitectureTests                # NetArchTest — Do
 
 CI gate em `.github/workflows/ci.yml` (F9) falha o build se Domain < 90% ou Application < 80%.
 
+> **Caveat de evidência local:** o snapshot mais recente em `docs/quality/final.txt` mostra que `Cashflow.Consolidation.UnitTests` não executou ("Não há nenhum teste disponível" + resolução `Azure.Core 1.6.0` ausente), portanto a cobertura da Consolidation **não foi medida nesse run**. Os badges valem para a execução verde de CI; reproduzir localmente exige restaurar/reparar o projeto de teste da Consolidation.
+
 ---
 
 ## 11. Validação do NFR de 50 req/s (`make perf`)
@@ -358,7 +363,7 @@ OK: NFR de isolamento validado.
     - Catch-up: ~22s (entriesCount=100).
 ```
 
-Mecanismo: a transação do Ledger grava na tabela `entries` **e** em `messaging.OutboxMessage` na mesma `SaveChanges`. Quando o Rabbit/Consolidation voltam, o dispatcher do MassTransit drena o Outbox em ordem; o consumer é idempotente via `processed_events.eventId` no Mongo (filtro `$ne` em `FindOneAndUpdate`, TTL 7d). Detalhes em [`docs/sequence/chaos-isolation.mmd`](docs/sequence/chaos-isolation.mmd) e [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md).
+Mecanismo: a transação do Ledger grava na tabela `entries` **e** em `messaging.OutboxMessage` na mesma `SaveChanges`. Quando o Rabbit/Consolidation voltam, o dispatcher do MassTransit drena o Outbox em ordem; o consumer é idempotente em **duas camadas**: (1) check-then-act em `processed_events` no Mongo (`Find().AnyAsync` + `InsertOneAsync` com tratamento de `DuplicateKey`, TTL 7d via índice em `processedAt`) e (2) guard `LastAppliedEventId` na projeção `daily_balances` (`UpdateOneAsync` em duas passadas — Pass1 com `$elemMatch` na categoria, Pass2 com `Push` + `SetOnInsert`). Detalhes em [`docs/sequence/chaos-isolation.mmd`](docs/sequence/chaos-isolation.mmd) e [ADR-0008](docs/adr/ADR-0008-masstransit-outbox.md).
 
 ---
 
@@ -403,7 +408,7 @@ Métricas custom exposed via Meter `Cashflow.*` (`/metrics` Prometheus). Dashboa
 | Cache stampede lock × Redlock | **`SET NX EX 5` simples** | Não é distributed lock formal (Kleppmann) | Aceitável para cache aside; janela de risco << TTL — [ADR-0009](docs/adr/ADR-0009-redis-cache.md) |
 | Rate-limit gateway × API | **Apenas no Gateway** | Burlar gateway abre as APIs | Network policy do Docker isola; header `X-Gateway-Token` opcional como defense-in-depth |
 | TLS no edge × mTLS interno | **TLS no edge** em prod / HTTP em dev | mTLS interno seria pesado para o desafio | HSTS sobre HTTP é inerte; documentado em [ADR-0014](docs/adr/ADR-0014-tls-edge-termination.md) |
-| Frontend completo × só API | **Só API (frontend MAY)** | Sem UI no MVP | NFR não exige UI; tempo investido em testes/observabilidade |
+| Frontend completo × só API | **Frontend Next.js + NextAuth (PKCE)** | Mais surface a manter | Entregue como app SSR/CSR sob `frontend/cashflow-web` (porta 3001); NextAuth proxia chamadas pelo Gateway |
 
 ---
 
@@ -471,7 +476,7 @@ Configurada em **Settings → Branches → Branch protection rules** com a regra
 
 ### Imagens publicadas
 
-Após merge em `main` o job `build-push` publica em **GitHub Container Registry**:
+Após merge em `main` o job `build-push` publica em **GitHub Container Registry** (apenas os 4 serviços .NET — o frontend Next.js é construído via compose local e **não** é publicado em GHCR pelo pipeline atual):
 
 ```
 ghcr.io/marcelocamargosjr/cashflow-ledger-api:sha-<SHA>           (e :latest)
@@ -480,7 +485,7 @@ ghcr.io/marcelocamargosjr/cashflow-consolidation-worker:sha-<SHA> (e :latest)
 ghcr.io/marcelocamargosjr/cashflow-gateway:sha-<SHA>              (e :latest)
 ```
 
-Critério de release: **Trivy reporta 0 vulnerabilidades HIGH/CRITICAL** nas 4 imagens (`07-INFRA §3.4 — OWASP A06/A08`).
+Critério de release: **Trivy reporta 0 vulnerabilidades HIGH/CRITICAL** nas 4 imagens container (`07-INFRA §3.4 — OWASP A06/A08`). Observação: Trivy escaneia o filesystem da imagem; transitivos NuGet detectados via `dotnet list package --vulnerable` ficam no snapshot `docs/quality/final.txt` (não bloqueiam o gate de container hoje).
 
 ---
 

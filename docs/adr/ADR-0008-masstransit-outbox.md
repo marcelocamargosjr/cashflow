@@ -64,14 +64,21 @@ services.AddMassTransit(x =>
             h.Username(Environment.GetEnvironmentVariable("RabbitMq__Username"));
             h.Password(Environment.GetEnvironmentVariable("RabbitMq__Password"));
         });
-        cfg.ConfigureEndpoints(ctx);
+        // NOTA: `cfg.ConfigureEndpoints(ctx)` é deliberadamente OMITIDO no Ledger —
+        // o Ledger apenas publica (Outbox dispatcher) e não consome nada.
+        // Configurar endpoints aqui criaria receive endpoints inúteis. Veja
+        // src/Cashflow.Ledger/.../MessagingServiceCollectionExtensions.cs.
     });
 });
+
+// Defesa adicional contra o cleanup automático do Inbox (que não usamos no Ledger):
+// o `InboxCleanupService` é removido por reflection do contêiner após o bootstrap
+// — comentário inline em MessagingServiceCollectionExtensions explica o motivo.
 ```
 
 **Apenas Outbox no Ledger; Inbox no Consumer fica via `processed_events` no Mongo** (escolha explícita — não usar **os dois**: `MassTransit.Inbox` + tabela própria).
 
-Razão: o consumer está em outro store (Mongo). Manter o `Inbox` do MassTransit no Postgres exigiria que o consumer escrevesse no Postgres em rotação, criando acoplamento desnecessário. A idempotência via `$ne EventId` no `findOneAndUpdate` ([ADR-0006](ADR-0006-mongo-read-side.md)) é mais simples e atômica para o caso.
+Razão: o consumer está em outro store (Mongo). Manter o `Inbox` do MassTransit no Postgres exigiria que o consumer escrevesse no Postgres em rotação, criando acoplamento desnecessário. A idempotência real é em duas camadas: (1) fast-path em `processed_events` com `Find + InsertOne` + tratamento de `DuplicateKey`; (2) guard `$ne LastAppliedEventId` em `daily_balances` via `UpdateOneAsync` em duas passadas — ver [ADR-0006](ADR-0006-mongo-read-side.md).
 
 **Migrations:** EF migration `0002_AddOutbox` cria `messaging.OutboxState`, `messaging.OutboxMessage` (e os índices necessários).
 

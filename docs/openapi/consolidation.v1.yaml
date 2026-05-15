@@ -3,9 +3,10 @@ info:
   title: Cashflow.Consolidation API
   version: "1.0.0"
   description: |
-    Read-side do sistema Cashflow. Serve a projeção `daily_balance` (1 documento
-    por `(merchantId, date)`) com **cache aside Redis** (TTL 60s) e **stampede
-    lock** (`SET NX EX 5`) no miss.
+    Read-side do sistema Cashflow. Serve a projeção `daily_balances` (1 documento
+    por `(merchantId, date)`, `_id` derivado) com **cache aside Redis** (TTL 60s) e
+    **stampede lock** (`SET lock:balance:daily:... NX EX 5`, release via Lua
+    compare-and-delete) no miss.
 
     Atualizações são **eventually consistent** — propagam-se via consumer
     MassTransit a partir dos eventos `EntryRegisteredV1` / `EntryReversedV1`
@@ -52,11 +53,10 @@ paths:
         - $ref: "#/components/parameters/CorrelationId"
       responses:
         "200":
-          description: OK — saldo do dia (pode ser zero se sem lançamentos).
-          headers:
-            Cache-Status:
-              description: HIT ou MISS — sinaliza se o conteúdo veio do Redis.
-              schema: { type: string, enum: [HIT, MISS] }
+          description: |
+            OK — saldo do dia (pode ser zero se sem lançamentos).
+            O sinalizador de cache hit é devolvido no próprio corpo da resposta
+            em `cache: { hit, ageSeconds }` (não há header `Cache-Status`).
           content:
             application/json:
               schema: { $ref: "#/components/schemas/DailyBalanceDto" }

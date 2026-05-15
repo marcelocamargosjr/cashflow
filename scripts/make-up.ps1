@@ -1,5 +1,11 @@
 # Cashflow — wrapper PowerShell para os alvos do Makefile (07 §6).
 #
+# REQUISITO: PowerShell 7+ (`pwsh`). Em Windows PowerShell 5.1 a combinação
+# de `$ErrorActionPreference = 'Stop'` com stderr nativa de `docker pull/build`
+# transforma cada linha de progresso em `NativeCommandError` e aborta o script.
+# Se você está em PS 5.1, rode `docker compose` diretamente (ver README §4) ou
+# use WSL2 / Git Bash.
+#
 # Uso:
 #   ./scripts/make-up.ps1                # = `make up`     (core + app)
 #   ./scripts/make-up.ps1 up-core        # = `make up-core`

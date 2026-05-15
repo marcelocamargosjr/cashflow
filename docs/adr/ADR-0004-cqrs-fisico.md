@@ -29,7 +29,7 @@ Precisamos decidir se separamos fisicamente (DBs diferentes) ou logicamente (mes
 - **Contras:** **falha em D1** — se Postgres cai, ambos os lados caem; **falha em D2** — materialized view + 50 req/s sem cache exige mais cuidado de tuning (índices, autovacuum) do que uma projeção Mongo por documento.
 
 ### Opção B — CQRS físico (Postgres write + Mongo read) — **escolhida**
-- Ledger persiste no Postgres, publica evento `EntryRegisteredV1` via Outbox, Worker consome e atualiza `daily_balance` no Mongo.
+- Ledger persiste no Postgres, publica evento `EntryRegisteredV1` via Outbox, Worker consome e atualiza a coleção `daily_balances` no Mongo.
 - **Prós:** isolamento real (D1); read otimizado por documento, com cache (D2); demonstra CQRS de verdade (D3).
 - **Contras:** dois stores para operar; eventual consistency (lag de projeção).
 

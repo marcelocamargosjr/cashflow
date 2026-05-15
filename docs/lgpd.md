@@ -19,11 +19,11 @@ Princípios aplicados (LGPD Art. 6º): **finalidade**, **adequação**, **necess
 | **Email do merchant** | Keycloak (`realm cashflow` → `users`) | Identificação eletrônica | Art. 7º, V (execução de contrato) | Autenticação | Até cancelamento + 5 anos |
 | **Nome / sobrenome** | Keycloak | Dado pessoal comum | Art. 7º, V | Identificação no console | Até cancelamento + 5 anos |
 | **Senha** (hash) | Keycloak (PBKDF2/Argon2 conforme config interna do Keycloak) | Dado sensível por exposição (não dado sensível LGPD) | Art. 7º, V | Autenticação | Até reset; rotacionada conforme política |
-| **`merchantId`** (UUID pseudonimizado) | Postgres `entries.merchant_id`, Postgres `idempotency_keys`, Mongo `daily_balance.merchantId`, Redis cache keys, logs estruturados, métricas Prometheus | Pseudônimo (LGPD Art. 13 §IV) | Art. 7º, V + Art. 11 (anonimização parcial) | Vincular lançamentos ao titular sem expor identidade | Até cancelamento + 5 anos (obrigação fiscal) |
-| **Valor de lançamento** (`amount.value`) | Postgres `entries.amount`, Mongo `daily_balance.totalCredits/totalDebits` | Dado pessoal financeiro | Art. 7º, V | Registro contábil | 5 anos (Art. 195 CTN) |
+| **`merchantId`** (UUID pseudonimizado) | Postgres `entries.merchant_id`, Postgres `idempotency_keys`, Mongo `daily_balances.merchantId`, Redis cache keys, logs estruturados, métricas Prometheus | Pseudônimo (LGPD Art. 13 §IV) | Art. 7º, V + Art. 11 (anonimização parcial) | Vincular lançamentos ao titular sem expor identidade | Até cancelamento + 5 anos (obrigação fiscal) |
+| **Valor de lançamento** (`amount.value`) | Postgres `entries.amount`, Mongo `daily_balances.totalCredits/totalDebits` | Dado pessoal financeiro | Art. 7º, V | Registro contábil | 5 anos (Art. 195 CTN) |
 | **Descrição** do lançamento (`description`) | Postgres `entries.description` | Dado pessoal narrativo | Art. 7º, V | Auditoria interna do merchant | 5 anos |
-| **Categoria** (`category`) | Postgres `entries.category`, Mongo `daily_balance.byCategory[]` | Dado pessoal financeiro | Art. 7º, V | Segmentação de relatórios | 5 anos |
-| **Data de competência** (`entryDate`) | Postgres `entries.entry_date`, Mongo `daily_balance.date` | Dado pessoal financeiro | Art. 7º, V | Localizar projeção | 5 anos |
+| **Categoria** (`category`) | Postgres `entries.category`, Mongo `daily_balances.byCategory[]` | Dado pessoal financeiro | Art. 7º, V | Segmentação de relatórios | 5 anos |
+| **Data de competência** (`entryDate`) | Postgres `entries.entry_date`, Mongo `daily_balances.date` | Dado pessoal financeiro | Art. 7º, V | Localizar projeção | 5 anos |
 | **`correlationId` / `traceId`** | Logs (Loki), traces (Tempo) | Metadado técnico (não-pessoal isolado, mas pode ser correlacionado) | Art. 7º, IX (legítimo interesse — observabilidade) | Diagnóstico operacional | 14 dias (retenção dev); 90 dias em prod |
 
 > **Não coletamos:** CPF, CNPJ, endereço físico, telefone, IP do consumidor final, geolocalização, dados de saúde, biométricos, raça, religião ou opinião política.
@@ -117,7 +117,7 @@ logger.LogInformation("Entry {EntryId} registered for merchant {MerchantId}", en
 | Tipo de dado | Onde | Retenção | Justificativa |
 |---|---|---|---|
 | Lançamentos (`entries`) | Postgres | 5 anos a partir do encerramento do exercício fiscal | Art. 195 CTN |
-| Projeções (`daily_balance`) | Mongo | Idem 5 anos (re-projetáveis dos eventos) | Idem |
+| Projeções (`daily_balances`) | Mongo | Idem 5 anos (re-projetáveis dos eventos) | Idem |
 | `processed_events` | Mongo (TTL automático) | **7 dias** | Idempotência: além disso, reentrega é evento "novo" para fins práticos |
 | `OutboxMessage` | Postgres | Limpeza em 7 dias após `DeliveredOn != null` | Auditoria de publish |
 | Logs (Loki) | Filesystem | 14d dev / 90d prod | Diagnóstico operacional |

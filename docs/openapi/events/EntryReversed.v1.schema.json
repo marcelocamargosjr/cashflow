@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cashflow.example.com/schemas/EntryReversed.v1.schema.json",
   "title": "EntryReversedV1",
-  "description": "Integration event publicado pelo Cashflow.Ledger via Outbox MassTransit quando um lançamento é estornado. Carrega SNAPSHOT da entry original (type/amount/currency/entryDate/category) para que o consumer decremente a projeção autonomamente, SEM chamar o Ledger sincronamente — preservando NFR-A-01 (isolamento). Idempotência via `$ne lastEventId` no consumer.",
+  "description": "Integration event publicado pelo Cashflow.Ledger via Outbox MassTransit quando um lançamento é estornado. Carrega SNAPSHOT da entry original (type/amount/currency/entryDate/category) para que o consumer decremente a projeção autonomamente, SEM chamar o Ledger sincronamente — preservando NFR-A-01 (isolamento). Idempotência em duas camadas: fast-path em `processed_events` (Find + InsertOne) e guard `$ne LastAppliedEventId` em `daily_balances` via UpdateOneAsync (Pass1/Pass2).",
   "$comment": "Origem: src/Cashflow.Contracts/V1/EntryReversedV1.cs.",
   "type": "object",
   "required": [
@@ -41,7 +41,7 @@
     "entryDate": {
       "type": "string",
       "format": "date",
-      "description": "SNAPSHOT — localiza o documento daily_balance."
+      "description": "SNAPSHOT — localiza o documento na coleção `daily_balances` (via `_id` derivado de `merchantId + entryDate`)."
     },
     "category": {
       "type": ["string", "null"],

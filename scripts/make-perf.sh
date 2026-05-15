@@ -2,9 +2,11 @@
 # =============================================================================
 # make-perf.sh — `08-TESTES.md §6.3`.
 #
-# Obtém token Keycloak via client_credentials no client `cashflow-api`,
-# dispara o cenário k6 (`balance-50rps.js` por padrão) e salva o output em
-# `docs/performance/k6-result-YYYY-MM-DD.json` como evidência do NFR.
+# Obtém token Keycloak no client `cashflow-api` — default = `password` grant
+# (user `merchant1@cashflow.local`); alternável para `client_credentials` via
+# `GRANT_TYPE=client_credentials`. Dispara o cenário k6 (`balance-50rps.js` por
+# padrão) e salva o output em `docs/performance/k6-result-YYYY-MM-DD.json` como
+# evidência do NFR.
 #
 # Uso:
 #   ./scripts/make-perf.sh                 # cenário NFR (50 req/s × 60s)

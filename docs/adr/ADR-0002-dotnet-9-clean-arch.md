@@ -64,7 +64,7 @@ Escolhemos **Opção B — .NET 9** com **Clean Architecture** (Domain → Appli
 - Central Package Management (`Directory.Packages.props`) reduz drift de versões entre projetos.
 
 ### Negativas / Trade-offs aceitos
-- **STS, não LTS** — janela de upgrade obrigatória para .NET 10 antes de maio/2026.
+- **STS, não LTS** — janela de upgrade para .NET 10 era prevista até maio/2026. Upgrade **ainda não realizado** nesta linha de release; reabrir como ADR de evolução antes de promover a v1.0.
 - **Mais cerimônia** que um single-project — 4 projetos por bounded context (Domain, Application, Infrastructure, Api).
 - **Curva inicial** para devs sem familiaridade com Clean Arch + MediatR.
 
@@ -77,7 +77,7 @@ Escolhemos **Opção B — .NET 9** com **Clean Architecture** (Domain → Appli
 
 ## Plano de revisão
 
-- Reavaliar em **out/2025** (com .NET 10 LTS preview disponível).
+- Janelas previstas (out/2025 preview, mai/2026 GA do .NET 10) **já transcorreram** sem upgrade. Próxima revisão: reabrir um ADR específico de upgrade .NET 10 antes do release v1.0 — projeto continua em `9.0.312` (ver `global.json`).
 - Métrica de saúde: tempo de build CI (< 4 min full) e coverage Domain ≥ 90%.
 
 ## Referências

@@ -33,18 +33,24 @@ sequenceDiagram
     Op->>API: (consolidation-api também restart)
 
     rect rgb(245, 250, 245)
-    note over WRK,MGO: Worker drena backlog idempotente
+    note over WRK,MGO: Worker drena backlog (idempotente em duas camadas)
         loop até processed_events alcançar 100
             WRK->>+MQ: Consume EntryRegisteredV1
             MQ-->>-WRK: message
-            WRK->>+MGO: FindOneAndUpdate atomic<br/>filter $ne LastEventId<br/>$inc totals + $set lastEventId
-            MGO-->>-WRK: upsert / no-op (replay safe)
+            WRK->>MGO: Find processed_events {_id: EventId}
+            alt já processado (fast-path)
+                MGO-->>WRK: skip
+            else novo
+                WRK->>+MGO: UpdateOneAsync daily_balances (Pass1/Pass2)<br/>guard $ne LastAppliedEventId
+                MGO-->>-WRK: upsert / no-op (replay safe)
+                WRK->>MGO: InsertOne processed_events (DuplicateKey = ack)
+            end
         end
     end
 
     note over Op: Fase 4 — verifica catch-up
     Op->>+API: GET /balances/{merchantId}/daily?date=2026-05-13
-    API->>MGO: findOne daily_balance
+    API->>MGO: findOne daily_balances (por _id derivado)
     MGO-->>API: doc com entriesCount = 100
     API-->>-Op: 200 OK
 

@@ -37,8 +37,8 @@ Critérios:
 
 ### Opção D — Redis com `SET key value NX EX 5` (stampede lock simples) — **escolhida**
 - Cache aside com TTL 60s. Em miss:
-  1. Tenta `SET miss_lock:<key> <uuid> NX EX 5`.
-  2. Se vence, busca no Mongo e popula o cache (`SET key value EX 60`).
+  1. Tenta `SET lock:balance:daily:<merchantId>:<yyyyMMdd> <uuid> NX EX 5`.
+  2. Se vence, busca no Mongo e popula o cache (`SET balance:daily:<merchantId>:<yyyyMMdd> <value> EX 60`).
   3. Se perde, dorme 100 ms e relê o cache (provavelmente populado pelo vencedor).
 
 ### Opção E — Redlock (algoritmo Antirez)
@@ -49,21 +49,28 @@ Critérios:
 
 Escolhemos **Redis 7.4-alpine** com cache aside simples + stampede lock `SET NX EX`.
 
-**Pseudo-código do GetDailyBalance handler:**
+**Pseudo-código do GetDailyBalance handler (alinhado com `RedisDailyBalanceCache.cs`):**
 
 ```csharp
-var key = $"daily_balance:{merchantId}:{date:yyyy-MM-dd}";
+var key     = $"balance:daily:{merchantId:D}:{date:yyyyMMdd}";
+var lockKey = $"lock:balance:daily:{merchantId:D}:{date:yyyyMMdd}";
+
 var cached = await redis.GetStringAsync(key);
 if (cached is not null) return Deserialize(cached);  // hit
 
 // miss: try stampede lock
-var lockKey = $"daily_balance_lock:{merchantId}:{date:yyyy-MM-dd}";
-var won = await redis.StringSetAsync(lockKey, lockId, TimeSpan.FromSeconds(5), When.NotExists);
+var lockId = Guid.NewGuid().ToString("N");
+var won    = await redis.StringSetAsync(lockKey, lockId, TimeSpan.FromSeconds(5), When.NotExists);
 if (won)
 {
     var fresh = await mongoRepo.GetDailyBalanceAsync(merchantId, date);
     await redis.SetStringAsync(key, Serialize(fresh), TimeSpan.FromSeconds(60));
-    await redis.KeyDeleteAsync(lockKey);  // libera cedo
+
+    // Release seguro: Lua compare-and-delete — só apaga se o valor bater com o lockId.
+    // Evita matar lock de outro caller caso o nosso TTL tenha expirado durante a recarga.
+    const string release =
+        "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end";
+    await redis.ScriptEvaluateAsync(release, new RedisKey[] { lockKey }, new RedisValue[] { lockId });
     return fresh;
 }
 

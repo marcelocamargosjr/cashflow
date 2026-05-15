@@ -15,7 +15,7 @@ sequenceDiagram
 
     Merchant->>+GW: POST /ledger/api/v1/entries<br/>Bearer JWT + Idempotency-Key
     GW->>GW: Valida JWT (cache JWKS 5min)
-    GW->>GW: Rate-limit sliding window<br/>(entry-write-policy 30/s/merchant)
+    GW->>GW: Rate-limit sliding window<br/>(entry-write-policy 200/s/merchant)
     GW->>+API: Proxy → POST /api/v1/entries<br/>X-Correlation-Id, traceparent
     API->>API: IdempotencyKeyEndpointFilter (header check)
     API->>API: RegisterEntryCommand → ValidationBehavior
@@ -42,8 +42,14 @@ sequenceDiagram
 
     MQ->>+WRK: Deliver EntryRegisteredV1
     WRK->>WRK: UseMessageRetry exp 5x (em caso de transient error)
-    WRK->>+MGO: FindOneAndUpdate filter:{merchantId, date, $ne LastEventId}<br/>$inc totals + $set lastEventId
-    MGO-->>-WRK: upsert / no-op (idempotente)
+    WRK->>MGO: Find processed_events {_id: EventId} (fast-path)
+    alt já processado
+        MGO-->>WRK: hit → return (skip)
+    else novo
+        WRK->>+MGO: UpdateOneAsync daily_balances<br/>Pass1: $elemMatch byCategory + guard $ne LastAppliedEventId<br/>Pass2 (se Pass1=0): $push novo bucket + SetOnInsert (IsUpsert)
+        MGO-->>-WRK: ModifiedCount / UpsertedId
+        WRK->>MGO: InsertOne processed_events {_id: EventId, processedAt}<br/>(DuplicateKey é tratado como sucesso)
+    end
     WRK-->>-MQ: ack
 
     note over CACHE: Próximo GET /balances/.../daily<br/>hit cache stale por até 60s (TTL).<br/>Mecanismo cache aside lê do Mongo no miss.

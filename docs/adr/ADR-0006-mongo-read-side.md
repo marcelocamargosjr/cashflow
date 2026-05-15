@@ -52,33 +52,37 @@ Critérios:
 Escolhemos **MongoDB 7.0.12** com:
 
 - **Database:** `cashflow_consolidation`.
-- **Coleção `daily_balance`:**
-  - Índice único composto `{ merchantId: 1, date: 1 }`.
-  - Documentos: `{ merchantId, date, totalCredits, totalDebits, balance, entriesCount, byCategory[], lastUpdatedAt, revision }`.
+- **Coleção `daily_balances`** (nome literal usado por `MongoOptions.DailyBalancesCollection` e `infra/mongo/init.js`):
+  - Índice composto `{ merchantId: 1, date: -1 }` (não único; nome `ix_merchant_date`). Documento identificado por `_id` derivado de `merchantId + date` (string composto via `DailyBalanceDoc.BuildId`), o que dá a garantia de unicidade.
+  - Índice auxiliar `{ lastUpdatedAt: -1 }` (`ix_last_updated`) para consultas por janela temporal.
+  - Documentos: `{ _id, merchantId, date, totalCredits, totalDebits, entriesCount, byCategory[], lastUpdatedAt, revision, lastAppliedEventId }`.
 - **Coleção `processed_events`:**
-  - Índice único em `{ eventId: 1 }`.
+  - Documento `{ _id: <eventId Guid>, processedAt }`. Unicidade do `eventId` é garantida pelo `_id` (índice default, único).
   - Índice TTL em `{ processedAt: 1 }` com `expireAfterSeconds: 604800` (7 dias).
-- **`init.js`** mountado em `/docker-entrypoint-initdb.d/init.js` para criar usuário de aplicação, índices e coleções no primeiro start.
+- **`init.js`** mountado em `/docker-entrypoint-initdb.d/init.js` cria coleções e índices no primeiro start.
 - **Driver:** `MongoDB.Driver` 3.x.
-- **Idempotência do consumer:**
+- **Idempotência do consumer (duas camadas, implementação real):**
 
 ```csharp
-await collection.FindOneAndUpdateAsync(
-    Builders<DailyBalanceDoc>.Filter.And(
-        Builders<DailyBalanceDoc>.Filter.Eq(d => d.MerchantId, evt.MerchantId),
-        Builders<DailyBalanceDoc>.Filter.Eq(d => d.Date, evt.EntryDate),
-        Builders<DailyBalanceDoc>.Filter.Ne(d => d.LastEventId, evt.EventId)
-    ),
-    Builders<DailyBalanceDoc>.Update
-        .Inc(d => d.TotalCredits, evt.Type == "Credit" ? evt.Amount : 0)
-        .Inc(d => d.TotalDebits,  evt.Type == "Debit"  ? evt.Amount : 0)
-        .Inc(d => d.EntriesCount, 1)
-        .Set(d => d.LastEventId, evt.EventId)
-        .Set(d => d.LastUpdatedAt, _clock.UtcNow),
-    new FindOneAndUpdateOptions<DailyBalanceDoc> { IsUpsert = true });
+// 1) Fast-path: pré-check em processed_events (NÃO usa FindOneAndUpdate atômico — usa Find + InsertOne com tratamento de DuplicateKey).
+var seen = await _mongo.ProcessedEvents
+    .Find(x => x.Id == evt.EventId).Project(x => x.Id).AnyAsync(ct);
+if (seen) return;
+
+// 2) Aplica a projeção com guard atômico em daily_balances (UpdateOneAsync em duas passadas).
+//    Pass1: tenta atualizar bucket existente via $elemMatch na categoria.
+//    Pass2: se Pass1 não modificou, faz Push do bucket novo (com IsUpsert no primeiro evento do dia).
+//    Em ambos os passos, o filtro inclui o guard $ne LastAppliedEventId para idempotência.
+var guard = filter.Or(filter.Exists(d => d.LastAppliedEventId, false),
+                     filter.Ne(d => d.LastAppliedEventId, eventId));
+// ... UpdateOneAsync(pass1Filter, pass1Update) → se ModifiedCount==0, UpdateOneAsync(pass2Filter, pass2Update, IsUpsert).
+
+// 3) Insere registro em processed_events depois do upsert; DuplicateKey concorrente é tratado como sucesso.
+try { await _mongo.ProcessedEvents.InsertOneAsync(new ProcessedEventDoc { Id = evt.EventId, ... }, ct); }
+catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey) { /* ack */ }
 ```
 
-O filtro `$ne EventId` faz com que reentregas do mesmo evento sejam **no-op** (FindOneAndUpdate retorna `null`).
+O guard `$ne LastAppliedEventId` torna reentregas do mesmo evento **no-op** na projeção, mesmo se o fast-path em `processed_events` for um falso negativo (race com concorrência).
 
 Porta host **27018** evita conflito com `mongod` nativo no Windows (lição registrada nas memórias do projeto).
 
@@ -86,12 +90,12 @@ Porta host **27018** evita conflito com `mongod` nativo no Windows (lição regi
 
 ### Positivas
 - Query `/balances/{merchantId}/daily` é **1 leitura indexada** + cache (≤ 1ms cache hit; ≤ 50 ms cache miss).
-- Idempotência via `$ne` é atômica — não precisa lock distribuído nem coordenação.
+- Idempotência via guard `$ne LastAppliedEventId` é atômica dentro do `UpdateOneAsync` — não precisa lock distribuído nem coordenação.
 - TTL nativo elimina rotina manual de limpeza.
 - Documento por dia escala lateralmente (sharding por `merchantId` no futuro).
 
 ### Negativas / Trade-offs aceitos
-- **Sem transações cross-collection** entre `daily_balance` e `processed_events` em standalone (Mongo single-replica). Aceitável porque `processed_events` é apenas auditoria — a idempotência real está no filtro do upsert.
+- **Sem transações cross-collection** entre `daily_balances` e `processed_events` em standalone (Mongo single-replica). Aceitável porque `processed_events` é fast-path + auditoria — a idempotência real está no guard `$ne LastAppliedEventId` dentro do `UpdateOneAsync` de `daily_balances`.
 - **Schema evolution** sem migrations formais — cuidado com `Revision` field e versionamento de eventos ([ADR-0007](ADR-0007-rabbitmq-vs-kafka.md)).
 
 ### Riscos e mitigações
@@ -105,7 +109,7 @@ Porta host **27018** evita conflito com `mongod` nativo no Windows (lição regi
 
 - Reavaliar se documento médio passar de 16 MB (improvável para nossa cardinalidade).
 - Reavaliar se cardinalidade de merchants × dias justificar sharding (hoje 1 nó basta).
-- Métrica de saúde: `mongo.collection.daily_balance.size` + `latency_ms p95 < 50` em queries diretas.
+- Métrica de saúde: `mongo.collection.daily_balances.size` + `latency_ms p95 < 50` em queries diretas.
 
 ## Referências
 
