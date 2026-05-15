@@ -194,8 +194,14 @@ jobs:
         # the merchantId attribute from the JWT to feed k6. cashflow-api is the
         # confidential client; `directAccessGrantsEnabled=true` enables this flow.
         id: token
+        # `bash {0}` opts out of GitHub Actions' default `bash -e`. We need
+        # this because the curl/jq pipeline below intentionally tolerates
+        # individual failures (and logs them) inside the retry loop. With
+        # `-e`, the first non-200 response aborts the script before the log
+        # line that explains *why* it failed.
+        shell: bash {0}
         run: |
-          set -uo pipefail
+          set +e
           # 1) Wait until the realm endpoint responds — Keycloak 25 returns the
           #    .well-known doc *after* the realm import finishes, so this is the
           #    real readiness signal (the container's HTTP healthcheck flips much
@@ -211,7 +217,9 @@ jobs:
           #    regardless of status. We retry a few times because users get
           #    materialised after the realm doc is queryable.
           ACCESS=""
+          HTTP_CODE="000"
           for i in $(seq 1 12); do
+            : > /tmp/token.json
             HTTP_CODE=$(curl -sS -o /tmp/token.json -w '%{http_code}' \
               -X POST http://localhost:8080/realms/cashflow/protocol/openid-connect/token \
               -H "Content-Type: application/x-www-form-urlencoded" \
@@ -219,17 +227,21 @@ jobs:
               -d "client_secret=cashflow-api-secret" \
               -d "grant_type=password" \
               -d "username=merchant1@cashflow.local" \
-              -d "password=merchant123" || echo "000")
-            RESPONSE=$(cat /tmp/token.json 2>/dev/null || echo "{}")
+              -d "password=merchant123" 2>/tmp/curl.err)
+            CURL_EXIT=$?
+            RESPONSE=$(cat /tmp/token.json 2>/dev/null)
+            echo "attempt $i: curl_exit=$CURL_EXIT http=$HTTP_CODE body=${RESPONSE:0:200}"
+            if [ "$CURL_EXIT" != "0" ]; then
+              echo "  curl stderr: $(cat /tmp/curl.err 2>/dev/null)"
+            fi
             if [ "$HTTP_CODE" = "200" ]; then
               ACCESS=$(echo "$RESPONSE" | jq -r '.access_token // empty')
-              [ -n "$ACCESS" ] && break
+              if [ -n "$ACCESS" ]; then break; fi
             fi
-            echo "attempt $i: HTTP=$HTTP_CODE body=$RESPONSE"
             sleep 5
           done
           if [ -z "$ACCESS" ]; then
-            echo "::error::failed to acquire access token after retries"
+            echo "::error::failed to acquire access token after retries (last HTTP=$HTTP_CODE)"
             echo "--- last keycloak response ---"
             cat /tmp/token.json 2>/dev/null || true
             echo "--- keycloak container logs (tail) ---"
