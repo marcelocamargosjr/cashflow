@@ -2,7 +2,10 @@
 **/.gitignore
 **/.gitattributes
 **/.dockerignore
-**/.editorconfig
+# .editorconfig is required inside the Docker build context: it carries the
+# project-wide analyzer severity overrides (MA0048, CA1716, CA1000, …). Without
+# it, `dotnet publish -c Release` re-promotes those warnings via
+# TreatWarningsAsErrors=true and the image build fails (F9 k6-smoke regression).
 **/.idea
 **/.vs
 **/.vscode
