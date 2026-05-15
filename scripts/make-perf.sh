@@ -13,8 +13,17 @@
 #   SCRIPT=balance-smoke.js ./scripts/make-perf.sh
 # Env vars sobrescrevíveis: KEYCLOAK, CLIENT_ID, CLIENT_SECRET, MERCHANT_ID,
 #                           TARGET_DATE, COMPOSE_FILE.
+#
+# Compatibilidade Windows (Git Bash / MSYS2):
+#   Git Bash reescreve argumentos que parecem caminhos Unix (ex.:
+#   `/scripts/balance-50rps.js`) para caminhos Windows (`C:/Program Files/Git/
+#   scripts/...`). Isso quebra o `k6 run /scripts/...` dentro do container.
+#   Este script desativa a conversão exportando MSYS_NO_PATHCONV=1 e
+#   MSYS2_ARG_CONV_EXCL=* — inofensivo em Linux/macOS.
 # =============================================================================
 set -euo pipefail
+export MSYS_NO_PATHCONV=1
+export MSYS2_ARG_CONV_EXCL='*'
 
 # --- defaults --------------------------------------------------------------
 KEYCLOAK="${KEYCLOAK:-http://localhost:8080}"

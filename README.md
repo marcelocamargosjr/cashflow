@@ -96,7 +96,7 @@ Apenas três dependências locais — **nenhuma instalação de .NET / Node / Po
 | Git | 2.40+ | `git --version` |
 | GNU Make | 4.x (Linux/macOS/WSL) | `make --version` |
 
-> **Windows nativo:** prefira **PowerShell 7+** (`pwsh`) ao Windows PowerShell 5.1. O wrapper `scripts/make-up.ps1` usa `$ErrorActionPreference = 'Stop'`, e em PS 5.1 a stderr de comandos nativos (típica em `docker pull`) é transformada em `NativeCommandError`, abortando o script no primeiro pull. Em PS 5.1, rode `docker compose -f infra/docker-compose.yml --env-file infra/.env --profile core --profile app up -d` diretamente, ou execute via WSL2 / Git Bash. Em PS 7+ ou WSL2/Git Bash o `make up` funciona normalmente.
+> **Windows nativo:** `scripts/make-up.ps1` é compatível com **Windows PowerShell 5.1 e PowerShell 7+**. O wrapper checa `$LASTEXITCODE` em cada chamada `docker` e não redireciona stderr — assim a stderr de `docker pull` (linhas de progresso) não vira `NativeCommandError` em PS 5.1. Para `make-perf.sh` em Git Bash, o script já define `MSYS_NO_PATHCONV=1` / `MSYS2_ARG_CONV_EXCL='*'` para impedir conversão de paths.
 > **CPU/RAM recomendados:** 4 vCPUs / 8 GB RAM (stack completa com observabilidade).
 
 ---
@@ -117,10 +117,18 @@ make up                                # core + app: 15 containers, ~90s para he
 Para popular dados (após `make up`):
 
 ```bash
-make seed       # NÃO IMPLEMENTADO neste build — o endpoint POST /ledger/admin/seed
-                # é um stub que retorna 501 Not Implemented. Para gerar dados, use
-                # POST /ledger/api/v1/entries em loop (ver §8) ou via Swagger.
+# Bash / WSL / Git Bash — Makefile (exige TOKEN no env):
+TOKEN=$(curl -fsS -X POST http://localhost:8080/realms/cashflow/protocol/openid-connect/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=password&client_id=cashflow-api&client_secret=cashflow-api-secret&username=admin@cashflow.local&password=admin123&scope=openid' \
+  | jq -r .access_token) make seed
+
+# PowerShell — wrapper já obtém token admin automaticamente:
+./scripts/make-up.ps1 seed             # default: 30 dias x 20 entries
+./scripts/make-up.ps1 seed 7 50        # 7 dias x 50 entries por dia
 ```
+
+O seeder usa Bogus para gerar lançamentos sintéticos (Credit/Debit, categorias variadas, descrições, valores aleatórios fixos por semente) e os passa pelo mesmo `RegisterEntryCommand` que o endpoint público — então o fluxo Outbox/RabbitMQ/Consolidation processa exatamente como em produção.
 
 Outros alvos: `make down` (stop), `make nuke` (apaga volumes), `make logs SERVICE=ledger-api`, `make test`, `make perf`, `make chaos-validate`, `make build`.
 
@@ -299,7 +307,7 @@ dotnet test tests/Cashflow.ArchitectureTests                # NetArchTest — Do
 
 CI gate em `.github/workflows/ci.yml` (F9) falha o build se Domain < 90% ou Application < 80%.
 
-> **Caveat de evidência local:** o snapshot mais recente em `docs/quality/final.txt` mostra que `Cashflow.Consolidation.UnitTests` não executou ("Não há nenhum teste disponível" + resolução `Azure.Core 1.6.0` ausente), portanto a cobertura da Consolidation **não foi medida nesse run**. Os badges valem para a execução verde de CI; reproduzir localmente exige restaurar/reparar o projeto de teste da Consolidation.
+> O snapshot histórico `docs/quality/final.txt` mostra um run em que `Cashflow.Consolidation.UnitTests` não descobriu testes — o projeto estava vazio. Foi corrigido nesta linha de release: o projeto agora tem testes unitários (`GetDailyBalanceQueryHandlerTests`, `GetPeriodBalanceQueryHandlerTests`) e roda local com `dotnet test tests/Cashflow.Consolidation.UnitTests`.
 
 ---
 
@@ -485,7 +493,7 @@ ghcr.io/marcelocamargosjr/cashflow-consolidation-worker:sha-<SHA> (e :latest)
 ghcr.io/marcelocamargosjr/cashflow-gateway:sha-<SHA>              (e :latest)
 ```
 
-Critério de release: **Trivy reporta 0 vulnerabilidades HIGH/CRITICAL** nas 4 imagens container (`07-INFRA §3.4 — OWASP A06/A08`). Observação: Trivy escaneia o filesystem da imagem; transitivos NuGet detectados via `dotnet list package --vulnerable` ficam no snapshot `docs/quality/final.txt` (não bloqueiam o gate de container hoje).
+Critério de release: **Trivy reporta 0 vulnerabilidades HIGH/CRITICAL** nas 4 imagens container (`07-INFRA §3.4 — OWASP A06/A08`). Também validado por `dotnet list package --vulnerable --include-transitive`: zero pacotes vulneráveis em todos os 19 projetos (transitivos críticos `System.Drawing.Common 5.0.0`, `System.Formats.Asn1 5.0.0`, `Azure.Identity 1.3.0`, `Snappier 1.0.0`, `SharpCompress 0.30.1` pinados via `Directory.Packages.props` com `CentralPackageTransitivePinningEnabled=true`).
 
 ---
 

@@ -1,10 +1,11 @@
 # Cashflow — wrapper PowerShell para os alvos do Makefile (07 §6).
 #
-# REQUISITO: PowerShell 7+ (`pwsh`). Em Windows PowerShell 5.1 a combinação
-# de `$ErrorActionPreference = 'Stop'` com stderr nativa de `docker pull/build`
-# transforma cada linha de progresso em `NativeCommandError` e aborta o script.
-# Se você está em PS 5.1, rode `docker compose` diretamente (ver README §4) ou
-# use WSL2 / Git Bash.
+# Compatibilidade: Windows PowerShell 5.1 e PowerShell 7+ (`pwsh`).
+# Em PS 5.1, redirecionar stderr de comandos nativos via `2>&1` causa
+# NativeCommandError. Este script NÃO usa redirecionamento de stderr
+# e mantém `$ErrorActionPreference = 'Continue'` para que a stderr de
+# `docker pull/build` (que é progresso, não erro) não aborte o pipeline.
+# Erros reais são detectados por `$LASTEXITCODE` após cada invocação.
 #
 # Uso:
 #   ./scripts/make-up.ps1                # = `make up`     (core + app)
@@ -14,6 +15,7 @@
 #   ./scripts/make-up.ps1 nuke           # = `make nuke`   (apaga volumes!)
 #   ./scripts/make-up.ps1 logs gateway   # = `make logs SERVICE=gateway`
 #   ./scripts/make-up.ps1 build          # builda imagens .NET
+#   ./scripts/make-up.ps1 seed           # popula 30 dias x 20 entries
 #   ./scripts/make-up.ps1 perf           # roda k6 (F7)
 #   ./scripts/make-up.ps1 chaos          # derruba consolidation-* (F7)
 #   ./scripts/make-up.ps1 restore        # restora consolidation-* (F7)
@@ -29,7 +31,10 @@ param(
     [string[]]$Rest
 )
 
-$ErrorActionPreference = 'Stop'
+# Continue (não Stop) para que stderr nativa de `docker pull` (linhas de
+# progresso interpretadas como exception em PS 5.1) não aborte o script.
+# A integridade é mantida via Invoke-Docker abaixo.
+$ErrorActionPreference = 'Continue'
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 $composeFile = Join-Path $repoRoot 'infra\docker-compose.yml'
@@ -40,29 +45,38 @@ if (-not (Test-Path $envFile)) {
     Copy-Item (Join-Path $repoRoot 'infra\.env.example') $envFile
 }
 
+# Invoca docker e checa exit code manualmente.
+# NÃO redireciona stderr — em PS 5.1 isso wrappa cada linha de progresso
+# do docker em ErrorRecord (NativeCommandError) e quebra o pipeline.
+function Invoke-Docker {
+    param([Parameter(ValueFromRemainingArguments = $true)] [string[]]$Args)
+    & docker @Args
+    if ($LASTEXITCODE -ne 0) {
+        throw "docker $($Args -join ' ') falhou com exit code $LASTEXITCODE"
+    }
+}
+
 $composeArgs = @('compose', '-f', $composeFile, '--env-file', $envFile)
-# `down`/`nuke` precisam dos profiles ativados — services profile-gated não são
-# afetados por `docker compose down` sem `--profile` correspondente.
 $composeArgsAll = $composeArgs + @('--profile','core','--profile','app','--profile','tools','--profile','perf')
 
 switch ($Target) {
     'up' {
-        & docker @composeArgs --profile core --profile app up -d
+        Invoke-Docker @composeArgs --profile core --profile app up -d --wait
     }
     'up-core' {
-        & docker @composeArgs --profile core up -d
+        Invoke-Docker @composeArgs --profile core up -d --wait
     }
     'up-tools' {
-        & docker @composeArgs --profile core --profile tools up -d
+        Invoke-Docker @composeArgs --profile core --profile tools up -d --wait
     }
     'down' {
-        & docker @composeArgsAll down --remove-orphans
+        Invoke-Docker @composeArgsAll down --remove-orphans
     }
     'nuke' {
         Write-Host "ATENÇÃO: isso apaga TODOS os volumes (dados Postgres/Mongo/Rabbit/Redis/Keycloak)." -ForegroundColor Yellow
         $confirm = Read-Host "Digite 'yes' para confirmar"
         if ($confirm -eq 'yes') {
-            & docker @composeArgsAll down -v --remove-orphans
+            Invoke-Docker @composeArgsAll down -v --remove-orphans
         } else {
             Write-Host "Cancelado." -ForegroundColor Green
         }
@@ -76,29 +90,50 @@ switch ($Target) {
         }
     }
     'build' {
-        & docker @composeArgs --profile app build
+        Invoke-Docker @composeArgs --profile app build
     }
     'seed' {
+        # Obtém token de admin automaticamente (admin@cashflow.local / admin123).
+        # Override via $env:TOKEN se quiser usar outro usuário.
         $token = $env:TOKEN
-        if (-not $token) { throw 'Defina $env:TOKEN antes de rodar seed (obter via /realms/cashflow/protocol/openid-connect/token).' }
-        Invoke-RestMethod -Method Post `
+        if (-not $token) {
+            Write-Host "Obtendo token admin via Keycloak..."
+            $body = @{
+                grant_type    = 'password'
+                client_id     = 'cashflow-api'
+                client_secret = 'cashflow-api-secret'
+                username      = 'admin@cashflow.local'
+                password      = 'admin123'
+                scope         = 'openid'
+            }
+            $token = (Invoke-RestMethod -Method Post `
+                -Uri 'http://localhost:8080/realms/cashflow/protocol/openid-connect/token' `
+                -ContentType 'application/x-www-form-urlencoded' -Body $body).access_token
+        }
+        $days = if ($Rest -and $Rest.Count -ge 1) { [int]$Rest[0] } else { 30 }
+        $perDay = if ($Rest -and $Rest.Count -ge 2) { [int]$Rest[1] } else { 20 }
+        Write-Host "Seed: $days dias x $perDay entries..."
+        $r = Invoke-RestMethod -Method Post `
             -Uri 'http://localhost:8000/ledger/admin/seed' `
-            -Headers @{ 'Authorization' = "Bearer $token"; 'Content-Type' = 'application/json' } `
-            -Body '{"days":30,"entriesPerDay":20}'
+            -Headers @{ 'Authorization' = "Bearer $token" } `
+            -ContentType 'application/json' `
+            -Body "{`"days`":$days,`"entriesPerDay`":$perDay}"
+        $r | ConvertTo-Json
     }
     'perf' {
-        & docker @composeArgs --profile perf run --rm k6 run /scripts/balance-50rps.js
+        Invoke-Docker @composeArgs --profile perf run --rm k6 run /scripts/balance-50rps.js
     }
     'chaos' {
-        & docker @composeArgs stop consolidation-api consolidation-worker
+        Invoke-Docker @composeArgs stop consolidation-api consolidation-worker
     }
     'restore' {
-        & docker @composeArgs start consolidation-api consolidation-worker
+        Invoke-Docker @composeArgs start consolidation-api consolidation-worker
     }
     'test' {
         Push-Location $repoRoot
-        try { & dotnet test } finally { Pop-Location }
+        try {
+            & dotnet test
+            if ($LASTEXITCODE -ne 0) { throw "dotnet test falhou com exit code $LASTEXITCODE" }
+        } finally { Pop-Location }
     }
 }
-
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -194,10 +194,19 @@ paths:
                 days: { type: integer, minimum: 1, maximum: 365, default: 30 }
                 entriesPerDay: { type: integer, minimum: 1, maximum: 100, default: 20 }
       responses:
-        "501":
+        "200":
           description: |
-            Not Implemented — endpoint é um stub. Implementação prevista para F4/F11
-            (Bogus stack). Comportamento atual: devolve 501 sem efeito colateral.
+            OK — seed concluído sincronamente. Devolve sumário com counters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  days:           { type: integer, example: 30 }
+                  entriesPerDay:  { type: integer, example: 20 }
+                  created:        { type: integer, example: 600 }
+                  failed:         { type: integer, example: 0 }
+                  elapsedMs:      { type: integer, example: 12450 }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
 components:
