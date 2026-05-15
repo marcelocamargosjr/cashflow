@@ -80,15 +80,29 @@ jobs:
             -reports:./TestResults/Coverage/**/coverage.cobertura.xml \
             -targetdir:./TestResults/CoverageReport \
             -reporttypes:'Html;Cobertura;TextSummary' \
-            -assemblyfilters:'+Cashflow.*.Domain;+Cashflow.*.Application;+Cashflow.SharedKernel' \
+            -assemblyfilters:'+Cashflow.*.Domain;+Cashflow.*.Application' \
             -classfilters:'-*Tests*'
           cat ./TestResults/CoverageReport/Summary.txt
-          # Parse per-assembly Line coverage out of the text summary.
-          DOMAIN=$(awk '/Cashflow\..*\.Domain/{flag=1} flag && /Line coverage/{print $3; exit}' ./TestResults/CoverageReport/Summary.txt | tr -d '%')
-          APP=$(awk    '/Cashflow\..*\.Application/{flag=1} flag && /Line coverage/{print $3; exit}' ./TestResults/CoverageReport/Summary.txt | tr -d '%')
-          echo "Domain coverage: ${DOMAIN:-0}% | Application coverage: ${APP:-0}%"
-          awk -v d="${DOMAIN:-0}" 'BEGIN{exit !(d+0 >= 90)}' || { echo "::error::Domain coverage ${DOMAIN}% < 90% (08-TESTES §7)"; exit 1; }
-          awk -v a="${APP:-0}"    'BEGIN{exit !(a+0 >= 80)}' || { echo "::error::Application coverage ${APP}% < 80% (08-TESTES §7)"; exit 1; }
+          # ReportGenerator's TextSummary lists each assembly as a single line whose
+          # last column is the line coverage percentage, e.g.
+          #     Cashflow.Ledger.Application                                                91%
+          # We take the MIN across every Cashflow.*.Domain / Cashflow.*.Application row
+          # so the gate scales naturally to additional bounded contexts.
+          DOMAIN_MIN=$(awk '
+            /^Cashflow\.[A-Za-z0-9_]+\.Domain[[:space:]]+[0-9.]+%[[:space:]]*$/ {
+              n=$NF; sub("%","",n);
+              if (min=="" || n+0 < min+0) min=n
+            } END { print (min==""?"0":min) }
+          ' ./TestResults/CoverageReport/Summary.txt)
+          APP_MIN=$(awk '
+            /^Cashflow\.[A-Za-z0-9_]+\.Application[[:space:]]+[0-9.]+%[[:space:]]*$/ {
+              n=$NF; sub("%","",n);
+              if (min=="" || n+0 < min+0) min=n
+            } END { print (min==""?"0":min) }
+          ' ./TestResults/CoverageReport/Summary.txt)
+          echo "Domain (min) coverage: ${DOMAIN_MIN}% | Application (min) coverage: ${APP_MIN}%"
+          awk -v d="$DOMAIN_MIN" 'BEGIN{exit !(d+0 >= 90)}' || { echo "::error::Domain coverage ${DOMAIN_MIN}% < 90% (08-TESTES §7)"; exit 1; }
+          awk -v a="$APP_MIN"    'BEGIN{exit !(a+0 >= 80)}' || { echo "::error::Application coverage ${APP_MIN}% < 80% (08-TESTES §7)"; exit 1; }
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -153,22 +167,99 @@ jobs:
     name: k6 smoke (perf/k6/balance-smoke.js)
     runs-on: ubuntu-latest
     needs: [build-test]
+    # Full stack build + start can take a while on a cold runner; allow 30 min.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET ${{ env.DOTNET_VERSION }}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: docker/setup-buildx-action@v3
 
-      - name: Compose up (core + app)
-        # The compose file expects an .env file alongside it. We seed one from the
-        # versioned example so the build args resolve. Secrets stay placeholder —
-        # the smoke test only needs the stack reachable, not real auth flow.
+      - name: Seed .env
+        # docker-compose substitutes ${VAR} from a sibling .env. The repo only
+        # ships .env.example — copy it so non-secret values resolve in CI.
+        run: cp infra/.env.example infra/.env
+
+      - name: Compose up (core + app, with --wait)
+        # `--wait` blocks until every service's healthcheck reports healthy or the
+        # timeout elapses. Building 4 .NET images cold + Keycloak realm import is
+        # the slow path; we give the wait phase 10 min after builds complete.
         run: |
-          cp infra/.env.example infra/.env || true
-          docker compose -f infra/docker-compose.yml --profile core --profile app up -d --wait --wait-timeout 180
+          docker compose -f infra/docker-compose.yml --profile core --profile app \
+            up -d --build --wait --wait-timeout 600
           docker compose -f infra/docker-compose.yml ps
+
+      - name: Acquire merchant JWT (password grant)
+        # Realm `cashflow` ships seeded users (07-INFRA §3.1.2). We exchange
+        # merchant1@cashflow.local credentials for an access token and capture
+        # the merchantId attribute from the JWT to feed k6. cashflow-api is the
+        # confidential client; `directAccessGrantsEnabled=true` enables this flow.
+        id: token
+        # `bash {0}` opts out of GitHub Actions' default `bash -e`. We need
+        # this because the curl/jq pipeline below intentionally tolerates
+        # individual failures (and logs them) inside the retry loop. With
+        # `-e`, the first non-200 response aborts the script before the log
+        # line that explains *why* it failed.
+        shell: bash {0}
+        run: |
+          set +e
+          # 1) Wait until the realm endpoint responds — Keycloak 25 returns the
+          #    .well-known doc *after* the realm import finishes, so this is the
+          #    real readiness signal (the container's HTTP healthcheck flips much
+          #    earlier).
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/realms/cashflow/.well-known/openid-configuration >/dev/null 2>&1; then
+              echo "keycloak realm reachable on attempt $i"
+              break
+            fi
+            sleep 5
+          done
+          # 2) Hit the token endpoint without `-f` so we can inspect the body
+          #    regardless of status. We retry a few times because users get
+          #    materialised after the realm doc is queryable.
+          ACCESS=""
+          HTTP_CODE="000"
+          for i in $(seq 1 12); do
+            : > /tmp/token.json
+            HTTP_CODE=$(curl -sS -o /tmp/token.json -w '%{http_code}' \
+              -X POST http://localhost:8080/realms/cashflow/protocol/openid-connect/token \
+              -H "Content-Type: application/x-www-form-urlencoded" \
+              -d "client_id=cashflow-api" \
+              -d "client_secret=cashflow-api-secret" \
+              -d "grant_type=password" \
+              -d "username=merchant1@cashflow.local" \
+              -d "password=merchant123" 2>/tmp/curl.err)
+            CURL_EXIT=$?
+            RESPONSE=$(cat /tmp/token.json 2>/dev/null)
+            echo "attempt $i: curl_exit=$CURL_EXIT http=$HTTP_CODE body=${RESPONSE:0:200}"
+            if [ "$CURL_EXIT" != "0" ]; then
+              echo "  curl stderr: $(cat /tmp/curl.err 2>/dev/null)"
+            fi
+            if [ "$HTTP_CODE" = "200" ]; then
+              ACCESS=$(echo "$RESPONSE" | jq -r '.access_token // empty')
+              if [ -n "$ACCESS" ]; then break; fi
+            fi
+            sleep 5
+          done
+          if [ -z "$ACCESS" ]; then
+            echo "::error::failed to acquire access token after retries (last HTTP=$HTTP_CODE)"
+            echo "--- last keycloak response ---"
+            cat /tmp/token.json 2>/dev/null || true
+            echo "--- keycloak container logs (tail) ---"
+            docker logs --tail=200 cashflow-keycloak 2>&1 || true
+            exit 1
+          fi
+          # JWT is three base64url-encoded segments; decode the payload to read merchantId.
+          PAYLOAD=$(echo "$ACCESS" | cut -d. -f2)
+          # Pad to a multiple of 4 chars so base64 -d does not complain.
+          PADDED=$(printf "%s%s" "$PAYLOAD" "$(printf '%.0s=' $(seq 1 $((4 - ${#PAYLOAD} % 4))))" | tr '_-' '/+')
+          MERCHANT_ID=$(echo "$PADDED" | base64 -d 2>/dev/null | jq -r '.merchantId')
+          if [ -z "$MERCHANT_ID" ] || [ "$MERCHANT_ID" = "null" ]; then
+            echo "::error::JWT has no merchantId claim"; exit 1
+          fi
+          echo "merchantId=$MERCHANT_ID"
+          echo "::add-mask::$ACCESS"
+          echo "token=$ACCESS"          >> "$GITHUB_OUTPUT"
+          echo "merchant_id=$MERCHANT_ID" >> "$GITHUB_OUTPUT"
 
       - name: Wait for gateway readiness
         run: |
@@ -183,9 +274,18 @@ jobs:
           exit 1
 
       - name: Run k6 smoke
+        env:
+          K6_TOKEN: ${{ steps.token.outputs.token }}
+          K6_MERCHANT_ID: ${{ steps.token.outputs.merchant_id }}
         run: |
-          docker compose -f infra/docker-compose.yml --profile perf \
-            run --rm k6 run /scripts/balance-smoke.js
+          # The k6 service mounts perf/k6 at /scripts. We pass TOKEN/MERCHANT_ID
+          # through compose's --env-from-stdin-friendly form via `-e`.
+          docker compose -f infra/docker-compose.yml --profile perf run --rm \
+            -e BASE_URL=http://gateway:8080 \
+            -e TOKEN="$K6_TOKEN" \
+            -e MERCHANT_ID="$K6_MERCHANT_ID" \
+            -e TARGET_DATE="$(date -u +%Y-%m-%d)" \
+            k6 run /scripts/balance-smoke.js
 
       - name: Compose logs on failure
         if: failure()

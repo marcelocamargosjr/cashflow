@@ -8,7 +8,7 @@
 [![coverage-application](https://img.shields.io/badge/coverage_application-≥%2080%25-brightgreen)](#10-como-rodar-os-testes)
 [![nfr-50rps](https://img.shields.io/badge/nfr_50rps-0%25%20err%20%2F%20p95%2053ms-brightgreen)](#11-validação-do-nfr-de-50-reqs-make-perf)
 [![chaos-isolation](https://img.shields.io/badge/chaos_isolation-100%2F100%20OK-brightgreen)](#12-demonstração-de-isolamento-make-chaos-validate)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#17-licença)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#18-licença)
 
 ---
 
@@ -451,42 +451,22 @@ Configurada em **Settings → Branches → Branch protection rules** com a regra
 - ✅ **Require a pull request before merging** — sem push direto.
 - ✅ **Require approvals: 1** review aprovado.
 - ✅ **Dismiss stale pull request approvals when new commits are pushed**.
-- ✅ **Require status checks to pass before merging** — checks obrigatórios:
-  - `build-test` (CI)
-  - `integration-tests` (CI)
-  - `k6-smoke` (CI)
-  - `analyze (csharp)` (CodeQL)
-  - `analyze (javascript-typescript)` (CodeQL)
+- ✅ **Require status checks to pass before merging** — checks obrigatórios (nomes literais como o GitHub Actions reporta):
+  - `build + test (Domain ≥90% / Application ≥80%)` (workflow `CI`)
+  - `integration tests (Testcontainers)` (workflow `CI`)
+  - `k6 smoke (perf/k6/balance-smoke.js)` (workflow `CI`)
+  - `analyze (csharp)` (workflow `CodeQL`)
+  - `analyze (javascript-typescript)` (workflow `CodeQL`)
 - ✅ **Require branches to be up to date before merging**.
 - ✅ **Require conversation resolution before merging**.
 - ✅ **Do not allow bypassing the above settings** (vale até para admins).
 - ⛔ **Allow force pushes / deletions** — desligados.
 
-> Para reaplicar via `gh`:
+> O payload canônico está versionado em [`docs/devops/branch-protection.json`](docs/devops/branch-protection.json). Para reaplicar:
 > ```bash
 > gh api -X PUT "repos/marcelocamargosjr/cashflow/branches/main/protection" \
 >   -H "Accept: application/vnd.github+json" \
->   --input - <<'JSON'
-> {
->   "required_status_checks": {
->     "strict": true,
->     "contexts": [
->       "build-test", "integration-tests", "k6-smoke",
->       "analyze (csharp)", "analyze (javascript-typescript)"
->     ]
->   },
->   "enforce_admins": true,
->   "required_pull_request_reviews": {
->     "required_approving_review_count": 1,
->     "dismiss_stale_reviews": true,
->     "require_code_owner_reviews": false
->   },
->   "restrictions": null,
->   "allow_force_pushes": false,
->   "allow_deletions": false,
->   "required_conversation_resolution": true
-> }
-> JSON
+>   --input docs/devops/branch-protection.json
 > ```
 
 ### Imagens publicadas
