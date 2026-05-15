@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+.dockerignore
+.eslintcache
+.env*
+!.env.example
+README.md
+coverage
+out
+build
+Dockerfile
+*.log

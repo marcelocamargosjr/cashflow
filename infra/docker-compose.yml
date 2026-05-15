@@ -406,6 +406,46 @@ services:
       retries: 12
       start_period: 20s
 
+  frontend:
+    # Contexto isolado em frontend/cashflow-web — o `.dockerignore` raiz exclui
+    # `frontend/`, mas como o build context aponta direto para a pasta da app,
+    # apenas o `.dockerignore` local é aplicado (F10).
+    build:
+      context: ../frontend/cashflow-web
+      dockerfile: Dockerfile
+    image: cashflow/web:dev
+    profiles: ["app"]
+    <<: *restart
+    container_name: cashflow-web
+    depends_on:
+      keycloak: { condition: service_healthy }
+      gateway: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-only-secret-change-me-please-32-chars-min}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:8080/realms/cashflow}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-cashflow-web}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-}
+      # Server-side proxy aponta para o gateway via DNS interna; o navegador
+      # nunca chama a API diretamente — todas as chamadas passam por
+      # /api/proxy/* no próprio Next, que injeta o Bearer da sessão.
+      CASHFLOW_API_BASE_URL: ${CASHFLOW_API_BASE_URL:-http://gateway:8080}
+      NEXT_PUBLIC_CASHFLOW_API_BASE_URL: ${NEXT_PUBLIC_CASHFLOW_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "3001:3001"
+    networks: [cashflow-net]
+    extra_hosts:
+      # Mesmo motivo do `gateway`: o `iss` do JWT é http://localhost:8080/...
+      # e a discovery feita pelo NextAuth precisa resolver para o host.
+      - "localhost:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
   # ==================== TOOLS ====================
 
   pgadmin:
